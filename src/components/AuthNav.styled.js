@@ -5,6 +5,10 @@ export const AuthNavWrapp = styled.div`
   display: grid;
   gap: 10px;
   margin-left: auto;
+  @media (min-width: 1440px) {
+    display: flex;
+    justify-content: flex-end;
+  }
 `;
 
 export const AuthButton = styled(NavLink)`
@@ -15,13 +19,13 @@ export const AuthButton = styled(NavLink)`
   border-radius: 5px;
   cursor: pointer;
   text-decoration: none;
-  color: gray;
+  color: white;
+  background-color: #29d1c3;
   &:hover {
-    background-color: #29d1c3;
-    color: white;
+    background-color: #0000ff;
   }
   @media (min-width: 768px) {
     width: 150px;
-    margin-left: auto;
+    /* margin-left: auto; */
   }
 `;

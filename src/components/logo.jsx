@@ -1,6 +1,11 @@
-import { LogoStyled } from "./logo.styled";
-import logo from "../images/logo.png";
+import { Link } from "react-router-dom";
+import { LogoStyled, LinkStyled } from "./logo.styled";
+import logo from "../images/logo_mini.png";
 
 export const Logo = () => {
-  return <LogoStyled src={logo} alt="logo" />;
+  return (
+    <LinkStyled to={"/"} style={{}}>
+      <LogoStyled src={logo} alt="logo" />;
+    </LinkStyled>
+  );
 };

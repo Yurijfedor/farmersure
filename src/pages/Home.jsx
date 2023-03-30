@@ -16,14 +16,12 @@ const Characters = () => {
     dispatch(fetchAllCharacters());
   }, [dispatch]);
 
-  return isAuth ? (
+  return (
     <>
-      <Logo />
-      <Filter />
+      {/* <Logo /> */}
+      {/* <Filter /> */}
       <CharactersList />
     </>
-  ) : (
-    navigate("/login")
   );
 };
 

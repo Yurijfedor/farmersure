@@ -1,9 +1,13 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const LogoStyled = styled.img`
-  margin: 68px auto 0 auto;
-  @media (min-width: 1440px) {
-    width: 600px;
-    margin-top: 86px;
-  }
+  width: 100px;
+`;
+
+export const LinkStyled = styled(Link)`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 5px;
 `;
