@@ -1,4 +1,4 @@
-export const Subcategory = ({ subcategory }) => {
+const Subcategory = ({ subcategory }) => {
   return (
     <div>
       <h3>{subcategory.title}</h3>
@@ -6,3 +6,5 @@ export const Subcategory = ({ subcategory }) => {
     </div>
   );
 };
+
+export default Subcategory;
