@@ -4,6 +4,7 @@ import { Container, HeaderContainer } from "./Layout.styled";
 import { AuthNav } from "./AuthNav";
 import { LogOut } from "./LogOut";
 import { UseAuth } from "../hooks/useAuth";
+import { categories } from "../siteStructure";
 import { Logo } from "./logo";
 import { NavBar } from "./Nav";
 
@@ -14,7 +15,7 @@ const Layout = () => {
     <Suspense>
       <HeaderContainer>
         <Logo />
-        <NavBar />
+        <NavBar categories={categories} />
         {isAuth ? <LogOut /> : <AuthNav />}
       </HeaderContainer>
       <Container>
