@@ -5,8 +5,8 @@ export const Container = styled.div`
   width: 360px;
   padding: 24px;
   margin: 0 auto;
-  @media (min-width: 1440px) {
-    width: 1440px;
+  @media (min-width: 1280px) {
+    width: 1280px;
     padding: 0 210px;
   }
 `;
@@ -16,11 +16,11 @@ export const HeaderContainer = styled.div`
   padding: 24px;
   margin: 0 auto;
   background-image: url(${cover});
-  @media (min-width: 1440px) {
+  @media (min-width: 1280px) {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    width: 1440px;
+    width: 100%;
     padding: 32px 100px;
   }
 `;

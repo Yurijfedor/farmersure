@@ -1,5 +1,5 @@
-export const fetchAllCharactersSuccessReducer = (state, action) => {
-  state.characters = action.payload.sort((a, b) => {
+export const fetchAllHivesSuccessReducer = (state, action) => {
+  state.hives = action.payload.sort((a, b) => {
     if (a.name > b.name) {
       return 1;
     }
@@ -10,8 +10,8 @@ export const fetchAllCharactersSuccessReducer = (state, action) => {
   });
 };
 
-export const fetchSingleCharacterSuccessReducer = (state, action) => {
-  state.singleCharacter = action.payload;
+export const fetchSingleHiveSuccessReducer = (state, action) => {
+  state.singleHive = action.payload;
 };
 
 export const pendingReducer = (state) => {

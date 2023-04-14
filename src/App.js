@@ -1,6 +1,6 @@
-import React from "react";
-import { lazy, Suspense, startTransition } from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { lazy, Suspense, startTransition } from "react";
+// import { lazy, Suspense, startTransition } from "react";
+import { Routes, Route, HashRouter } from "react-router-dom";
 import { categories } from "./siteStructure";
 
 const Subcategory = lazy(() => import("./pages/Subcategory"));
@@ -36,52 +36,44 @@ const Register = lazy(() => import("./pages/Register"));
 
 export const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        {categories.map((category) => {
-          const categoryTitle = category.title
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join("");
-          const CategoryComponent = () => <Category category={category} />;
-          return (
-            <Route
-              key={category.id}
-              path={`/${category.title.split(" ").join("")}`}
-              element={
-                <Suspense fallback={<div>Loading...</div>}>
-                  <startTransition>
-                    <Category category={category} />
-                  </startTransition>
-                </Suspense>
-              }
-            >
-              {category.subcategories.map((subcategory) => {
-                const SubcategoryComponent = () => (
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <startTransition>
-                      <Subcategory subcategory={subcategory} />
-                    </startTransition>
-                  </Suspense>
-                );
-                const subcategoryRoute = subcategory.route
-                  .split(" ")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join("");
-                return (
-                  <Route
-                    key={subcategory.id}
-                    path={subcategoryRoute}
-                    element={React.createElement(SubcategoryComponent)}
-                  />
-                );
-              })}
-            </Route>
-          );
-        })}
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="/home">
+            <Route path="about" element={<About />} />
+            <Route path="services" element={<Services />} />
+            <Route path="reviews" element={<Reviews />} />
+            <Route path="contacts" element={<Contacts />} />
+          </Route>
+          <Route path="/ourservices">
+            <Route path="rent" element={<Rent />} />
+            <Route path="store" element={<Store />} />
+            <Route path="maintenance" element={<Maintenance />} />
+          </Route>
+          <Route path="/ourcompany">
+            <Route path="values" element={<Values />} />
+            <Route path="team" element={<Team />} />
+            <Route path="achievements" element={<Achievements />} />
+          </Route>
+          <Route path="/apiculture">
+            <Route path="beekeeping" element={<Beekeeping />} />
+            <Route path="production" element={<Production />} />
+            <Route path="problems" element={<Problems />} />
+          </Route>
+          <Route path="/news">
+            <Route path="freshNews" element={<Freshnews />} />
+            <Route path="recommendations" element={<Recommendations />} />
+          </Route>
+          <Route path="/ourcontacts">
+            <Route path="contacting" element={<Contacting />} />
+            <Route path="contactInfo" element={<Contactinfo />} />
+            <Route path="ordering" element={<Ordering />} />
+          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };

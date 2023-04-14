@@ -13,6 +13,7 @@ export const NavList = styled.ul`
 `;
 
 export const SubcategoriesList = styled.ul`
+  display: none;
   position: absolute;
   top: 100%;
   left: 0;

@@ -3,8 +3,8 @@ import axios from "axios";
 
 axios.defaults.baseURL = "https://rickandmortyapi.com/api";
 
-export const fetchAllCharacters = createAsyncThunk(
-  "characters/fetchAll",
+export const fetchAllHives = createAsyncThunk(
+  "hives/fetchAll",
   async (_, thunkAPI) => {
     try {
       const response = await axios.get("/character");
@@ -15,11 +15,11 @@ export const fetchAllCharacters = createAsyncThunk(
   }
 );
 
-export const fetchSingleCharacter = createAsyncThunk(
-  "characters/fetchSingle",
+export const fetchSingleHive = createAsyncThunk(
+  "hives/fetchSingle",
   async (id, thunkAPI) => {
     try {
-      const response = await axios.get(`/character/${id}`);
+      const response = await axios.get(`/hive/${id}`);
       return response.data;
     } catch (e) {
       return thunkAPI.rejectWithValue(e.message);

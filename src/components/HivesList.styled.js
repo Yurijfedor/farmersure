@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-export const CharactersListStyled = styled.ul`
+export const HivesListStyled = styled.ul`
   display: grid;
   margin-top: 32px;
   max-width: 100vw;

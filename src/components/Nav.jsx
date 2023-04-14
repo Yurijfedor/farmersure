@@ -50,22 +50,24 @@ export const NavBar = ({ categories }) => {
             >
               {category.title}
             </div>
-            {isOpen && selectedCategory === category && (
-              <SubcategoriesList ref={ref}>
-                {category.subcategories.map((subcategory) => (
-                  <SubcategoriesItem key={subcategory.id}>
-                    <Link
-                      to={subcategory.route}
-                      onClick={(event) => {
-                        handleSubcategoryClick(event);
-                      }}
-                    >
-                      {subcategory.title}
-                    </Link>
-                  </SubcategoriesItem>
-                ))}
-              </SubcategoriesList>
-            )}
+            {/* {isOpen && selectedCategory === category && ( */}
+            <SubcategoriesList ref={ref}>
+              {category.subcategories.map((subcategory) => (
+                <SubcategoriesItem key={subcategory.id}>
+                  <Link
+                    to={`${category.title.split(" ").join("")}/${
+                      subcategory.route
+                    }`}
+                    onClick={(event) => {
+                      handleSubcategoryClick(event);
+                    }}
+                  >
+                    {subcategory.title}
+                  </Link>
+                </SubcategoriesItem>
+              ))}
+            </SubcategoriesList>
+            {/* )} */}
           </NavItem>
         ))}
       </NavList>
