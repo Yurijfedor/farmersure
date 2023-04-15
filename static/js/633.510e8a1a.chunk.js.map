@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/633.510e8a1a.chunk.js","mappings":"iIAIA,UAJe,WACb,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,qBACd,C","sources":["pages/Values.jsx"],"sourcesContent":["const Values = () => {\r\n  return <div>Hello!I am Values</div>;\r\n};\r\n\r\nexport default Values;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

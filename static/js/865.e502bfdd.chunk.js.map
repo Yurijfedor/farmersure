@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/865.e502bfdd.chunk.js","mappings":"iIAIA,UAJiB,WACf,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,uBACd,C","sources":["pages/Ordering.jsx"],"sourcesContent":["const Ordering = () => {\r\n  return <div>Hello!I am Ordering</div>;\r\n};\r\n\r\nexport default Ordering;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

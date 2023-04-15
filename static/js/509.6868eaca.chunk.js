@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfarmersure=self.webpackChunkfarmersure||[]).push([[509],{8509:function(e,r,u){u.r(r);var n=u(184);r.default=function(){return(0,n.jsx)("div",{children:"Hello!I am Apiculture"})}}}]);
+//# sourceMappingURL=509.6868eaca.chunk.js.map
