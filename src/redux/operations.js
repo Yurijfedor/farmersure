@@ -1,4 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import db from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 import axios from "axios";
 
 axios.defaults.baseURL = "https://rickandmortyapi.com/api";
@@ -7,8 +9,12 @@ export const fetchAllHives = createAsyncThunk(
   "hives/fetchAll",
   async (_, thunkAPI) => {
     try {
-      const response = await axios.get("/character");
-      return response.data.results;
+      const querySnapshot = await getDocs(collection(db, "hives"));
+      const result = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      return result;
     } catch (e) {
       return thunkAPI.rejectWithValue(e.message);
     }
