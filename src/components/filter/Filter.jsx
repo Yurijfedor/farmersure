@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFilterValue } from "../redux/filterSlice";
-import { selectFilterValue } from "../redux/selectors";
+import { setFilterValue } from "../../redux/filterSlice";
+import { selectFilterValue } from "../../redux/selectors";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import sprite from "../images/sprite.svg";
-import { InputStyled, FilterInputWrapp, ButtonStyled } from "./Filter.styled";
+import { InputStyled, FilterInputWrapp, ButtonStyled } from "../Filter.styled";
 
 export const Filter = () => {
   const dispatch = useDispatch();

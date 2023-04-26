@@ -6,7 +6,7 @@ import { categories } from "./siteStructure";
 const Subcategory = lazy(() => import("./pages/Subcategory"));
 const Category = lazy(() => import("./pages/Category"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Layout = lazy(() => import("./components/layout"));
+const Layout = lazy(() => import("./components/layout/layout"));
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
 const Services = lazy(() => import("./pages/Services"));

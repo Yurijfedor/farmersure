@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { removeUser } from "../redux/userSlice";
+import { removeUser } from "../../redux/userSlice";
 import { LogOutButton } from "./LogOut.styled";
 
 export const LogOut = () => {

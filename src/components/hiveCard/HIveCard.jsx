@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
-import { selectSingleCharacter } from "../redux/selectors";
-import { ImgStyled, NameStyled } from "./CharacterCard.styled";
-import { Information } from "./Information";
+import { selectSingleCharacter } from "../../redux/selectors";
+import { ImgStyled, NameStyled } from "./HiveCard.styled";
+import { Information } from "../Information";
 
-export const CharacterCard = () => {
+export const HiveCard = () => {
   const character = useSelector(selectSingleCharacter);
   return (
     character && (

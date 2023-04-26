@@ -1,11 +1,11 @@
 import { parse, differenceInMonths } from "date-fns";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchSingleHive } from "../redux/operations";
+import { fetchSingleHive } from "../../redux/operations";
 import {
   selectVisibleHives,
   selectFilterValue,
   selectHives,
-} from "../redux/selectors";
+} from "../../redux/selectors";
 import {
   HivesListStyled,
   ImgStyled,
@@ -18,7 +18,7 @@ import {
   ImageText,
   HeartButton,
 } from "./HivesList.styled";
-import { heartFull as HeartFull, heart as Heart } from "../images";
+import { heartFull as HeartFull, heart as Heart } from "../../images";
 
 export const HivesList = () => {
   const hives = useSelector(selectHives);

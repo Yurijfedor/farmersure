@@ -1,21 +1,20 @@
-import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { setUser } from "../redux/userSlice";
-
+import { setUser } from "../../redux/userSlice";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { FormStyled, InputStyled, ButtonSubmit } from "./LoginForm.styled";
 
-export const RegisterForm = () => {
+export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const auth = getAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const auth = getAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createUserWithEmailAndPassword(auth, email, password)
+    signInWithEmailAndPassword(auth, email, password)
       .then(({ user }) => {
         dispatch(
           setUser({
@@ -26,7 +25,7 @@ export const RegisterForm = () => {
         );
         navigate("/home");
       })
-      .catch(() => alert("email exists!"));
+      .catch(() => alert("Invalid user!"));
     setEmail("");
     setPassword("");
   };
@@ -36,18 +35,18 @@ export const RegisterForm = () => {
       <InputStyled
         placeholder="e-mail"
         name="email"
-        value={email}
         type="email"
+        value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
       <InputStyled
         placeholder="password"
         name="password"
-        value={password}
         type="password"
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <ButtonSubmit type="submit">Register</ButtonSubmit>
+      <ButtonSubmit type="submit">Log In</ButtonSubmit>
     </FormStyled>
   );
 };
