@@ -3,26 +3,18 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { App } from "./App";
 import { HashRouter } from "react-router-dom";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/es/integration/react";
-import { store, persistor } from "./redux/store";
 import "./firebase";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const onBeforeLift = () => ({});
+const client = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <PersistGate
-        loading={<div>...Loading</div>}
-        persistor={persistor}
-        onBeforeLift={onBeforeLift}
-      >
-        <HashRouter>
-          <App />
-        </HashRouter>
-      </PersistGate>
-    </Provider>
+    <QueryClientProvider client={client}>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </QueryClientProvider>
   </React.StrictMode>
 );

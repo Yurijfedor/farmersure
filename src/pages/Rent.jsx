@@ -1,19 +1,8 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAllHives } from "../redux/operations";
 import { Button } from "../components/button/Button";
 import { Title } from "../components/title/Title";
 import { HivesList } from "../components/hivesList/HivesList";
 import { ButtonContainer } from "./Rent.styled";
-import { selectHives } from "../redux/selectors";
 const Rent = () => {
-  const hives = useSelector(selectHives);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchAllHives());
-  }, [dispatch]);
-
   return (
     <>
       <Title text={"rent of beehives"} />

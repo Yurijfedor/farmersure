@@ -3,13 +3,13 @@ import { Suspense } from "react";
 import { Container, HeaderContainer } from "../layout/Layout.styled";
 import { AuthNav } from "../authNav/AuthNav";
 import { LogOut } from "../logOut/LogOut";
-import { UseAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { categories } from "../../siteStructure";
 import { Logo } from "../logo/logo";
 import { NavBar } from "../nav/Nav";
 
 const Layout = () => {
-  const { isAuth } = UseAuth();
+  const { isAuth } = useAuth();
 
   return (
     <Suspense>

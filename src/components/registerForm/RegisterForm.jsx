@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { setUser } from "../../redux/userSlice";
+import { useMutation } from "@tanstack/react-query";
+import { register } from "../../services/auth";
 
 import {
   FormStyled,
@@ -13,26 +12,27 @@ import {
 export const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const auth = getAuth();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+
+  const { mutate: registerMutation } = useMutation(register, {
+    onSuccess: () => {
+      navigate("/home");
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(({ user }) => {
-        dispatch(
-          setUser({
-            email: user.email,
-            id: user.uid,
-            token: user.accessToken,
-          })
-        );
-        navigate("/home");
-      })
-      .catch(() => alert("email exists!"));
-    setEmail("");
-    setPassword("");
+    try {
+      registerMutation({ email, password });
+      navigate("/home");
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      alert("Invalid user!");
+    }
   };
 
   return (

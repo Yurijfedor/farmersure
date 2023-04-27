@@ -1,32 +1,24 @@
 import { parse, differenceInMonths } from "date-fns";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchSingleHive } from "../../redux/operations";
-import {
-  selectVisibleHives,
-  selectFilterValue,
-  selectHives,
-} from "../../redux/selectors";
+import { useHivesQuery } from "../../hooks/useHives";
 import {
   HivesListStyled,
   ImgStyled,
   LinkStyled,
   CardText,
-  Race,
   CardContentWrapp,
   ItemStyled,
   ImageWrapp,
   ImageText,
   HeartButton,
 } from "./HivesList.styled";
-import { heartFull as HeartFull, heart as Heart } from "../../images";
+import { heartFull as HeartFull } from "../../images";
 
 export const HivesList = () => {
-  const hives = useSelector(selectHives);
-  const filterValue = useSelector(selectFilterValue);
-  const dispatch = useDispatch();
   const handleClick = (id) => {
-    dispatch(fetchSingleHive(id));
+    console.log(`hello! I am this ${id}`);
   };
+
+  const { data, isSuccess } = useHivesQuery();
 
   const getQueensAge = (dateString) => {
     const date = parse(dateString, "dd.MM.yyyy", new Date());
@@ -41,12 +33,12 @@ export const HivesList = () => {
     const diffInMonths = differenceInMonths(date, today);
     return diffInMonths;
   };
-
   return (
     <HivesListStyled>
-      {hives.length !== 0 ? (
-        hives.map((hive) => {
-          console.log(hive.queensBirthday);
+      {isSuccess &&
+        Array.isArray(data) &&
+        data.length !== 0 &&
+        data.map((hive) => {
           return (
             <ItemStyled key={hive.id} type={hive.lessee}>
               <LinkStyled
@@ -87,10 +79,7 @@ export const HivesList = () => {
               </CardContentWrapp>
             </ItemStyled>
           );
-        })
-      ) : (
-        <h2>{`Sorry, we didn't find any hives with the name ${filterValue}`}</h2>
-      )}
+        })}
     </HivesListStyled>
   );
 };

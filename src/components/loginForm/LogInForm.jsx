@@ -1,33 +1,33 @@
-import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { setUser } from "../../redux/userSlice";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useMutation } from "@tanstack/react-query";
+import { logIn } from "../../services/auth";
 import { FormStyled, InputStyled, ButtonSubmit } from "./LoginForm.styled";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const auth = getAuth();
 
-  const handleSubmit = (e) => {
+  const { mutate: loginMutation } = useMutation(logIn, {
+    onSuccess: () => {
+      navigate("/home");
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then(({ user }) => {
-        dispatch(
-          setUser({
-            email: user.email,
-            id: user.uid,
-            token: user.accessToken,
-          })
-        );
-        navigate("/home");
-      })
-      .catch(() => alert("Invalid user!"));
-    setEmail("");
-    setPassword("");
+    try {
+      loginMutation({ email, password });
+      navigate("/home");
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      alert("Invalid user!");
+    }
   };
 
   return (
