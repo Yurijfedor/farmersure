@@ -1,5 +1,5 @@
 import { parse, differenceInMonths } from "date-fns";
-import { useHivesQuery } from "../../hooks/useHives";
+import { useHivesQuery } from "../../hooks/useHives"
 import {
   HivesListStyled,
   ImgStyled,

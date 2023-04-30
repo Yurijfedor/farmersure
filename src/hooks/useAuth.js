@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 export const useAuth = () => {
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();

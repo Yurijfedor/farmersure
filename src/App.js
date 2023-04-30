@@ -1,7 +1,7 @@
-import React, { lazy, Suspense, startTransition } from "react";
-// import { lazy, Suspense, startTransition } from "react";
-import { Routes, Route, HashRouter } from "react-router-dom";
-import { categories } from "./siteStructure";
+import React, { lazy, Suspense } from "react";
+import { Routes, Route, Outlet, Router } from "react-router-dom";
+import { useAuth } from "./hooks/useAuth";
+import PrivateRoutes from "./PrivateRoutes/PrivateRoutes";
 
 const Subcategory = lazy(() => import("./pages/Subcategory"));
 const Category = lazy(() => import("./pages/Category"));
@@ -35,20 +35,24 @@ const Login = lazy(() => import("./pages/LogIn"));
 const Register = lazy(() => import("./pages/Register"));
 
 export const App = () => {
+  const { isAuth } = useAuth();
+  console.log(isAuth);
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="/home">
+          <Route path="/home" element={<Outlet />}>
             <Route path="about" element={<About />} />
             <Route path="services" element={<Services />} />
             <Route path="reviews" element={<Reviews />} />
             <Route path="contacts" element={<Contacts />} />
           </Route>
           <Route path="/ourservices">
-            <Route path="rent" element={<Rent />} />
             <Route path="store" element={<Store />} />
             <Route path="maintenance" element={<Maintenance />} />
+            <Route element={<PrivateRoutes />}>
+              <Route path="rent" element={<Rent />} />
+            </Route>
           </Route>
           <Route path="/ourcompany">
             <Route path="values" element={<Values />} />

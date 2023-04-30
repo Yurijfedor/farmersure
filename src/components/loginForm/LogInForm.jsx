@@ -11,7 +11,7 @@ export const LoginForm = () => {
 
   const { mutate: loginMutation } = useMutation(logIn, {
     onSuccess: () => {
-      navigate("/home");
+      navigate("/ourservices/rent");
     },
     onError: (error) => {
       alert(error.message);

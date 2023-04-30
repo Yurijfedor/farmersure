@@ -6,7 +6,7 @@ export const LogOut = () => {
   const navigate = useNavigate();
   const handleClick = () => {
     logOut();
-    navigate("/");
+    navigate("/home");
   };
 
   return <LogOutButton onClick={handleClick}>Log out</LogOutButton>;
