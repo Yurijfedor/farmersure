@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled, { css } from 'styled-components';
 
 export const ButtonStyled = styled.button`
   display: flex;
@@ -17,25 +17,25 @@ export const ButtonStyled = styled.button`
     background-color: #0000ff;
   }
   ${({ variant }) =>
-    variant === "filterBtn" &&
+    variant === 'filterBtn' &&
     css`
       background-color: aqua;
     `}
 
   ${({ variant }) =>
-    variant === "formBtn" &&
+    variant === 'formBtn' &&
     css`
       width: 100%;
     `}
 
     ${({ size }) =>
-    size === "medium" &&
+    size === 'medium' &&
     css`
       padding: 10px;
     `}
 
     ${({ size }) =>
-    size === "large" &&
+    size === 'large' &&
     css`
       padding: 25px;
       border-radius: 10px;

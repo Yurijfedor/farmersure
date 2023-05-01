@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { Link } from "react-router-dom";
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 export const HivesListStyled = styled.ul`
   display: grid;
@@ -59,7 +59,7 @@ export const ItemStyled = styled.li`
     0px 2px 4px rgba(0, 0, 0, 0.14);
   border-radius: 4px;
   ${({ type }) =>
-    type !== "" &&
+    type !== '' &&
     `
     &::before {
       content: "Rented";

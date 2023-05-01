@@ -1,9 +1,9 @@
 const config = {
   transform: {
-    "^.+\\.jsx?$": "babel-jest",
+    '^.+\\.jsx?$': 'babel-jest',
   },
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["./src/setupTests.js", "@testing-library/react"],
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['./src/setupTests.js', '@testing-library/react'],
   verbose: true,
 };
 

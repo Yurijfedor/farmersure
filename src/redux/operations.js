@@ -1,15 +1,17 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import db from "../firebase";
-import { collection, getDocs } from "firebase/firestore";
-import axios from "axios";
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
-axios.defaults.baseURL = "https://rickandmortyapi.com/api";
+import { collection, getDocs } from 'firebase/firestore';
+import axios from 'axios';
+
+import db from '../firebase';
+
+axios.defaults.baseURL = 'https://rickandmortyapi.com/api';
 
 export const fetchAllHives = createAsyncThunk(
-  "hives/fetchAll",
+  'hives/fetchAll',
   async (_, thunkAPI) => {
     try {
-      const querySnapshot = await getDocs(collection(db, "hives"));
+      const querySnapshot = await getDocs(collection(db, 'hives'));
       const result = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -22,7 +24,7 @@ export const fetchAllHives = createAsyncThunk(
 );
 
 export const fetchSingleHive = createAsyncThunk(
-  "hives/fetchSingle",
+  'hives/fetchSingle',
   async (id, thunkAPI) => {
     try {
       const response = await axios.get(`/hive/${id}`);

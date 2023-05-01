@@ -32,23 +32,10 @@
     "eject": "react-scripts eject",
     "sb": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "jest"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      }
-    ]
+    "test": "jest",
+    "lint": "eslint -c .eslintrc --ext .js .",
+    "lint:fix": "npm run lint -- --fix",
+    "pret": "prettier --write ."
   },
   "browserslist": {
     "production": [

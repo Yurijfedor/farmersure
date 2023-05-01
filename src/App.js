@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from "react";
 import { Routes, Route, Outlet, Router } from "react-router-dom";
+
 import { useAuth } from "./hooks/useAuth";
 import PrivateRoutes from "./PrivateRoutes/PrivateRoutes";
 
@@ -36,7 +37,6 @@ const Register = lazy(() => import("./pages/Register"));
 
 export const App = () => {
   const { isAuth } = useAuth();
-  console.log(isAuth);
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>

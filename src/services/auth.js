@@ -3,7 +3,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   createUserWithEmailAndPassword,
-} from "firebase/auth";
+} from 'firebase/auth';
 
 const auth = getAuth();
 
@@ -12,7 +12,7 @@ export const register = async (userData) => {
     const { email, password } = userData;
     await createUserWithEmailAndPassword(auth, email, password).then(
       ({ user }) => {
-        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem('user', JSON.stringify(user));
       }
     );
     return true;
@@ -26,7 +26,7 @@ export const logIn = async (userData) => {
   try {
     const { email, password } = userData;
     await signInWithEmailAndPassword(auth, email, password).then(({ user }) => {
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(user));
     });
     return true;
   } catch (error) {
@@ -38,7 +38,7 @@ export const logIn = async (userData) => {
 export const logOut = async () => {
   try {
     await signOut(auth);
-    localStorage.removeItem("user");
+    localStorage.removeItem('user');
     return true;
   } catch (error) {
     console.log(error);

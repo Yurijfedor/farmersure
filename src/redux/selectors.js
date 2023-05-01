@@ -1,4 +1,4 @@
-import { createSelector } from "@reduxjs/toolkit";
+import { createSelector } from '@reduxjs/toolkit';
 
 export const selectHives = (state) => state.hives.hives;
 export const selectSingleHive = (state) => state.hives.singleHive;

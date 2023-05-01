@@ -1,5 +1,6 @@
-import styled from "styled-components";
-import cover from "../../images/cover.png";
+import styled from 'styled-components';
+
+import cover from '../../images/cover.png';
 
 export const Container = styled.div`
   width: 360px;
