@@ -6,7 +6,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     const auth = getAuth();
-    console.log(auth);
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         localStorage.setItem("user", JSON.stringify(user));

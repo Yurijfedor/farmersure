@@ -10,7 +10,7 @@ import { NavBar } from "../nav/Nav";
 
 const Layout = () => {
   const { isAuth } = useAuth();
-
+  console.log(isAuth);
   return (
     <Suspense>
       <HeaderContainer>
