@@ -1,4 +1,4 @@
-import { parse, differenceInMonths } from "date-fns";
+import { parse, differenceInMonths, getYear } from "date-fns";
 import { useHivesQuery } from "../../hooks/useHives";
 import {
   HivesListStyled,
@@ -10,6 +10,8 @@ import {
   ImageWrapp,
   ImageText,
   HeartButton,
+  CardTextWrapper,
+  CardTextPopup,
 } from "./HivesList.styled";
 import { heartFull as HeartFull } from "../../images";
 
@@ -70,12 +72,19 @@ export const HivesList = () => {
                 <CardText>{`Матка (вік): ${getQueensAge(
                   hive.queensBirthday
                 )} місяців`}</CardText>
-                <CardText>{`Мінімальний термін оренди: ${
+                {/* <CardText>{`Мінімальний термін оренди: ${
                   getDiffInMonths("31.08.2023") + 1
-                } місяців`}</CardText>
-                <CardText>{`Вартість оренди: ${
-                  getDiffInMonths("31.08.2023") + 1
-                } місяців`}</CardText>
+                } місяців`}</CardText> */}
+                <CardTextWrapper>
+                  <CardText>{`Мінімальний термін оренди: до вересня місяця ${getYear(
+                    new Date()
+                  )} `}</CardText>
+                  <CardTextPopup>{`до вересня місяця ${getYear(
+                    new Date()
+                  )}`}</CardTextPopup>
+                </CardTextWrapper>
+
+                <CardText>{`Базова вартість оренди: $92`}</CardText>
               </CardContentWrapp>
             </ItemStyled>
           );

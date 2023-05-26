@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 export const HivesListStyled = styled.ul`
   display: grid;
@@ -59,7 +59,7 @@ export const ItemStyled = styled.li`
     0px 2px 4px rgba(0, 0, 0, 0.14);
   border-radius: 4px;
   ${({ type }) =>
-    type !== '' &&
+    type !== "" &&
     `
     &::before {
       content: "Rented";
@@ -141,6 +141,30 @@ export const CardText = styled.p`
     background-color: rgba(0, 0, 0, 0.7);
     color: #fff;
     z-index: 1;
+  }
+`;
+
+export const CardTextWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+export const CardTextPopup = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  z-index: 2;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.3s ease;
+
+  ${CardTextWrapper}:hover & {
+    visibility: visible;
+    opacity: 1;
   }
 `;
 
