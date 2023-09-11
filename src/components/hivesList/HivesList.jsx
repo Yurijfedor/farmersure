@@ -1,3 +1,4 @@
+
 import { parse, differenceInMonths, getYear } from "date-fns";
 import { useHivesQuery } from "../../hooks/useHives";
 import {
@@ -16,6 +17,8 @@ import {
 import { heartFull as HeartFull } from "../../images";
 
 export const HivesList = () => {
+  
+
   const handleClick = (id) => {
     console.log(`hello! I am this ${id}`);
   };
@@ -35,6 +38,7 @@ export const HivesList = () => {
     const diffInMonths = differenceInMonths(date, today);
     return diffInMonths;
   };
+  
   return (
     <HivesListStyled>
       {isSuccess &&
@@ -66,20 +70,21 @@ export const HivesList = () => {
               </LinkStyled>
 
               <CardContentWrapp>
-                <CardText>{`Тип вулика: ${hive.system}`}</CardText>
+                <CardTextWrapper >
+                  <CardText>{`Тип вулика: ${hive.system}`}</CardText>
+                  <CardTextPopup >{hive.system}</CardTextPopup>
+                </CardTextWrapper>
+                
                 <CardText>{`Сила сім'ї: ${hive.power} рамок`}</CardText>
                 <CardText>{`Порода: ${hive.breed}`}</CardText>
                 <CardText>{`Матка (вік): ${getQueensAge(
                   hive.queensBirthday
                 )} місяців`}</CardText>
-                {/* <CardText>{`Мінімальний термін оренди: ${
-                  getDiffInMonths("31.08.2023") + 1
-                } місяців`}</CardText> */}
-                <CardTextWrapper>
+                <CardTextWrapper >
                   <CardText>{`Мінімальний термін оренди: до вересня місяця ${getYear(
                     new Date()
                   )} `}</CardText>
-                  <CardTextPopup>{`до вересня місяця ${getYear(
+                   <CardTextPopup >{`до вересня місяця ${getYear(
                     new Date()
                   )}`}</CardTextPopup>
                 </CardTextWrapper>
