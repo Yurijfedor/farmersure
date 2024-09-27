@@ -7,7 +7,8 @@ import {
 } from "firebase/auth";
 
 export const useAuth = () => {
-  const [isAuth, setIsAuth] = useState(false); // Початкове значення false
+  const [isAuth, setIsAuth] = useState(false); // Початкове значення
+  const [loading, setLoading] = useState(true); // Додали стан для завантаження
 
   useEffect(() => {
     const auth = getAuth();
@@ -23,13 +24,15 @@ export const useAuth = () => {
             localStorage.removeItem("user");
             setIsAuth(false);
           }
+          setLoading(false); // Після зміни стану авторизації змінюємо loading на false
         });
-        return unsubscribe; // Повернення функції відписки від оновлень
+        return unsubscribe;
       })
       .catch((error) => {
         console.error("Помилка при налаштуванні persistence:", error);
+        setLoading(false); // Якщо є помилка, також припиняємо завантаження
       });
   }, []);
 
-  return { isAuth };
+  return { isAuth, loading };
 };
