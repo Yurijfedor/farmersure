@@ -10,8 +10,8 @@
   ],
   "rules": {
     "no-unused-vars": "off",
-    "no-console": "warn",
-    // "quotes": ["warn", "single"],
+    // "no-console": "warn",
+    "quotes": ["warn", "single"],
     "jsx-quotes": ["warn", "prefer-double"],
     "prefer-const": "warn",
     "max-len": ["warn", { "code": 120 }],
