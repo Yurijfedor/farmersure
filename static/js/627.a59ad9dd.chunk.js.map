@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/627.a59ad9dd.chunk.js","mappings":"gIAIA,UAJiB,WACf,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,uBACd,C","sources":["pages/Problems.jsx"],"sourcesContent":["const Problems = () => {\r\n  return <div>Hello!I am Problems</div>;\r\n};\r\n\r\nexport default Problems;\r\n"],"names":["_jsx","children"],"sourceRoot":""}
