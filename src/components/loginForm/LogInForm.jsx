@@ -11,7 +11,7 @@ export const LoginForm = () => {
 
   const { mutate: loginMutation } = useMutation(logIn, {
     onSuccess: () => {
-      navigate("/ourservices/rent");
+      navigate(-2);
     },
     onError: (error) => {
       alert(error.message);
@@ -22,7 +22,7 @@ export const LoginForm = () => {
     e.preventDefault();
     try {
       loginMutation({ email, password });
-      navigate("/home");
+      navigate("/login");
       setEmail("");
       setPassword("");
     } catch (error) {

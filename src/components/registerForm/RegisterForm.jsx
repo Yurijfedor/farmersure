@@ -27,7 +27,7 @@ export const RegisterForm = () => {
     e.preventDefault();
     try {
       registerMutation({ email, password });
-      navigate("/home");
+      navigate("/register");
       setEmail("");
       setPassword("");
     } catch (error) {
