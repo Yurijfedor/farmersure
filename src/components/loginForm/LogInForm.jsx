@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { logIn } from "../../services/auth";
-import { FormStyled, InputStyled, ButtonSubmit } from "./LoginForm.styled";
+import { logInWithEmail, logInWithGoogle } from "../../services/auth";
+import googlePng from "../../images/icons8-google-48.png";
+import {
+  FormStyled,
+  InputStyled,
+  ButtonSubmit,
+  GoogleButton,
+  Divider,
+} from "./LoginForm.styled";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const { mutate: loginMutation } = useMutation(logIn, {
+  const { mutate: loginWithEmail } = useMutation(logInWithEmail, {
     onSuccess: () => {
       navigate(-2);
     },
@@ -18,16 +25,24 @@ export const LoginForm = () => {
     },
   });
 
-  const handleSubmit = async (e) => {
+  const { mutate: loginWithGoogle } = useMutation(logInWithGoogle, {
+    onSuccess: () => {
+      navigate(-2);
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      loginMutation({ email, password });
-      navigate("/login");
-      setEmail("");
-      setPassword("");
-    } catch (error) {
-      alert("Invalid user!");
-    }
+    loginWithEmail({ email, password });
+    setEmail("");
+    setPassword("");
+  };
+
+  const handleGoogleLogin = () => {
+    loginWithGoogle();
   };
 
   return (
@@ -47,6 +62,12 @@ export const LoginForm = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <ButtonSubmit type="submit">Log In</ButtonSubmit>
+
+      <Divider>or</Divider>
+
+      <GoogleButton onClick={handleGoogleLogin}>
+        <img src={googlePng} alt="Google Icon" /> Sign in with Google
+      </GoogleButton>
     </FormStyled>
   );
 };

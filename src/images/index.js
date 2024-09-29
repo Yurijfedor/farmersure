@@ -10,3 +10,4 @@ export { default as royalJelly } from "./royalJelly.png";
 export { default as beeBread } from "./beeBread.png";
 export { default as venom } from "./venom.png";
 export { default as wax } from "./wax.png";
+export { default as googlePng } from "./icons8-google-48.png";
