@@ -45,7 +45,7 @@ export const HivesList = () => {
           return (
             <ItemStyled key={hive.id} type={hive.lessee}>
               <LinkStyled
-                to={`/home/about`}
+                to={`/ourservices/hive_card`}
                 onClick={() => handleClick(hive.id)}
               >
                 <ImageWrapp>
