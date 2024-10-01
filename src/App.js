@@ -53,7 +53,7 @@ export const App = () => {
             <Route path="maintenance" element={<Maintenance />} />
             <Route element={<PrivateRoutes />}>
               <Route path="rent" element={<Rent />} />
-              <Route path="hive_card" element={<HiveCard />} />
+              <Route path="hive_card/:hiveId" element={<HiveCard />} />
             </Route>
           </Route>
           <Route path="/ourcompany">
