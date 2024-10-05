@@ -14,6 +14,7 @@ import {
   ThumbImage,
   ModalImage,
   ImageContainer,
+  Description,
 } from "./BeeHiveCard.styled";
 
 export const BeeHiveCard = () => {
@@ -26,6 +27,15 @@ export const BeeHiveCard = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [agreeWithBasicTech, setAgreeWithBasicTech] = useState(false);
+  const [additionalServices, setAdditionalServices] = useState({
+    pollen: false,
+    propolis: false,
+    wax: false,
+    royalJelly: false,
+    droneHomogenate: false,
+    beeVenom: false,
+  });
 
   useLockBodyScroll(isModalOpen);
 
@@ -63,9 +73,44 @@ export const BeeHiveCard = () => {
     setIsDragging(false);
   };
 
+  const ageOfQueen = (dateOfBirthd) => {
+    const today = new Date(); // Поточна дата
+    const birthDate = new Date(dateOfBirthd); // Дата народження
+
+    // Обчислюємо різницю в роках і місяцях
+    const yearsDiff = today.getFullYear() - birthDate.getFullYear();
+    const monthsDiff = today.getMonth() - birthDate.getMonth();
+
+    // Загальна кількість місяців з урахуванням років і місяців
+    let ageInMonths = yearsDiff * 12 + monthsDiff;
+
+    // Якщо день народження ще не настав цього місяця, зменшуємо на 1 місяць
+    if (today.getDate() < birthDate.getDate()) {
+      ageInMonths--;
+    }
+
+    return ageInMonths;
+  };
+
+  const handleCheckboxChange = (e) => {
+    setAgreeWithBasicTech(e.target.checked); // Оновлюємо стан при зміні чекбоксу
+  };
+
+  const handleAdditionalServiceChange = (e) => {
+    const { name, checked } = e.target;
+    setAdditionalServices((prevServices) => ({
+      ...prevServices,
+      [name]: checked, // Оновлюємо стан відповідної додаткової послуги
+    }));
+  };
+
+  console.log(hive.queensBirthday);
+
   return (
     <>
-      <h2>"I'm a BeehiveCard"</h2>
+      <h2 style={{ textAlign: "center", marginBottom: "10px" }}>
+        "I'm a BeehiveCard"
+      </h2>
       {/* Головний Swiper для великого зображення */}
       <SwiperWrapper>
         <MainSwiperWrapper>
@@ -125,6 +170,113 @@ export const BeeHiveCard = () => {
           />
         </ImageContainer>
       </Modal>
+      <Description>
+        <h4>hive system: {hive.system}</h4>
+        <h4>the power of the colony: {hive.power} рамок</h4>
+        <h4>breed: {hive.breed}</h4>
+        <h4>
+          the age of the queen bee: {ageOfQueen(hive.queensBirthday)} місяців
+        </h4>
+      </Description>
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={agreeWithBasicTech}
+            onChange={handleCheckboxChange}
+          />
+          Погоджуюсь застосовувати Базову технологію бджільництва
+        </label>
+      </div>
+
+      {/* Виводимо поточний стан чекбоксу */}
+      <p style={{ textAlign: "center", margin: "10px 0 20px 0" }}>
+        {agreeWithBasicTech
+          ? "Ви погодились застосовувати Базову технологію бджільництва"
+          : "Ви ще не погодились застосовувати Базову технологію бджільництва"}
+      </p>
+
+      {/* Група чекбоксів для додаткових послуг */}
+      <div style={{ textAlign: "left", margin: "auto", maxWidth: "370px" }}>
+        <h3 style={{ marginBottom: "20px" }}>Додаткові послуги:</h3>
+        <div style={{ marginBottom: "10px" }}>
+          <label>
+            <input
+              type="checkbox"
+              name="pollen"
+              checked={additionalServices.pollen}
+              onChange={handleAdditionalServiceChange}
+            />
+            Пилок
+          </label>
+        </div>
+        <div style={{ marginBottom: "10px" }}>
+          <label>
+            <input
+              type="checkbox"
+              name="propolis"
+              checked={additionalServices.propolis}
+              onChange={handleAdditionalServiceChange}
+            />
+            Прополіс
+          </label>
+        </div>
+        <div style={{ marginBottom: "10px" }}>
+          <label>
+            <input
+              type="checkbox"
+              name="wax"
+              checked={additionalServices.wax}
+              onChange={handleAdditionalServiceChange}
+            />
+            Віск
+          </label>
+        </div>
+        <div style={{ marginBottom: "10px" }}>
+          <label>
+            <input
+              type="checkbox"
+              name="royalJelly"
+              checked={additionalServices.royalJelly}
+              onChange={handleAdditionalServiceChange}
+            />
+            Маточне молочко
+          </label>
+        </div>
+        <div style={{ marginBottom: "10px" }}>
+          <label>
+            <input
+              type="checkbox"
+              name="droneHomogenate"
+              checked={additionalServices.droneHomogenate}
+              onChange={handleAdditionalServiceChange}
+            />
+            Трутневий гомогенат
+          </label>
+        </div>
+        <div style={{ marginBottom: "10px" }}>
+          <label>
+            <input
+              type="checkbox"
+              name="beeVenom"
+              checked={additionalServices.beeVenom}
+              onChange={handleAdditionalServiceChange}
+            />
+            Бджолина отрута
+          </label>
+        </div>
+      </div>
+
+      {/* Виведення стану додаткових послуг */}
+      <div style={{ textAlign: "center", marginTop: "10px" }}>
+        <h4>Обрані послуги:</h4>
+        <p>{additionalServices.pollen && "Пилок"}</p>
+        <p>{additionalServices.propolis && "Прополіс"}</p>
+        <p>{additionalServices.wax && "Віск"}</p>
+        <p>{additionalServices.royalJelly && "Маточне молочко"}</p>
+        <p>{additionalServices.droneHomogenate && "Трутневий гомогенат"}</p>
+        <p>{additionalServices.beeVenom && "Бджолина отрута"}</p>
+      </div>
     </>
   );
 };

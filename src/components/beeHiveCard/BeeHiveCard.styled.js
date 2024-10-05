@@ -4,6 +4,7 @@ export const SwiperWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 10px;
 `;
 
 export const MainSwiperWrapper = styled.div`
@@ -17,9 +18,11 @@ export const ThumbSwiperWrapper = styled.div`
 `;
 
 export const SwiperImage = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 70%;
+  height: 70%;
   object-fit: cover;
+  display: block; /* Встановлюємо block, щоб працював margin */
+  margin: 0 auto; /* Центруємо зображення */
 `;
 
 export const ThumbImage = styled.img`
@@ -48,4 +51,12 @@ export const ImageContainer = styled.div`
   position: relative; /* Для абсолютного позиціонування зображення */
   height: 100%; /* Встановлюємо висоту контейнера */
   overflow: hidden; /* Сховати частини зображення, які виходять за межі контейнера */
+`;
+
+export const Description = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 370px;
+  margin: auto;
 `;
