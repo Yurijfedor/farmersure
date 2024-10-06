@@ -60,3 +60,9 @@ export const Description = styled.div`
   max-width: 370px;
   margin: auto;
 `;
+
+export const Wrapper = styled.div`
+  text-align: left;
+  margin: 0 auto 20px auto;
+  max-width: 370px;
+`;

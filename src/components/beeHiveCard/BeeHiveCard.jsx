@@ -5,7 +5,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper/modules"; // Підключаємо модулі Navigation і Thumbs
 import "swiper/swiper-bundle.css";
 import { Modal } from "../modal/Modal";
+import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
+import { ageOfQueen } from "../../helpers/ageOfQueen";
+import { calculatePerformance } from "../../helpers/calculatePerformance";
+import { prices } from "../../constants/prices";
+
 import {
   SwiperWrapper,
   MainSwiperWrapper,
@@ -15,6 +20,7 @@ import {
   ModalImage,
   ImageContainer,
   Description,
+  Wrapper,
 } from "./BeeHiveCard.styled";
 
 export const BeeHiveCard = () => {
@@ -23,7 +29,6 @@ export const BeeHiveCard = () => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
-  const [scale, setScale] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -73,25 +78,6 @@ export const BeeHiveCard = () => {
     setIsDragging(false);
   };
 
-  const ageOfQueen = (dateOfBirthd) => {
-    const today = new Date(); // Поточна дата
-    const birthDate = new Date(dateOfBirthd); // Дата народження
-
-    // Обчислюємо різницю в роках і місяцях
-    const yearsDiff = today.getFullYear() - birthDate.getFullYear();
-    const monthsDiff = today.getMonth() - birthDate.getMonth();
-
-    // Загальна кількість місяців з урахуванням років і місяців
-    let ageInMonths = yearsDiff * 12 + monthsDiff;
-
-    // Якщо день народження ще не настав цього місяця, зменшуємо на 1 місяць
-    if (today.getDate() < birthDate.getDate()) {
-      ageInMonths--;
-    }
-
-    return ageInMonths;
-  };
-
   const handleCheckboxChange = (e) => {
     setAgreeWithBasicTech(e.target.checked); // Оновлюємо стан при зміні чекбоксу
   };
@@ -103,6 +89,12 @@ export const BeeHiveCard = () => {
       [name]: checked, // Оновлюємо стан відповідної додаткової послуги
     }));
   };
+
+  const performance = calculatePerformance(
+    hive,
+    additionalServices,
+    agreeWithBasicTech
+  );
 
   console.log(hive.queensBirthday);
 
@@ -195,9 +187,13 @@ export const BeeHiveCard = () => {
           ? "Ви погодились застосовувати Базову технологію бджільництва"
           : "Ви ще не погодились застосовувати Базову технологію бджільництва"}
       </p>
-
+      <PerformanceScale
+        prices={prices}
+        performance={performance}
+        power={hive.power}
+      />
       {/* Група чекбоксів для додаткових послуг */}
-      <div style={{ textAlign: "left", margin: "auto", maxWidth: "370px" }}>
+      <Wrapper>
         <h3 style={{ marginBottom: "20px" }}>Додаткові послуги:</h3>
         <div style={{ marginBottom: "10px" }}>
           <label>
@@ -262,21 +258,39 @@ export const BeeHiveCard = () => {
               checked={additionalServices.beeVenom}
               onChange={handleAdditionalServiceChange}
             />
-            Бджолина отрута
+            Бджолина отрута (сирець)
           </label>
         </div>
-      </div>
+      </Wrapper>
 
       {/* Виведення стану додаткових послуг */}
-      <div style={{ textAlign: "center", marginTop: "10px" }}>
+      <Wrapper>
         <h4>Обрані послуги:</h4>
         <p>{additionalServices.pollen && "Пилок"}</p>
         <p>{additionalServices.propolis && "Прополіс"}</p>
         <p>{additionalServices.wax && "Віск"}</p>
         <p>{additionalServices.royalJelly && "Маточне молочко"}</p>
         <p>{additionalServices.droneHomogenate && "Трутневий гомогенат"}</p>
-        <p>{additionalServices.beeVenom && "Бджолина отрута"}</p>
-      </div>
+        <p>{additionalServices.beeVenom && "Бджолина отрута (сирець)"}</p>
+      </Wrapper>
+      <Wrapper>
+        <h3
+          title="Ви отримаєте всю вироблену цією бджолосім'єю продукцію, якої може бути набагато більше, але не менше вказаної продуктивності, яку ми гарантуємо при застосуванні базової технології."
+          style={{ display: "inline-block", cursor: "pointer" }}
+        >
+          Гарантована продуктивність бджолиної сім'ї
+          <span style={{ cursor: "pointer", color: "red", marginLeft: "5px" }}>
+            *
+          </span>
+        </h3>
+        <p>Мед: {performance.honey} кг</p>
+        {<p>Пилок: {performance.pollenAmount} кг</p>}
+        {<p>Прополіс: {performance.propolisAmount} кг</p>}
+        {<p>Віск: {performance.waxAmount} кг</p>}
+        {<p>Маточне молочко: {performance.royalJellyAmount} кг</p>}
+        {<p>Трутневий гомогенат: {performance.droneHomogenateAmount} кг</p>}
+        {<p>Бджолина отрута (сирець): {performance.beeVenomAmount} кг</p>}
+      </Wrapper>
     </>
   );
 };
