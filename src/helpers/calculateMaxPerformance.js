@@ -1,4 +1,4 @@
-import { prices } from "../constants/prices";
+import { productPrices } from "../constants/prices";
 
 export const calculateMaxPerformance = (power) => {
   // Мед
@@ -59,13 +59,13 @@ export const calculateMaxPerformance = (power) => {
   else if (power === 5) beeVenomAmount = 0.0005;
 
   const maxAmount =
-    honey * prices.honey +
-    pollenAmount * prices.pollen +
-    propolisAmount * prices.propolis +
-    waxAmount * prices.wax +
-    royalJellyAmount * prices.royalJelly +
-    droneHomogenateAmount * prices.droneHomogenate +
-    beeVenomAmount * prices.beeVenom;
+    honey * productPrices.honey +
+    pollenAmount * productPrices.pollen +
+    propolisAmount * productPrices.propolis +
+    waxAmount * productPrices.wax +
+    royalJellyAmount * productPrices.royalJelly +
+    droneHomogenateAmount * productPrices.droneHomogenate +
+    beeVenomAmount * productPrices.beeVenom;
 
   return maxAmount;
 };

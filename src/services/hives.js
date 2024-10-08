@@ -14,7 +14,7 @@ export const fetchHiveById = async ({ hiveId }) => {
   if (typeof hiveId !== "string") {
     throw new Error("Invalid hive ID");
   }
-  const docRef = doc(db, "hives", "GGTAWhEwXJhMdzdn8G36");
+  const docRef = doc(db, "hives", hiveId);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {

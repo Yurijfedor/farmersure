@@ -6,10 +6,11 @@ import { Navigation, Thumbs } from "swiper/modules"; // Підключаємо �
 import "swiper/swiper-bundle.css";
 import { Modal } from "../modal/Modal";
 import { PerformanceScale } from "../performanceScale/PerformanceScale";
+import { RentInfo } from "../rentInfo/RentInfo";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
-import { prices } from "../../constants/prices";
+import { productPrices } from "../../constants/prices";
 
 import {
   SwiperWrapper,
@@ -96,7 +97,7 @@ export const BeeHiveCard = () => {
     agreeWithBasicTech
   );
 
-  console.log(hive.queensBirthday);
+  console.log(hive.number);
 
   return (
     <>
@@ -188,7 +189,7 @@ export const BeeHiveCard = () => {
           : "Ви ще не погодились застосовувати Базову технологію бджільництва"}
       </p>
       <PerformanceScale
-        prices={prices}
+        prices={productPrices}
         performance={performance}
         power={hive.power}
       />
@@ -291,6 +292,7 @@ export const BeeHiveCard = () => {
         {<p>Трутневий гомогенат: {performance.droneHomogenateAmount} кг</p>}
         {<p>Бджолина отрута (сирець): {performance.beeVenomAmount} кг</p>}
       </Wrapper>
+      <RentInfo hiveComponents={hive.hiveComponents} power={hive.power} />
     </>
   );
 };
