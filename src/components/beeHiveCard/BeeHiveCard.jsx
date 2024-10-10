@@ -1,16 +1,23 @@
-import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useHive } from "../../hooks/useHives";
+
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper/modules"; // Підключаємо модулі Navigation і Thumbs
+
+import { useHive } from "../../hooks/useHives";
+
 import "swiper/swiper-bundle.css";
 import { Modal } from "../modal/Modal";
 import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { RentInfo } from "../rentInfo/RentInfo";
+import { TaskTable } from "../taskTable/TaskTable";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
 import { productPrices } from "../../constants/prices";
+import { beekeepingTasks } from "../../constants/beekeepingTasks";
+import { generateTasksForMonth } from "../../helpers/generateTasksForMonth";
 
 import {
   SwiperWrapper,
@@ -96,6 +103,35 @@ export const BeeHiveCard = () => {
     additionalServices,
     agreeWithBasicTech
   );
+
+  const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
+
+  const defaultTasks = beekeepingTasks.filter((task) =>
+    task.month.includes(currentMonth)
+  );
+
+  // const generateTasksForMonth = () => {
+  //   return beekeepingTasks
+  //     .filter((task) => task.month.includes(currentMonth))
+  //     .map((task) => ({
+  //       id: uuidv4(), // Unique ID for each task
+  //       name: task.name,
+  //       purpose: task.purpose,
+  //       description: task.description,
+  //       cost: ((100 * task.duration) / 60) * task.costPerHour,
+  //       status: "Pending",
+  //       executor: null,
+  //       date: null,
+  //     }));
+  // };
+
+  const handleConfirmTask = (taskId) => {
+    console.log(`confirmed ${taskId}`);
+  };
+
+  const handleDeleteTask = (taskId) => {
+    console.log(`deleted ${taskId}`);
+  };
 
   console.log(hive.number);
 
@@ -293,6 +329,16 @@ export const BeeHiveCard = () => {
         {<p>Бджолина отрута (сирець): {performance.beeVenomAmount} кг</p>}
       </Wrapper>
       <RentInfo hiveComponents={hive.hiveComponents} power={hive.power} />
+      <h3>Планові роботи на {currentMonth} місяць</h3>
+      <TaskTable
+        tasks={
+          hive.tasks && hive.tasks.length !== 0
+            ? hive.tasks
+            : generateTasksForMonth(currentMonth)
+        }
+        onConfirmTask={handleConfirmTask}
+        onDeleteTask={handleDeleteTask}
+      />
     </>
   );
 };
