@@ -31,6 +31,8 @@ import {
   Wrapper,
 } from "./BeeHiveCard.styled";
 
+const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
+
 export const BeeHiveCard = () => {
   const hiveId = useParams();
   const { data: hive, isLoading, error } = useHive(hiveId); // завантажуємо дані про вулик  console.log(hive);
@@ -49,6 +51,21 @@ export const BeeHiveCard = () => {
     droneHomogenate: false,
     beeVenom: false,
   });
+  const [tasks, setTasks] = useState(
+    hive && hive.tasks && hive.tasks.length !== 0
+      ? hive.tasks
+      : generateTasksForMonth(currentMonth)
+  );
+
+  useEffect(() => {
+    if (hive && hive.tasks) {
+      setTasks(
+        hive.tasks.length !== 0
+          ? hive.tasks
+          : generateTasksForMonth(currentMonth)
+      );
+    }
+  }, [hive, currentMonth]);
 
   useLockBodyScroll(isModalOpen);
 
@@ -104,35 +121,24 @@ export const BeeHiveCard = () => {
     agreeWithBasicTech
   );
 
-  const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
-
-  const defaultTasks = beekeepingTasks.filter((task) =>
-    task.month.includes(currentMonth)
-  );
-
-  // const generateTasksForMonth = () => {
-  //   return beekeepingTasks
-  //     .filter((task) => task.month.includes(currentMonth))
-  //     .map((task) => ({
-  //       id: uuidv4(), // Unique ID for each task
-  //       name: task.name,
-  //       purpose: task.purpose,
-  //       description: task.description,
-  //       cost: ((100 * task.duration) / 60) * task.costPerHour,
-  //       status: "Pending",
-  //       executor: null,
-  //       date: null,
-  //     }));
-  // };
-
   const handleConfirmTask = (taskId) => {
-    console.log(`confirmed ${taskId}`);
+    const updatedTasks = tasks.map((task) =>
+      task.id === taskId ? { ...task, status: "Under Review" } : task
+    );
+    setTasks(updatedTasks); // Оновлюємо стан завдань
+    // Додатково тут можна оновити Firestore або LocalStorage
   };
 
+  // Функція для видалення завдання
   const handleDeleteTask = (taskId) => {
-    console.log(`deleted ${taskId}`);
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks); // Оновлюємо стан завдань
+    // Додатково тут можна оновити Firestore або LocalStorage
   };
 
+  const addTask = () => {
+    console.log("i am a new task");
+  };
   console.log(hive.number);
 
   return (
@@ -330,14 +336,12 @@ export const BeeHiveCard = () => {
       </Wrapper>
       <RentInfo hiveComponents={hive.hiveComponents} power={hive.power} />
       <h3>Планові роботи на {currentMonth} місяць</h3>
+      <button onClick={() => addTask()}>Add Task</button>
       <TaskTable
-        tasks={
-          hive.tasks && hive.tasks.length !== 0
-            ? hive.tasks
-            : generateTasksForMonth(currentMonth)
-        }
+        tasks={tasks}
         onConfirmTask={handleConfirmTask}
         onDeleteTask={handleDeleteTask}
+        setTasks={setTasks}
       />
     </>
   );
