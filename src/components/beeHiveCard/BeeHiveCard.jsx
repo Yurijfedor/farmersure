@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper/modules"; // Підключаємо модулі Navigation і Thumbs
 
 import { useHive } from "../../hooks/useHives";
+import { useHiveTask } from "../../hooks/useHiveTasks";
 
 import "swiper/swiper-bundle.css";
 import { Modal } from "../modal/Modal";
@@ -16,7 +17,6 @@ import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
 import { productPrices } from "../../constants/prices";
-import { beekeepingTasks } from "../../constants/beekeepingTasks";
 import { generateTasksForMonth } from "../../helpers/generateTasksForMonth";
 
 import {
@@ -51,10 +51,14 @@ export const BeeHiveCard = () => {
     droneHomogenate: false,
     beeVenom: false,
   });
+  console.log(JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}`)));
+
   const [tasks, setTasks] = useState(
     hive && hive.tasks && hive.tasks.length !== 0
       ? hive.tasks
-      : generateTasksForMonth(currentMonth)
+      : JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}`)).length === 0
+      ? generateTasksForMonth(currentMonth, hiveId.hiveId)
+      : JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}`))
   );
 
   useEffect(() => {
@@ -62,10 +66,10 @@ export const BeeHiveCard = () => {
       setTasks(
         hive.tasks.length !== 0
           ? hive.tasks
-          : generateTasksForMonth(currentMonth)
+          : generateTasksForMonth(currentMonth, hiveId.hiveId)
       );
     }
-  }, [hive, currentMonth]);
+  }, [hive, hiveId, tasks]);
 
   useLockBodyScroll(isModalOpen);
 
@@ -136,10 +140,7 @@ export const BeeHiveCard = () => {
     // Додатково тут можна оновити Firestore або LocalStorage
   };
 
-  const addTask = () => {
-    console.log("i am a new task");
-  };
-  console.log(hive.number);
+  console.log(tasks);
 
   return (
     <>
@@ -335,13 +336,13 @@ export const BeeHiveCard = () => {
         {<p>Бджолина отрута (сирець): {performance.beeVenomAmount} кг</p>}
       </Wrapper>
       <RentInfo hiveComponents={hive.hiveComponents} power={hive.power} />
-      <h3>Планові роботи на {currentMonth} місяць</h3>
-      <button onClick={() => addTask()}>Add Task</button>
+
       <TaskTable
         tasks={tasks}
         onConfirmTask={handleConfirmTask}
         onDeleteTask={handleDeleteTask}
         setTasks={setTasks}
+        currentMonth={currentMonth}
       />
     </>
   );

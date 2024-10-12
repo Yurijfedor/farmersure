@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import beekeepingTasks from "../constants/beekeepingTasks"; // Імпортуємо список завдань
+import { generateTasksForMonth } from "../helpers/generateTasksForMonth";
 
 const fetchTasksForHive = async (hiveId) => {
   const response = await fetch(`/api/tasks/${hiveId}`);
@@ -10,14 +10,12 @@ const fetchTasksForHive = async (hiveId) => {
   return response.json();
 };
 
-const useHiveTasks = (hiveId, currentMonth) => {
+export const useHiveTasks = (hiveId, currentMonth) => {
   return useQuery(["tasks", hiveId], () => fetchTasksForHive(hiveId), {
     onSuccess: (fetchedTasks) => {
       // Якщо завдань немає в базі даних, використовуємо список з constants
       if (!fetchedTasks || fetchedTasks.length === 0) {
-        const defaultTasks = beekeepingTasks.filter((task) =>
-          task.months.includes(currentMonth)
-        );
+        const defaultTasks = generateTasksForMonth(currentMonth);
         localStorage.setItem(`tasks-${hiveId}`, JSON.stringify(defaultTasks));
         return defaultTasks;
       }
@@ -28,12 +26,8 @@ const useHiveTasks = (hiveId, currentMonth) => {
     },
     onError: () => {
       // Якщо виникла помилка, також використовуємо список з constants
-      const defaultTasks = beekeepingTasks.filter((task) =>
-        task.months.includes(currentMonth)
-      );
+      const defaultTasks = generateTasksForMonth(currentMonth);
       return defaultTasks;
     },
   });
 };
-
-export default useHiveTasks;

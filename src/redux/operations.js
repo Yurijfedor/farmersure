@@ -1,11 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import { collection, getDocs, getDoc, doc } from "firebase/firestore";
-import axios from "axios";
 
 import db from "../firebase";
-
-axios.defaults.baseURL = "https://rickandmortyapi.com/api";
 
 export const fetchAllHives = createAsyncThunk(
   "hives/fetchAll",
