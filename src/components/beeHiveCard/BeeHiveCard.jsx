@@ -14,6 +14,8 @@ import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { RentInfo } from "../rentInfo/RentInfo";
 import { TaskTable } from "../taskTable/TaskTable";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
+import { useUpdateHiveTasks } from "../../hooks/useHives";
+import { useDeleteHiveTask } from "../../hooks/useHives";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
 import { productPrices } from "../../constants/prices";
@@ -35,7 +37,10 @@ const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
 
 export const BeeHiveCard = () => {
   const hiveId = useParams();
+  const user = JSON.parse(localStorage.getItem("user"));
   const { data: hive, isLoading, error } = useHive(hiveId); // завантажуємо дані про вулик  console.log(hive);
+  const { mutate: updateTasks } = useUpdateHiveTasks();
+  const { mutate: deleteTask } = useDeleteHiveTask();
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
@@ -51,25 +56,29 @@ export const BeeHiveCard = () => {
     droneHomogenate: false,
     beeVenom: false,
   });
-  console.log(JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}`)));
 
   const [tasks, setTasks] = useState(
     hive && hive.tasks && hive.tasks.length !== 0
       ? hive.tasks
-      : JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}`)).length === 0
+      : !JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}-${user.uid}`))
       ? generateTasksForMonth(currentMonth, hiveId.hiveId)
-      : JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}`))
+      : JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}-${user.uid}`))
   );
 
   useEffect(() => {
     if (hive && hive.tasks) {
-      setTasks(
-        hive.tasks.length !== 0
-          ? hive.tasks
-          : generateTasksForMonth(currentMonth, hiveId.hiveId)
+      // Якщо є завдання у Firebase
+      setTasks(hive.tasks.length !== 0 ? hive.tasks : []);
+    } else {
+      // Якщо завдань у Firebase немає, завантажити з LocalStorage
+      const localTasks = localStorage.getItem(
+        `tasks-${hiveId.hiveId}-${user.uid}`
       );
+      if (localTasks) {
+        setTasks(JSON.parse(localTasks));
+      }
     }
-  }, [hive, hiveId, tasks]);
+  }, [hive, hiveId, user.uid]); // Залежності без tasks
 
   useLockBodyScroll(isModalOpen);
 
@@ -130,16 +139,18 @@ export const BeeHiveCard = () => {
       task.id === taskId ? { ...task, status: "Under Review" } : task
     );
     setTasks(updatedTasks); // Оновлюємо стан завдань
-    // Додатково тут можна оновити Firestore або LocalStorage
+    updateTasks({ hiveId: hiveId.hiveId, tasks: updatedTasks }); // Оновлюємо Firestore
   };
 
   // Функція для видалення завдання
   const handleDeleteTask = (taskId) => {
+    // Фільтруємо завдання, видаляючи вибране
     const updatedTasks = tasks.filter((task) => task.id !== taskId);
-    setTasks(updatedTasks); // Оновлюємо стан завдань
-    // Додатково тут можна оновити Firestore або LocalStorage
+    // Оновлюємо Firestore, передаючи оновлений масив tasks
+    deleteTask({ hiveId: hiveId.hiveId, tasks: updatedTasks });
+    // Оновлюємо локальний стан
+    setTasks(updatedTasks);
   };
-
   console.log(tasks);
 
   return (
@@ -343,6 +354,7 @@ export const BeeHiveCard = () => {
         onDeleteTask={handleDeleteTask}
         setTasks={setTasks}
         currentMonth={currentMonth}
+        hiveId={hiveId.hiveId}
       />
     </>
   );

@@ -21,7 +21,8 @@ export const generateTasksForMonth = (currentMonth, hiveId) => {
       executor: null,
       date: null,
     }));
-  localStorage.setItem(`tasks-${hiveId}`, JSON.stringify(tasks));
+  const user = JSON.parse(localStorage.getItem("user"));
+  localStorage.setItem(`tasks-${hiveId}-${user.uid}`, JSON.stringify(tasks));
   return tasks;
 };
 

@@ -10,6 +10,7 @@ export const TaskTable = ({
   onDeleteTask,
   setTasks,
   currentMonth,
+  hiveId,
 }) => {
   const [tempDate, setTempDate] = useState({});
   const [selectedExecutor, setSelectedExecutor] = useState({});
@@ -38,6 +39,11 @@ export const TaskTable = ({
         : task
     );
     setTasks(updatedTasks); // Оновлюємо завдання після втрати фокусу
+    const user = JSON.parse(localStorage.getItem("user"));
+    localStorage.setItem(
+      `tasks-${hiveId}-${user.uid}`,
+      JSON.stringify(updatedTasks)
+    );
   };
 
   const isDateValid = (date) => {

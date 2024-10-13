@@ -1,4 +1,10 @@
-import { collection, getDocs, getDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 
 import db from "../firebase";
 
@@ -25,4 +31,14 @@ export const fetchHiveById = async ({ hiveId }) => {
   } else {
     throw new Error("Hive not found");
   }
+};
+
+export const updateHiveTasks = async ({ hiveId, tasks }) => {
+  const hiveDocRef = doc(db, "hives", hiveId);
+  await updateDoc(hiveDocRef, { tasks }); // Оновлюємо або додаємо поле tasks
+};
+
+export const deleteHiveTask = async ({ hiveId, tasks }) => {
+  const hiveDocRef = doc(db, "hives", hiveId);
+  await updateDoc(hiveDocRef, { tasks }); // Оновлюємо або видаляємо завдання з масиву tasks
 };
