@@ -35,6 +35,7 @@ const Ordering = lazy(() => import("./pages/Ordering"));
 const Login = lazy(() => import("./pages/LogIn"));
 const Register = lazy(() => import("./pages/Register"));
 const HiveCard = lazy(() => import("./pages/HiveCard"));
+const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 
 export const App = () => {
   const { isAuth } = useAuth();
@@ -74,6 +75,9 @@ export const App = () => {
             <Route path="contacting" element={<Contacting />} />
             <Route path="contactInfo" element={<Contactinfo />} />
             <Route path="ordering" element={<Ordering />} />
+          </Route>
+          <Route path="/foradmin">
+            <Route path="adminpanel" element={<AdminPanel />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

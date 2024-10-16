@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+
 import { useAuth } from "../../hooks/useAuth";
+
 import {
   NavList,
   NavItem,
@@ -11,7 +13,7 @@ import {
 export const NavBar = ({ categories }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
-  const { isAuth } = useAuth();
+  const { isAuth, isAdmin } = useAuth();
 
   const ref = useRef(null);
 
@@ -36,56 +38,59 @@ export const NavBar = ({ categories }) => {
   return (
     <nav>
       <NavList>
-        {categories.map((category) => (
-          <NavItem key={category.id}>
-            <div
-              onClick={(event) => {
-                if (selectedCategory === category) {
-                  setIsOpen((prevState) => !prevState);
-                } else {
-                  setSelectedCategory(category);
-                  setIsOpen(true);
-                }
-                event.stopPropagation();
-              }}
-            >
-              {category.title}
-            </div>
-            <SubcategoriesList ref={ref}>
-              {category.subcategories.map((subcategory) => (
-                <SubcategoriesItem key={subcategory.id}>
-                  {subcategory.route === "rent" ? (
-                    <Link
-                      to={
-                        isAuth
-                          ? `${category.title.split(" ").join("")}/${
-                              subcategory.route
-                            }`
-                          : "/login"
-                      }
-                      onClick={(event) => {
-                        handleSubcategoryClick(event);
-                      }}
-                    >
-                      {subcategory.title}
-                    </Link>
-                  ) : (
-                    <Link
-                      to={`${category.title.split(" ").join("")}/${
-                        subcategory.route
-                      }`}
-                      onClick={(event) => {
-                        handleSubcategoryClick(event);
-                      }}
-                    >
-                      {subcategory.title}
-                    </Link>
-                  )}
-                </SubcategoriesItem>
-              ))}
-            </SubcategoriesList>
-          </NavItem>
-        ))}
+        {categories.map((category) => {
+          // Перевіряємо, чи це "for admin", і якщо так, рендеримо лише для адміна
+          if (category.title === "for admin" && !isAdmin) {
+            return null; // Якщо не адміністратор, нічого не рендеримо для "for admin"
+          }
+
+          return (
+            <NavItem key={category.id}>
+              <div
+                onClick={(event) => {
+                  if (selectedCategory === category) {
+                    setIsOpen((prevState) => !prevState);
+                  } else {
+                    setSelectedCategory(category);
+                    setIsOpen(true);
+                  }
+                  event.stopPropagation();
+                }}
+              >
+                {category.title}
+              </div>
+              <SubcategoriesList ref={ref}>
+                {category.subcategories.map((subcategory) => (
+                  <SubcategoriesItem key={subcategory.id}>
+                    {subcategory.route === "rent" ? (
+                      <Link
+                        to={
+                          isAuth
+                            ? `${category.title.split(" ").join("")}/${
+                                subcategory.route
+                              }`
+                            : "/login"
+                        }
+                        onClick={handleSubcategoryClick}
+                      >
+                        {subcategory.title}
+                      </Link>
+                    ) : (
+                      <Link
+                        to={`${category.title.split(" ").join("")}/${
+                          subcategory.route
+                        }`}
+                        onClick={handleSubcategoryClick}
+                      >
+                        {subcategory.title}
+                      </Link>
+                    )}
+                  </SubcategoriesItem>
+                ))}
+              </SubcategoriesList>
+            </NavItem>
+          );
+        })}
       </NavList>
     </nav>
   );

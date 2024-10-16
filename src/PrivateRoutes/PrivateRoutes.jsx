@@ -7,7 +7,6 @@ const PrivateRoutes = () => {
   if (loading) {
     return <div>Loading...</div>; // Відображаємо індикатор завантаження поки не з'ясований стан
   }
-  console.log(isAuth);
 
   return isAuth ? <Outlet /> : <Navigate to={"/login"} />;
 };

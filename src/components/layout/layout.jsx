@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { Suspense } from "react";
+
 import { Container, HeaderContainer } from "../layout/Layout.styled";
 import { AuthNav } from "../authNav/AuthNav";
 import { LogOut } from "../logOut/LogOut";
@@ -10,7 +11,6 @@ import { NavBar } from "../nav/Nav";
 
 const Layout = () => {
   const { isAuth } = useAuth();
-  console.log(isAuth);
   return (
     <Suspense>
       <HeaderContainer>

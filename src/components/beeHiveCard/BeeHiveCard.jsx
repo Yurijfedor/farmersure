@@ -5,17 +5,18 @@ import { useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper/modules"; // Підключаємо модулі Navigation і Thumbs
 
-import { useHive } from "../../hooks/useHives";
-import { useHiveTask } from "../../hooks/useHiveTasks";
-
 import "swiper/swiper-bundle.css";
 import { Modal } from "../modal/Modal";
 import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { RentInfo } from "../rentInfo/RentInfo";
 import { TaskTable } from "../taskTable/TaskTable";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
-import { useUpdateHiveTasks } from "../../hooks/useHives";
-import { useDeleteHiveTask } from "../../hooks/useHives";
+import {
+  useUpdateHiveTasks,
+  useAddTaskToConfirmation,
+  useDeleteHiveTask,
+  useHive,
+} from "../../hooks/useHives";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
 import { productPrices } from "../../constants/prices";
@@ -41,6 +42,7 @@ export const BeeHiveCard = () => {
   const { data: hive, isLoading, error } = useHive(hiveId); // завантажуємо дані про вулик  console.log(hive);
   const { mutate: updateTasks } = useUpdateHiveTasks();
   const { mutate: deleteTask } = useDeleteHiveTask();
+  const { mutate: addTaskToConfirmation } = useAddTaskToConfirmation();
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
@@ -135,11 +137,17 @@ export const BeeHiveCard = () => {
   );
 
   const handleConfirmTask = (taskId) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, status: "Under Review" } : task
-    );
-    setTasks(updatedTasks); // Оновлюємо стан завдань
-    updateTasks({ hiveId: hiveId.hiveId, tasks: updatedTasks }); // Оновлюємо Firestore
+    console.log(taskId);
+
+    const taskToUpdate = tasks.map((task) => {
+      return task.id === taskId ? { ...task, status: "Under Review" } : task;
+    });
+
+    const taskToConfirmation = tasks.filter((task) => task.id === taskId);
+
+    setTasks(taskToUpdate); // Оновлюємо стан завдань
+    updateTasks({ hiveId: hiveId.hiveId, tasks: taskToUpdate }); // Оновлюємо Firestore
+    addTaskToConfirmation(taskToConfirmation[0]);
   };
 
   // Функція для видалення завдання
@@ -151,7 +159,6 @@ export const BeeHiveCard = () => {
     // Оновлюємо локальний стан
     setTasks(updatedTasks);
   };
-  console.log(tasks);
 
   return (
     <>

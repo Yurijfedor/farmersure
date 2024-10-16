@@ -5,6 +5,7 @@ import {
   fetchHiveById,
   updateHiveTasks,
   deleteHiveTask,
+  addTaskToConfirmationCollection,
 } from "../services/hives";
 
 export const useHivesQuery = () => {
@@ -45,6 +46,18 @@ export const useDeleteHiveTask = () => {
     },
     onError: (error) => {
       console.error("Error deleting hive task:", error);
+    },
+  });
+};
+
+// Мутація для додавання завдань до колекції завдань для підтвердження
+export const useAddTaskToConfirmation = () => {
+  return useMutation(addTaskToConfirmationCollection, {
+    onSuccess: () => {
+      console.log("Task added to confirmation collection");
+    },
+    onError: (error) => {
+      console.error("Error adding task to confirmation collection:", error);
     },
   });
 };

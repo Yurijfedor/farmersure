@@ -4,6 +4,7 @@ import {
   getDoc,
   doc,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 import db from "../firebase";
@@ -41,4 +42,22 @@ export const updateHiveTasks = async ({ hiveId, tasks }) => {
 export const deleteHiveTask = async ({ hiveId, tasks }) => {
   const hiveDocRef = doc(db, "hives", hiveId);
   await updateDoc(hiveDocRef, { tasks }); // Оновлюємо або видаляємо завдання з масиву tasks
+};
+
+// Функція для додавання завдання в колекцію для підтвердження
+export const addTaskToConfirmationCollection = async (task) => {
+  console.log(task);
+  const confirmationCollection = collection(db, "tasksForConfirmation");
+  const taskDocRef = doc(confirmationCollection, task.id); // посилання на документ за id завдання
+
+  // Перевірка, чи завдання вже існує
+  const taskSnapshot = await getDoc(taskDocRef);
+  if (!taskSnapshot.exists()) {
+    // Якщо завдання ще немає, додаємо його
+    await setDoc(taskDocRef, task);
+  } else {
+    console.log(
+      `Task with ID ${task.id} already exists in the confirmation collection`
+    );
+  }
 };
