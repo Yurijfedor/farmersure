@@ -52,11 +52,12 @@ export const TaskTable = ({
     // Перевірка, чи вибрана дата не пізніше ніж за 24 години до початку
     return selectedDate - currentDate > 24 * 60 * 60 * 1000; // 24 години в мілісекундах
   };
+  console.log(tasks);
 
   return (
     <>
       <h3>Планові роботи на {currentMonth} місяць</h3>
-      <TaskSelector addTaskToTable={setTasks} />
+      <TaskSelector addTaskToTable={setTasks} hiveId={hiveId} tasks={tasks} />
       {tasks.length > 0 ? (
         <table>
           <thead>

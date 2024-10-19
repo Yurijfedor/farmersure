@@ -5,6 +5,7 @@ import {
   doc,
   updateDoc,
   setDoc,
+  arrayUnion
 } from "firebase/firestore";
 
 import db from "../firebase";
@@ -37,6 +38,11 @@ export const fetchHiveById = async ({ hiveId }) => {
 export const updateHiveTasks = async ({ hiveId, tasks }) => {
   const hiveDocRef = doc(db, "hives", hiveId);
   await updateDoc(hiveDocRef, { tasks }); // Оновлюємо або додаємо поле tasks
+};
+
+export const addSingleTask = async ({ hiveId, task }) => {
+  const hiveDocRef = doc(db, "hives", hiveId);
+  await updateDoc(hiveDocRef, { tasks: arrayUnion(task) }); // Оновлюємо або додаємо поле tasks
 };
 
 export const deleteHiveTask = async ({ hiveId, tasks }) => {

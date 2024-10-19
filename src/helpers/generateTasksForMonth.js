@@ -11,6 +11,7 @@ export const generateTasksForMonth = (currentMonth, hiveId) => {
     .filter((task) => task.month.includes(currentMonth))
     .map((task) => ({
       id: uuidv4(), // Unique ID for each task
+      hiveId,
       name: task.name,
       purpose: task.purpose,
       description: task.description,
@@ -26,13 +27,14 @@ export const generateTasksForMonth = (currentMonth, hiveId) => {
   return tasks;
 };
 
-export const unifyTask = (task) => {
+export const unifyTask = (task, hiveId) => {
   const now = new Date();
   const twoDaysBefore = new Date(now.getTime() + 49 * 60 * 60 * 1000); // 48 годин до поточної дати
   const plannedDate = twoDaysBefore.toISOString().slice(0, 16); // Призначення значення за замовчуванням
 
   return {
     id: uuidv4(), // Генеруємо унікальний ID для кожного завдання
+    hiveId,
     name: task.name,
     purpose: task.purpose,
     description: task.description,

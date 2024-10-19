@@ -3,10 +3,13 @@ import React, { useState } from "react";
 import { CustomTaskForm } from "../сustomTaskForm/CustomTaskForm";
 import { beekeepingTasks } from "../../constants/beekeepingTasks";
 import { unifyTask } from "../../helpers/generateTasksForMonth";
+import { useUpdateHiveTasks, useAddSingleTasks } from "../../hooks/useHives";
 
-export const TaskSelector = ({ addTaskToTable }) => {
+export const TaskSelector = ({ addTaskToTable, hiveId, tasks }) => {
   // Стан для обраного завдання
   const [selectedTask, setSelectedTask] = useState("");
+  const { mutate: updateTasks } = useUpdateHiveTasks();
+  const { mutate: addSingleTask } = useAddSingleTasks();
   const [customTask, setCustomTask] = useState({
     name: "",
     purpose: "",
@@ -39,13 +42,21 @@ export const TaskSelector = ({ addTaskToTable }) => {
     if (selectedTask === "custom") {
       if (!validateCustomTaskFields()) return;
       // Якщо обране власне завдання
-      addTaskToTable((prevTasks) => [unifyTask(customTask), ...prevTasks]);
+      addTaskToTable((prevTasks) => [
+        unifyTask(customTask, hiveId),
+        ...prevTasks,
+      ]);
+      addSingleTask({
+        hiveId: hiveId,
+        task: unifyTask(customTask, hiveId),
+      });
     } else {
       // Якщо обране завдання зі списку
       const task = beekeepingTasks.find((t) => t.name === selectedTask);
       if (task) {
-        const unifiedTask = unifyTask(task);
+        const unifiedTask = unifyTask(task, hiveId);
         addTaskToTable((prevTasks) => [unifiedTask, ...prevTasks]); // Викликаємо функцію, щоб додати завдання у таблицю
+        addSingleTask({ hiveId: hiveId, task: unifiedTask });
       }
     }
     // Очистити стан після додавання
