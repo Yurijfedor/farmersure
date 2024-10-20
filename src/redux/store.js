@@ -1,4 +1,4 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
   persistStore,
   persistReducer,
@@ -8,21 +8,19 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
-import { hivesReducer } from './hivesSlice';
-import { filterReducer } from './filterSlice';
-import { userReducer } from './userSlice';
+import { hivesReducer } from "./hivesSlice";
+import { userReducer } from "./userSlice";
 
 const rootReducer = combineReducers({
   hives: hivesReducer,
-  filter: filterReducer,
   user: userReducer,
 });
 
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage,
 };
 

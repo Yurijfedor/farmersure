@@ -5,17 +5,20 @@ import {
   doc,
   updateDoc,
   setDoc,
-  arrayUnion
+  arrayUnion,
 } from "firebase/firestore";
 
 import db from "../firebase";
 
 export const fetchAllHives = async () => {
   const querySnapshot = await getDocs(collection(db, "hives"));
-  return querySnapshot.docs.map((doc) => ({
+  const data = querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   }));
+  console.log(data);
+
+  return data;
 };
 
 export const fetchHiveById = async ({ hiveId }) => {
@@ -38,6 +41,40 @@ export const fetchHiveById = async ({ hiveId }) => {
 export const updateHiveTasks = async ({ hiveId, tasks }) => {
   const hiveDocRef = doc(db, "hives", hiveId);
   await updateDoc(hiveDocRef, { tasks }); // Оновлюємо або додаємо поле tasks
+};
+
+export const updateTaskStatus = async ({ hiveId, taskId, newStatus }) => {
+  // Отримуємо посилання на документ вулика
+  const hiveRef = doc(db, "hives", hiveId);
+
+  // Завантажуємо поточні дані завдань через getDoc()
+  const currentHiveData = await getDoc(hiveRef);
+
+  if (!currentHiveData.exists()) {
+    throw new Error(`Hive with ID ${hiveId} not found`);
+  }
+
+  const tasks = currentHiveData.data().tasks || [];
+
+  // Оновлюємо конкретне завдання в масиві, переконуючись, що немає undefined
+  const updatedTasks = tasks.map((task) => {
+    if (task.id === taskId) {
+      return {
+        ...task,
+        status: newStatus ?? task.status, // Використовуємо nullish operator, щоб уникнути undefined
+        date: task.date ?? null, // Переконуємося, що значення date не є undefined
+        cost: task.cost ?? 0, // Установлюємо дефолтне значення для вартості
+        duration: task.duration ?? 0, // Установлюємо дефолтне значення для тривалості
+        executor: task.executor ?? "Unknown", // Установлюємо дефолтне значення для виконавця
+      };
+    }
+    return task;
+  });
+
+  // Оновлюємо документ вулика з новим масивом tasks, перевіряючи, що кожне поле має допустиме значення
+  await updateDoc(hiveRef, {
+    tasks: updatedTasks,
+  });
 };
 
 export const addSingleTask = async ({ hiveId, task }) => {

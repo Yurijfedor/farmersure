@@ -1,5 +1,9 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, Outlet, Router } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+// import { useHivesQuery } from "./hooks/useHives";
+import { fetchAllHives } from "./redux/operations";
 
 import { useAuth } from "./hooks/useAuth";
 import PrivateRoutes from "./PrivateRoutes/PrivateRoutes";
@@ -38,7 +42,12 @@ const HiveCard = lazy(() => import("./pages/HiveCard"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 
 export const App = () => {
-  const { isAuth } = useAuth();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAllHives()); // Завантаження глобальних даних
+  }, [dispatch]);
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>

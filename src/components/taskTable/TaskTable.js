@@ -52,7 +52,6 @@ export const TaskTable = ({
     // Перевірка, чи вибрана дата не пізніше ніж за 24 години до початку
     return selectedDate - currentDate > 24 * 60 * 60 * 1000; // 24 години в мілісекундах
   };
-  console.log(tasks);
 
   return (
     <>
@@ -75,8 +74,7 @@ export const TaskTable = ({
           </thead>
           <tbody>
             {tasks.map((task) => {
-              const isEditable =
-                task.status !== "Approved" && isDateValid(task.plannedDate); // 24 години в мілісекундах
+              const isEditable = isDateValid(task.plannedDate); // 24 години в мілісекундах
 
               return (
                 <tr key={task.id}>
@@ -144,12 +142,13 @@ export const TaskTable = ({
                   </td>
                   <td>{task.status}</td>
                   <td>
-                    {task.status === "Pending" && (
+                    {(task.status === "Pending" ||
+                      task.status === "Approved") && (
                       <button onClick={() => onConfirmTask(task.id)}>
                         Confirm
                       </button>
                     )}
-                    {task.status !== "Approved" && task.status !== "Done" && (
+                    {task.status !== "Done" && (
                       <button onClick={() => onDeleteTask(task.id)}>
                         Delete
                       </button>

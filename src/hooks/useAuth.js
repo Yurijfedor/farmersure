@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { getAuth, onAuthStateChanged, setPersistence, browserSessionPersistence } from "firebase/auth";
+import {
+  getAuth,
+  onAuthStateChanged,
+  setPersistence,
+  browserSessionPersistence,
+} from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 export const useAuth = () => {

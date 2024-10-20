@@ -27,7 +27,6 @@ export const Chart = ({ data }) => {
             : 0;
 
         percentageDifference[key] = percentDifference.toFixed(2);
-        console.log(percentDifference);
       }
     }
 

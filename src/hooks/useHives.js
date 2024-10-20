@@ -7,6 +7,7 @@ import {
   deleteHiveTask,
   addTaskToConfirmationCollection,
   addSingleTask,
+  updateTaskStatus,
 } from "../services/hives";
 
 export const useHivesQuery = () => {
@@ -27,6 +28,20 @@ export const useUpdateHiveTasks = () => {
   const queryClient = useQueryClient();
 
   return useMutation(updateHiveTasks, {
+    onSuccess: (data, variables) => {
+      // Оновлення кешу для цього вулика після успішного оновлення
+      queryClient.invalidateQueries(["hive", variables.hiveId]);
+    },
+    onError: (error) => {
+      console.error("Error updating hive tasks:", error);
+    },
+  });
+};
+
+export const useUpdateTaskStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(updateTaskStatus, {
     onSuccess: (data, variables) => {
       // Оновлення кешу для цього вулика після успішного оновлення
       queryClient.invalidateQueries(["hive", variables.hiveId]);
