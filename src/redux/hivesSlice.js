@@ -6,6 +6,9 @@ import {
   pendingReducer,
   rejectedReducer,
   fulfilledReducer,
+  updateTaskReducer,
+  addTaskReducer,
+  removeTaskReducer,
 } from "./reducers";
 
 const extraActions = [fetchAllHives];
@@ -22,6 +25,12 @@ const hivesSlice = createSlice({
   name: "hives",
   initialState: hivesInitialState,
 
+  reducers: {
+    updateTaskState: updateTaskReducer,
+    addTaskToHive: addTaskReducer,
+    removeTaskFromHive: removeTaskReducer,
+  },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllHives.fulfilled, fetchAllHivesSuccessReducer)
@@ -31,4 +40,6 @@ const hivesSlice = createSlice({
   },
 });
 
+export const { updateTaskState, addTaskToHive, removeTaskFromHive } =
+  hivesSlice.actions;
 export const hivesReducer = hivesSlice.reducer;

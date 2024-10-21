@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -17,6 +18,7 @@ import {
   useDeleteHiveTask,
   useHive,
 } from "../../hooks/useHives";
+import { updateTaskState, removeTaskFromHive } from "../../redux/hivesSlice";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
 import { productPrices } from "../../constants/prices";
@@ -39,6 +41,7 @@ const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
 export const BeeHiveCard = () => {
   const hiveId = useParams();
   const user = JSON.parse(localStorage.getItem("user"));
+  const dispatch = useDispatch();
   const { data: hive, isLoading, error } = useHive(hiveId); // завантажуємо дані про вулик  console.log(hive);
   const { mutate: updateTasks } = useUpdateHiveTasks();
   const { mutate: deleteTask } = useDeleteHiveTask();
@@ -148,6 +151,12 @@ export const BeeHiveCard = () => {
     setTasks(taskToUpdate); // Оновлюємо стан завдань
     updateTasks({ hiveId: hiveId.hiveId, tasks: taskToUpdate }); // Оновлюємо Firestore
     addTaskToConfirmation(taskToConfirmation[0]);
+    dispatch(
+      updateTaskState({
+        hiveId: hiveId.hiveId,
+        updatedTask: taskToUpdate,
+      })
+    );
   };
 
   // Функція для видалення завдання
@@ -158,6 +167,7 @@ export const BeeHiveCard = () => {
     deleteTask({ hiveId: hiveId.hiveId, tasks: updatedTasks });
     // Оновлюємо локальний стан
     setTasks(updatedTasks);
+    dispatch(removeTaskFromHive({ hiveId: hiveId.hiveId, taskId }));
   };
 
   return (
