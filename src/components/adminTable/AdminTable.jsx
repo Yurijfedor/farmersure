@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import { selectTasksUnderReview } from "../../redux/selectors"; // Імпортуємо селектор
+import { updateTaskState } from "../../redux/hivesSlice";
 import { useUpdateTaskStatus } from "../../hooks/useHives";
 
 export const AdminTable = () => {
   const tasks = useSelector(selectTasksUnderReview); // Отримуємо завдання зі статусом "Under Review"
+  const dispatch = useDispatch();
   console.log(tasks);
 
   const updateTask = useUpdateTaskStatus(); // Хук для оновлення завдань
@@ -23,12 +25,17 @@ export const AdminTable = () => {
       [taskId]: newStatus,
     }));
 
+    const taskToUpdate = tasks.map((task) => {
+      return task.id === taskId ? { ...task, status: newStatus } : task;
+    });
+
     // Викликаємо мутацію для оновлення статусу в Firebase
     updateTask.mutate({
       hiveId,
       taskId,
       newStatus, // Передаємо новий статус
     });
+    // dispatch(updateTaskState({ hiveId, updatedTask: taskToUpdate }));
   };
 
   return (

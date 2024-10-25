@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
 import { Backdrop } from "./Modal.styled";
 import { ModalContent } from "./Modal.styled";
 

@@ -1,12 +1,9 @@
 import {
   calculateHiveRent,
   calculateBeeColonyRent,
-  calculateTotalRent,
 } from "../../helpers/calculateRent";
 
-export const RentInfo = ({ hiveComponents, power }) => {
-  const totalRent = calculateTotalRent(hiveComponents, power);
-
+export const RentInfo = ({ hiveComponents, power, totalRent }) => {
   return (
     <div>
       <h4>
@@ -17,11 +14,9 @@ export const RentInfo = ({ hiveComponents, power }) => {
           style={{ position: "relative", cursor: "pointer" }}
           title={`Деталі розрахунку:\n- Оренда вулика: ${calculateHiveRent(
             hiveComponents
-          ).toFixed(2)}$\n- Оренда бджолосімї: ${calculateBeeColonyRent(
-            power
-          ).toFixed(2)}$`}
+          )}$\n- Оренда бджолосімї: ${calculateBeeColonyRent(power)}$`}
         >
-          {totalRent.toFixed(2)} $/міс
+          {totalRent} $/міс
         </span>
       </h4>
     </div>

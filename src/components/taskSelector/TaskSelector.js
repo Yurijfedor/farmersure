@@ -51,7 +51,7 @@ export const TaskSelector = ({ addTaskToTable, hiveId, tasks }) => {
         hiveId: hiveId,
         task: unifiedTask,
       });
-      dispatch(addTaskToHive({ hiveId, unifiedTask }));
+      dispatch(addTaskToHive({ hiveId, newTask: unifiedTask }));
     } else {
       // Якщо обране завдання зі списку
       const task = beekeepingTasks.find((t) => t.name === selectedTask);

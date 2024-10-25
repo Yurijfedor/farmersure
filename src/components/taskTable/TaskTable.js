@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { TaskSelector } from "../taskSelector/TaskSelector";
 import { executors } from "../../constants/executors"; // Імпортуємо масив виконавців
@@ -11,6 +11,7 @@ export const TaskTable = ({
   setTasks,
   currentMonth,
   hiveId,
+  onPlannedTasksTotalCostChange,
 }) => {
   const [tempDate, setTempDate] = useState({});
   const [selectedExecutor, setSelectedExecutor] = useState({});
@@ -52,6 +53,14 @@ export const TaskTable = ({
     // Перевірка, чи вибрана дата не пізніше ніж за 24 години до початку
     return selectedDate - currentDate > 24 * 60 * 60 * 1000; // 24 години в мілісекундах
   };
+
+  const getTotalCost = useCallback(() => {
+    return tasks.reduce((total, task) => total + (task.cost || 0), 0);
+  }, [tasks]);
+
+  useEffect(() => {
+    onPlannedTasksTotalCostChange(getTotalCost()); // Передаємо нове значення загальної вартості
+  }, [tasks, onPlannedTasksTotalCostChange, getTotalCost]);
 
   return (
     <>
@@ -96,7 +105,7 @@ export const TaskTable = ({
                       <span>{task.plannedDate}</span> // Відображаємо дату як рядок
                     )}
                   </td>
-                  <td>{task.cost}</td>
+                  <td>{task.cost.toFixed(2)}</td>
                   <td>
                     <div
                       style={{
@@ -157,6 +166,15 @@ export const TaskTable = ({
                 </tr>
               );
             })}
+            <tr>
+              <td colSpan="5" style={{ fontWeight: "bold" }}>
+                Total Cost:
+              </td>
+              <td style={{ fontWeight: "bold" }}>
+                ${getTotalCost().toFixed(2)}
+              </td>
+              <td colSpan="3"></td>
+            </tr>
           </tbody>
         </table>
       ) : (

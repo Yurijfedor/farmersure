@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -12,6 +11,8 @@ import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { RentInfo } from "../rentInfo/RentInfo";
 import { TaskTable } from "../taskTable/TaskTable";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
+import { Button } from "../button/Button";
+import { ContractModal } from "../сontractModal/ContractModal";
 import {
   useUpdateHiveTasks,
   useAddTaskToConfirmation,
@@ -21,8 +22,10 @@ import {
 import { updateTaskState, removeTaskFromHive } from "../../redux/hivesSlice";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
+import { calculateTotalRent } from "../../helpers/calculateRent";
 import { productPrices } from "../../constants/prices";
 import { generateTasksForMonth } from "../../helpers/generateTasksForMonth";
+import { calculateMandatoryTasksCost } from "../../helpers/calculateMandatoryTasksCost";
 
 import {
   SwiperWrapper,
@@ -48,6 +51,7 @@ export const BeeHiveCard = () => {
   const { mutate: addTaskToConfirmation } = useAddTaskToConfirmation();
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
@@ -61,6 +65,8 @@ export const BeeHiveCard = () => {
     droneHomogenate: false,
     beeVenom: false,
   });
+  const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
+  const [rentTotalCost, setRentTotalCost] = useState(0);
 
   const [tasks, setTasks] = useState(
     hive && hive.tasks && hive.tasks.length !== 0
@@ -169,6 +175,34 @@ export const BeeHiveCard = () => {
     setTasks(updatedTasks);
     dispatch(removeTaskFromHive({ hiveId: hiveId.hiveId, taskId }));
   };
+
+  const handleOpenContractModal = () => {
+    setIsContractModalOpen(true);
+  };
+
+  const handleCloseContractModal = () => {
+    setIsContractModalOpen(false);
+  };
+
+  const contractText = `
+    Договір оренди вулика та бджолосім'ї...
+    Орендодавець: __________
+    Орендар: __________
+    Вартість оренди: __________
+    Заплановані роботи: __________
+    Умови договору: __________
+  `;
+
+  const handleSignContract = () => {
+    // Логіка для списання суми з балансу користувача
+    handleCloseContractModal();
+  };
+
+  const handlePlannedTasksTotalCostChange = (newTotalCost) => {
+    setPlannedTasksTotalCost(newTotalCost);
+  };
+
+  const totalRent = calculateTotalRent(hive.hiveComponents, hive.power);
 
   return (
     <>
@@ -363,7 +397,11 @@ export const BeeHiveCard = () => {
         {<p>Трутневий гомогенат: {performance.droneHomogenateAmount} кг</p>}
         {<p>Бджолина отрута (сирець): {performance.beeVenomAmount} кг</p>}
       </Wrapper>
-      <RentInfo hiveComponents={hive.hiveComponents} power={hive.power} />
+      <RentInfo
+        hiveComponents={hive.hiveComponents}
+        power={hive.power}
+        totalRent={totalRent.toFixed(2)}
+      />
 
       <TaskTable
         tasks={tasks}
@@ -372,6 +410,35 @@ export const BeeHiveCard = () => {
         setTasks={setTasks}
         currentMonth={currentMonth}
         hiveId={hiveId.hiveId}
+        onPlannedTasksTotalCostChange={handlePlannedTasksTotalCostChange}
+      />
+      <Button
+        variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
+        size="large" // Розмір кнопки, наприклад "large"
+        onClick={handleOpenContractModal} // Функція для відкриття модалки
+      >
+        Оформити договір оренди на наступний місяць ( $
+        {(totalRent + plannedTasksTotalCost).toFixed(2)} )
+        <br />
+        управління бджолосім'єю онлайн, збір доступних продуктів бджільництва
+      </Button>
+      <Button
+        variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
+        size="large" // Розмір кнопки, наприклад "large"
+        onClick={handleOpenContractModal} // Функція для відкриття модалки
+      >
+        Оформити договір оренди на 6 місяців - повний сезон ($
+        {(totalRent * 6 + calculateMandatoryTasksCost()).toFixed(2)})
+        <br />
+        управління бджолосім'єю онлайн, гарантоване отримання базового набору
+        продуктів бджільництва
+      </Button>
+      {/* Модалка для договору */}
+      <ContractModal
+        isOpen={isContractModalOpen}
+        onClose={handleCloseContractModal}
+        contractText={contractText}
+        onSignContract={handleSignContract}
       />
     </>
   );
