@@ -1,4 +1,5 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import thunk from "redux-thunk";
 import {
   persistStore,
   persistReducer,
@@ -33,7 +34,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(thunk), // Додаємо thunk до middleware
 });
 
 export const persistor = persistStore(store);

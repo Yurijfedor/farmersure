@@ -1,18 +1,26 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { selectTasksUnderReview } from "../../redux/selectors"; // Імпортуємо селектор
-import { updateTaskState } from "../../redux/hivesSlice";
+import {
+  selectTasksUnderReview,
+  selectHives,
+  selectAllTasks,
+} from "../../redux/selectors"; // Імпортуємо селектор
+import { updateTaskStatusAsync } from "../../redux/operations";
+import { updateTasksStatus } from "../../redux/hivesSlice";
 import { useUpdateTaskStatus } from "../../hooks/useHives";
+import { updateTaskStatus } from "../../services/hives";
 
 export const AdminTable = () => {
-  const tasks = useSelector(selectTasksUnderReview); // Отримуємо завдання зі статусом "Under Review"
+  const tasksUnderReview = useSelector(selectTasksUnderReview); // Отримуємо завдання зі статусом "Under Review"
+  const tasks = useSelector(selectAllTasks);
   const dispatch = useDispatch();
-  console.log(tasks);
 
   const updateTask = useUpdateTaskStatus(); // Хук для оновлення завдань
 
   const [statusUpdate, setStatusUpdate] = useState({});
+
+  console.log(tasks);
 
   const handleStatusChange = (taskId, hiveId, newStatus) => {
     if (!newStatus) {
@@ -20,22 +28,8 @@ export const AdminTable = () => {
       return;
     }
 
-    setStatusUpdate((prevState) => ({
-      ...prevState,
-      [taskId]: newStatus,
-    }));
-
-    const taskToUpdate = tasks.map((task) => {
-      return task.id === taskId ? { ...task, status: newStatus } : task;
-    });
-
-    // Викликаємо мутацію для оновлення статусу в Firebase
-    updateTask.mutate({
-      hiveId,
-      taskId,
-      newStatus, // Передаємо новий статус
-    });
-    // dispatch(updateTaskState({ hiveId, updatedTask: taskToUpdate }));
+    // Викликаємо асинхронний action
+    dispatch(updateTaskStatusAsync({ hiveId, taskId, newStatus }));
   };
 
   return (
@@ -53,7 +47,7 @@ export const AdminTable = () => {
         </tr>
       </thead>
       <tbody>
-        {tasks.map((task) => (
+        {tasksUnderReview.map((task) => (
           <tr key={task.id}>
             <td>{task.hiveId}</td>
             <td>{task.name}</td>

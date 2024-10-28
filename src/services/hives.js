@@ -16,7 +16,6 @@ export const fetchAllHives = async () => {
     id: doc.id,
     ...doc.data(),
   }));
-  console.log(data);
 
   return data;
 };
@@ -44,6 +43,10 @@ export const updateHiveTasks = async ({ hiveId, tasks }) => {
 };
 
 export const updateTaskStatus = async ({ hiveId, taskId, newStatus }) => {
+  console.log(hiveId);
+  console.log(taskId);
+  console.log(newStatus);
+
   // Отримуємо посилання на документ вулика
   const hiveRef = doc(db, "hives", hiveId);
 

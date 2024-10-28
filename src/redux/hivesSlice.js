@@ -1,6 +1,6 @@
 import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 
-import { fetchAllHives } from "./operations";
+import { fetchAllHives, updateTaskStatusAsync } from "./operations";
 import {
   fetchAllHivesSuccessReducer,
   pendingReducer,
@@ -11,7 +11,7 @@ import {
   removeTaskReducer,
 } from "./reducers";
 
-const extraActions = [fetchAllHives];
+const extraActions = [fetchAllHives, updateTaskStatusAsync]; // Додаємо async action
 
 const getActions = (type) => extraActions.map((action) => action[type]);
 
@@ -26,7 +26,7 @@ const hivesSlice = createSlice({
   initialState: hivesInitialState,
 
   reducers: {
-    updateTaskState: updateTaskReducer,
+    updateTasksStatus: updateTaskReducer,
     addTaskToHive: addTaskReducer,
     removeTaskFromHive: removeTaskReducer,
   },
@@ -34,12 +34,26 @@ const hivesSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllHives.fulfilled, fetchAllHivesSuccessReducer)
+      .addCase(updateTaskStatusAsync.fulfilled, (state, action) => {
+        // Знаходимо вулик і оновлюємо статус завдання у стані Redux
+        const { hiveId, updatedTask } = action.payload;
+        const hive = state.hives.find((hive) => hive.id === hiveId);
+
+        if (hive) {
+          const taskIndex = hive.tasks.findIndex(
+            (task) => task.id === updatedTask.id
+          );
+          if (taskIndex !== -1) {
+            hive.tasks[taskIndex] = updatedTask;
+          }
+        }
+      })
       .addMatcher(isAnyOf(...getActions("pending")), pendingReducer)
       .addMatcher(isAnyOf(...getActions("rejected")), rejectedReducer)
       .addMatcher(isAnyOf(...getActions("fulfilled")), fulfilledReducer);
   },
 });
 
-export const { updateTaskState, addTaskToHive, removeTaskFromHive } =
+export const { updateTasksStatus, addTaskToHive, removeTaskFromHive } =
   hivesSlice.actions;
 export const hivesReducer = hivesSlice.reducer;

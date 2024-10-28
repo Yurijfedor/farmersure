@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -19,7 +19,14 @@ import {
   useDeleteHiveTask,
   useHive,
 } from "../../hooks/useHives";
-import { updateTaskState, removeTaskFromHive } from "../../redux/hivesSlice";
+import { updateTasksStatus, removeTaskFromHive } from "../../redux/hivesSlice";
+import {
+  selectDoneTasks,
+  selectHives,
+  selectHiveById,
+  selectIsLoading,
+  selectError,
+} from "../../redux/selectors";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
 import { calculateTotalRent } from "../../helpers/calculateRent";
@@ -45,7 +52,9 @@ export const BeeHiveCard = () => {
   const hiveId = useParams();
   const user = JSON.parse(localStorage.getItem("user"));
   const dispatch = useDispatch();
-  const { data: hive, isLoading, error } = useHive(hiveId); // завантажуємо дані про вулик  console.log(hive);
+  const hive = useSelector((state) => selectHiveById(state, hiveId.hiveId));
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
   const { mutate: updateTasks } = useUpdateHiveTasks();
   const { mutate: deleteTask } = useDeleteHiveTask();
   const { mutate: addTaskToConfirmation } = useAddTaskToConfirmation();
@@ -66,15 +75,25 @@ export const BeeHiveCard = () => {
     beeVenom: false,
   });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
-  const [rentTotalCost, setRentTotalCost] = useState(0);
-
-  const [tasks, setTasks] = useState(
-    hive && hive.tasks && hive.tasks.length !== 0
-      ? hive.tasks
-      : !JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}-${user.uid}`))
-      ? generateTasksForMonth(currentMonth, hiveId.hiveId)
-      : JSON.parse(localStorage.getItem(`tasks-${hiveId.hiveId}-${user.uid}`))
+  const doneTasks = useSelector((state) =>
+    selectDoneTasks(state, hiveId.hiveId)
   );
+
+  const [tasks, setTasks] = useState(() => {
+    if (hive && hive.tasks && hive.tasks.length !== 0) {
+      if (!hive.lessee) {
+        console.log(generateTasksForMonth(currentMonth, hiveId.hiveId));
+
+        return doneTasks.concat(
+          generateTasksForMonth(currentMonth, hiveId.hiveId)
+        );
+      } else {
+        return hive.tasks;
+      }
+    } else {
+      return generateTasksForMonth(currentMonth, hiveId.hiveId); // Якщо немає завдань
+    }
+  });
 
   useEffect(() => {
     if (hive && hive.tasks) {
@@ -146,21 +165,20 @@ export const BeeHiveCard = () => {
   );
 
   const handleConfirmTask = (taskId) => {
-    console.log(taskId);
-
     const taskToUpdate = tasks.map((task) => {
       return task.id === taskId ? { ...task, status: "Under Review" } : task;
     });
 
-    const taskToConfirmation = tasks.filter((task) => task.id === taskId);
+    const taskToConfirmation = taskToUpdate.filter(
+      (task) => task.id === taskId
+    );
 
     setTasks(taskToUpdate); // Оновлюємо стан завдань
     updateTasks({ hiveId: hiveId.hiveId, tasks: taskToUpdate }); // Оновлюємо Firestore
-    addTaskToConfirmation(taskToConfirmation[0]);
     dispatch(
-      updateTaskState({
+      updateTasksStatus({
         hiveId: hiveId.hiveId,
-        updatedTask: taskToUpdate,
+        updatedTask: taskToConfirmation[0],
       })
     );
   };

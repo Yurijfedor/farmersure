@@ -5,9 +5,16 @@ export const fetchAllHivesSuccessReducer = (state, action) => {
 export const updateTaskReducer = (state, action) => {
   const { hiveId, updatedTask } = action.payload;
   const hive = state.hives.find((hive) => hive.id === hiveId);
+  console.log(updatedTask);
 
   if (hive) {
-    hive.tasks = updatedTask; // Оновлення завдання в state
+    hive.tasks = hive.tasks.map((task) => {
+      // Якщо ID завдання дорівнює ID оновленого завдання, повертаємо оновлене
+      if (task.id === updatedTask.id) {
+        return updatedTask; // Замінюємо старе завдання на нове
+      }
+      return task; // Інакше повертаємо старе завдання без змін
+    });
   }
 };
 
