@@ -1,26 +1,14 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import {
-  selectTasksUnderReview,
-  selectHives,
-  selectAllTasks,
-} from "../../redux/selectors"; // Імпортуємо селектор
+import { selectTasksUnderReview } from "../../redux/selectors"; // Імпортуємо селектор
 import { updateTaskStatusAsync } from "../../redux/operations";
-import { updateTasksStatus } from "../../redux/hivesSlice";
-import { useUpdateTaskStatus } from "../../hooks/useHives";
-import { updateTaskStatus } from "../../services/hives";
 
 export const AdminTable = () => {
   const tasksUnderReview = useSelector(selectTasksUnderReview); // Отримуємо завдання зі статусом "Under Review"
-  const tasks = useSelector(selectAllTasks);
   const dispatch = useDispatch();
 
-  const updateTask = useUpdateTaskStatus(); // Хук для оновлення завдань
-
   const [statusUpdate, setStatusUpdate] = useState({});
-
-  console.log(tasks);
 
   const handleStatusChange = (taskId, hiveId, newStatus) => {
     if (!newStatus) {

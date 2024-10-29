@@ -5,7 +5,6 @@ import { useDispatch } from "react-redux";
 // import { useHivesQuery } from "./hooks/useHives";
 import { fetchAllHives } from "./redux/operations";
 
-import { useAuth } from "./hooks/useAuth";
 import PrivateRoutes from "./PrivateRoutes/PrivateRoutes";
 
 const Subcategory = lazy(() => import("./pages/Subcategory"));

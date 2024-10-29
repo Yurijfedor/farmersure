@@ -1,4 +1,5 @@
 import { BeeHiveCard } from "../components/beeHiveCard/BeeHiveCard";
+
 const HiveCard = () => {
   return <BeeHiveCard />;
 };

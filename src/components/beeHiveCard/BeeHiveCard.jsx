@@ -13,16 +13,10 @@ import { TaskTable } from "../taskTable/TaskTable";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
 import { Button } from "../button/Button";
 import { ContractModal } from "../сontractModal/ContractModal";
-import {
-  useUpdateHiveTasks,
-  useAddTaskToConfirmation,
-  useDeleteHiveTask,
-  useHive,
-} from "../../hooks/useHives";
+import { useUpdateHiveTasks, useDeleteHiveTask } from "../../hooks/useHives";
 import { updateTasksStatus, removeTaskFromHive } from "../../redux/hivesSlice";
 import {
   selectDoneTasks,
-  selectHives,
   selectHiveById,
   selectIsLoading,
   selectError,
@@ -57,7 +51,6 @@ export const BeeHiveCard = () => {
   const error = useSelector(selectError);
   const { mutate: updateTasks } = useUpdateHiveTasks();
   const { mutate: deleteTask } = useDeleteHiveTask();
-  const { mutate: addTaskToConfirmation } = useAddTaskToConfirmation();
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);

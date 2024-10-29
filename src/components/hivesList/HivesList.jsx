@@ -1,5 +1,9 @@
 import { parse, differenceInMonths, getYear } from "date-fns";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+
 import { useHivesQuery } from "../../hooks/useHives";
+import { heartFull as HeartFull } from "../../images";
+
 import {
   HivesListStyled,
   ImgStyled,
@@ -13,27 +17,33 @@ import {
   CardTextWrapper,
   CardTextPopup,
 } from "./HivesList.styled";
-import { heartFull as HeartFull } from "../../images";
 
 export const HivesList = () => {
-  const handleClick = (id) => {
-    console.log(`hello! I am this: ${id}`);
-  };
-
+  const navigate = useNavigate(); // Initialize navigate
   const { data, isSuccess } = useHivesQuery();
+
+  const handleHiveClick = (hive) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userEmail = user ? user.email : null;
+
+    if (hive.lessee === "") {
+      // If lessee is an empty string, allow access
+      console.log(`Navigating to hive card: ${hive.id}`);
+      navigate(`/ourservices/hive_card/${hive.id}`); // Navigate to hive card
+    } else if (hive.lessee === userEmail) {
+      // If lessee matches the logged-in user, allow access
+      console.log(`Navigating to hive card: ${hive.id}`);
+      navigate(`/ourservices/hive_card/${hive.id}`); // Navigate to hive card
+    } else {
+      // If lessee does not match, show alert
+      alert("Цей вулик уже в оренді. Будь ласка, виберіть інший.");
+    }
+  };
 
   const getQueensAge = (dateString) => {
     const date = parse(dateString, "dd.MM.yyyy", new Date());
     const today = new Date();
-    const diffInMonths = differenceInMonths(today, date);
-    return diffInMonths;
-  };
-
-  const getDiffInMonths = (dateString) => {
-    const date = parse(dateString, "dd.MM.yyyy", new Date());
-    const today = new Date();
-    const diffInMonths = differenceInMonths(date, today);
-    return diffInMonths;
+    return differenceInMonths(today, date);
   };
 
   return (
@@ -44,9 +54,8 @@ export const HivesList = () => {
         data.map((hive) => {
           return (
             <ItemStyled key={hive.id} type={hive.lessee}>
-              <LinkStyled
-                to={`/ourservices/hive_card/${hive.id}`}
-                onClick={() => handleClick(hive.id)}
+              <div
+                onClick={() => handleHiveClick(hive)} // Call the new handler
               >
                 <ImageWrapp>
                   <ImgStyled
@@ -64,7 +73,7 @@ export const HivesList = () => {
                     <img src={HeartFull} alt="heartFull" />
                   </HeartButton>
                 </ImageWrapp>
-              </LinkStyled>
+              </div>
 
               <CardContentWrapp>
                 <CardTextWrapper>
