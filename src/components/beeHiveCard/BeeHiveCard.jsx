@@ -71,37 +71,31 @@ export const BeeHiveCard = () => {
   const doneTasks = useSelector((state) =>
     selectDoneTasks(state, hiveId.hiveId)
   );
-
-  const [tasks, setTasks] = useState(() => {
-    if (hive && hive.tasks && hive.tasks.length !== 0) {
-      if (!hive.lessee) {
-        console.log(generateTasksForMonth(currentMonth, hiveId.hiveId));
-
-        return doneTasks.concat(
-          generateTasksForMonth(currentMonth, hiveId.hiveId)
-        );
-      } else {
-        return hive.tasks;
-      }
-    } else {
-      return generateTasksForMonth(currentMonth, hiveId.hiveId); // Якщо немає завдань
-    }
-  });
+  const tasks =
+    hive && hive.tasks && hive.tasks.length !== 0
+      ? !hive.lessee
+        ? doneTasks.concat(generateTasksForMonth(currentMonth, hiveId.hiveId))
+        : hive.tasks
+      : generateTasksForMonth(currentMonth, hiveId.hiveId); // Якщо немає завдань
 
   useEffect(() => {
-    if (hive && hive.tasks) {
-      // Якщо є завдання у Firebase
-      setTasks(hive.tasks.length !== 0 ? hive.tasks : []);
-    } else {
-      // Якщо завдань у Firebase немає, завантажити з LocalStorage
-      const localTasks = localStorage.getItem(
-        `tasks-${hiveId.hiveId}-${user.uid}`
-      );
-      if (localTasks) {
-        setTasks(JSON.parse(localTasks));
-      }
-    }
-  }, [hive, hiveId, user.uid]); // Залежності без tasks
+    console.log("i am a reload!");
+  }, []);
+
+  // useEffect(() => {
+  //   if (hive && hive.tasks) {
+  //     // Якщо є завдання у Firebase
+  //     setTasks(hive.tasks.length !== 0 ? hive.tasks : []);
+  //   } else {
+  //     // Якщо завдань у Firebase немає, завантажити з LocalStorage
+  //     const localTasks = localStorage.getItem(
+  //       `tasks-${hiveId.hiveId}-${user.uid}`
+  //     );
+  //     if (localTasks) {
+  //       setTasks(JSON.parse(localTasks));
+  //     }
+  //   }
+  // }, [hive, hiveId, user.uid]); // Залежності без tasks
 
   useLockBodyScroll(isModalOpen);
 
@@ -166,7 +160,7 @@ export const BeeHiveCard = () => {
       (task) => task.id === taskId
     );
 
-    setTasks(taskToUpdate); // Оновлюємо стан завдань
+    // setTasks(taskToUpdate); // Оновлюємо стан завдань
     updateTasks({ hiveId: hiveId.hiveId, tasks: taskToUpdate }); // Оновлюємо Firestore
     dispatch(
       updateTasksStatus({
@@ -183,7 +177,7 @@ export const BeeHiveCard = () => {
     // Оновлюємо Firestore, передаючи оновлений масив tasks
     deleteTask({ hiveId: hiveId.hiveId, tasks: updatedTasks });
     // Оновлюємо локальний стан
-    setTasks(updatedTasks);
+    // setTasks(updatedTasks);
     dispatch(removeTaskFromHive({ hiveId: hiveId.hiveId, taskId }));
   };
 
@@ -418,7 +412,6 @@ export const BeeHiveCard = () => {
         tasks={tasks}
         onConfirmTask={handleConfirmTask}
         onDeleteTask={handleDeleteTask}
-        setTasks={setTasks}
         currentMonth={currentMonth}
         hiveId={hiveId.hiveId}
         onPlannedTasksTotalCostChange={handlePlannedTasksTotalCostChange}

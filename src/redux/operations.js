@@ -51,7 +51,7 @@ export const fetchHiveById = createAsyncThunk(
 
 export const updateTaskStatusAsync = createAsyncThunk(
   "hives/updateTaskStatus",
-  async ({ hiveId, taskId, newStatus }, { rejectWithValue }) => {
+  async ({ hiveId, taskId, property, newValue }, { rejectWithValue }) => {
     try {
       // Отримуємо документ вулика з Firestore
       const hiveRef = doc(db, "hives", hiveId);
@@ -65,8 +65,10 @@ export const updateTaskStatusAsync = createAsyncThunk(
 
       // Оновлюємо конкретне завдання в масиві
       const updatedTasks = tasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
+        task.id === taskId ? { ...task, [property]: newValue } : task
       );
+      console.log(newValue);
+      console.log(updatedTasks);
 
       // Оновлюємо документ вулика з новим масивом завдань
       await updateDoc(hiveRef, { tasks: updatedTasks });

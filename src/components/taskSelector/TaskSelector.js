@@ -7,7 +7,7 @@ import { unifyTask } from "../../helpers/generateTasksForMonth";
 import { useUpdateHiveTasks, useAddSingleTasks } from "../../hooks/useHives";
 import { addTaskToHive } from "../../redux/hivesSlice";
 
-export const TaskSelector = ({ addTaskToTable, hiveId, tasks }) => {
+export const TaskSelector = ({ hiveId, tasks }) => {
   const dispatch = useDispatch();
   // Стан для обраного завдання
   const [selectedTask, setSelectedTask] = useState("");
@@ -46,7 +46,7 @@ export const TaskSelector = ({ addTaskToTable, hiveId, tasks }) => {
       const unifiedTask = unifyTask(customTask, hiveId);
       if (!validateCustomTaskFields()) return;
       // Якщо обране власне завдання
-      addTaskToTable((prevTasks) => [unifiedTask, ...prevTasks]);
+      // addTaskToTable((prevTasks) => [unifiedTask, ...prevTasks]);
       addSingleTask({
         hiveId: hiveId,
         task: unifiedTask,
@@ -57,7 +57,7 @@ export const TaskSelector = ({ addTaskToTable, hiveId, tasks }) => {
       const task = beekeepingTasks.find((t) => t.name === selectedTask);
       if (task) {
         const unifiedTask = unifyTask(task, hiveId);
-        addTaskToTable((prevTasks) => [unifiedTask, ...prevTasks]); // Викликаємо функцію, щоб додати завдання у таблицю
+        // addTaskToTable((prevTasks) => [unifiedTask, ...prevTasks]); // Викликаємо функцію, щоб додати завдання у таблицю
         addSingleTask({ hiveId: hiveId, task: unifiedTask });
         dispatch(addTaskToHive({ hiveId, newTask: unifiedTask }));
       }

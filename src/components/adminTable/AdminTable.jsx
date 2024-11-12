@@ -10,14 +10,13 @@ export const AdminTable = () => {
 
   const [statusUpdate, setStatusUpdate] = useState({});
 
-  const handleStatusChange = (taskId, hiveId, newStatus) => {
-    if (!newStatus) {
+  const handleStatusChange = (taskId, hiveId, property, newValue) => {
+    if (!newValue) {
       console.error("Invalid status selected");
       return;
     }
-
     // Викликаємо асинхронний action
-    dispatch(updateTaskStatusAsync({ hiveId, taskId, newStatus }));
+    dispatch(updateTaskStatusAsync({ hiveId, taskId, property, newValue }));
   };
 
   return (
@@ -48,7 +47,12 @@ export const AdminTable = () => {
               <select
                 value={statusUpdate[task.id] || task.status}
                 onChange={(e) =>
-                  handleStatusChange(task.id, task.hiveId, e.target.value)
+                  handleStatusChange(
+                    task.id,
+                    task.hiveId,
+                    "status",
+                    e.target.value
+                  )
                 }
               >
                 <option value="Under Review">Under Review</option>

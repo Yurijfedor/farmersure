@@ -35,7 +35,6 @@ const hivesSlice = createSlice({
     builder
       .addCase(fetchAllHives.fulfilled, fetchAllHivesSuccessReducer)
       .addCase(updateTaskStatusAsync.fulfilled, (state, action) => {
-        // Знаходимо вулик і оновлюємо статус завдання у стані Redux
         const { hiveId, updatedTask } = action.payload;
         const hive = state.hives.find((hive) => hive.id === hiveId);
 
@@ -44,7 +43,12 @@ const hivesSlice = createSlice({
             (task) => task.id === updatedTask.id
           );
           if (taskIndex !== -1) {
-            hive.tasks[taskIndex] = updatedTask;
+            // Створюємо новий масив завдань з оновленим завданням
+            hive.tasks = [
+              ...hive.tasks.slice(0, taskIndex),
+              updatedTask,
+              ...hive.tasks.slice(taskIndex + 1),
+            ];
           }
         }
       })
