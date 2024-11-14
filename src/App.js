@@ -39,6 +39,7 @@ const Login = lazy(() => import("./pages/LogIn"));
 const Register = lazy(() => import("./pages/Register"));
 const HiveCard = lazy(() => import("./pages/HiveCard"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -86,6 +87,11 @@ export const App = () => {
           </Route>
           <Route path="/foradmin">
             <Route path="adminpanel" element={<AdminPanel />} />
+          </Route>
+          <Route path="/dashboard">
+            <Route element={<PrivateRoutes />}>
+              <Route path=":userId" element={<ClientDashboard />} />
+            </Route>
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

@@ -60,33 +60,38 @@ export const NavBar = ({ categories }) => {
                 {category.title}
               </div>
               <SubcategoriesList ref={ref}>
-                {category.subcategories.map((subcategory) => (
-                  <SubcategoriesItem key={subcategory.id}>
-                    {subcategory.route === "rent" ? (
-                      <Link
-                        to={
-                          isAuth
-                            ? `${category.title.split(" ").join("")}/${
-                                subcategory.route
-                              }`
-                            : "/login"
-                        }
-                        onClick={handleSubcategoryClick}
-                      >
-                        {subcategory.title}
-                      </Link>
-                    ) : (
-                      <Link
-                        to={`${category.title.split(" ").join("")}/${
+                {category.subcategories.map((subcategory) => {
+                  let toPath;
+
+                  if (subcategory.route === "dashboard") {
+                    const user = JSON.parse(localStorage.getItem("user")); // Дістаємо об'єкт користувача
+                    if (user && user.uid) {
+                      toPath = `${category.title.split(" ").join("")}/${
+                        user.uid
+                      }`;
+                    } else {
+                      toPath = "/login"; // Якщо користувач не знайдений, перенаправляємо на сторінку входу
+                    }
+                  } else if (subcategory.route === "rent") {
+                    toPath = isAuth
+                      ? `${category.title.split(" ").join("")}/${
                           subcategory.route
-                        }`}
-                        onClick={handleSubcategoryClick}
-                      >
+                        }`
+                      : "/login";
+                  } else {
+                    toPath = `${category.title.split(" ").join("")}/${
+                      subcategory.route
+                    }`;
+                  }
+
+                  return (
+                    <SubcategoriesItem key={subcategory.id}>
+                      <Link to={toPath} onClick={handleSubcategoryClick}>
                         {subcategory.title}
                       </Link>
-                    )}
-                  </SubcategoriesItem>
-                ))}
+                    </SubcategoriesItem>
+                  );
+                })}
               </SubcategoriesList>
             </NavItem>
           );

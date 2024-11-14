@@ -130,9 +130,20 @@ export const categories = [
     title: "for admin",
     subcategories: [
       {
-        id: "62",
+        id: "71",
         title: "Admin Panel",
         route: "adminpanel",
+      },
+    ],
+  },
+  {
+    id: "8",
+    title: "dashboard",
+    subcategories: [
+      {
+        id: "81",
+        title: "User Cabinet",
+        route: "dashboard",
       },
     ],
   },
