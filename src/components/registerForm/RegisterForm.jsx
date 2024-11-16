@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+
 import { register } from "../../services/auth";
 
 import {
@@ -12,6 +13,7 @@ import {
 export const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const navigate = useNavigate();
 
   const { mutate: registerMutation } = useMutation(register, {
@@ -26,7 +28,7 @@ export const RegisterForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     try {
-      registerMutation({ email, password });
+      registerMutation({ email, password, name });
       navigate("/register");
       setEmail("");
       setPassword("");
@@ -38,11 +40,19 @@ export const RegisterForm = () => {
   return (
     <FormStyled onSubmit={handleSubmit}>
       <InputStyled
+        placeholder="name"
+        name="name"
+        value={name}
+        type="text"
+        onChange={(e) => setName(e.target.value)}
+      />
+      <InputStyled
         placeholder="e-mail"
         name="email"
         value={email}
         type="email"
         onChange={(e) => setEmail(e.target.value)}
+        required
       />
       <InputStyled
         placeholder="password"
@@ -50,6 +60,7 @@ export const RegisterForm = () => {
         value={password}
         type="password"
         onChange={(e) => setPassword(e.target.value)}
+        required
       />
       <ButtonSubmit type="submit">Register</ButtonSubmit>
     </FormStyled>
