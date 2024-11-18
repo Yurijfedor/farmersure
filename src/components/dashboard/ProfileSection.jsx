@@ -9,7 +9,6 @@ export const ProfileSection = () => {
   const [editableProfile, setEditableProfile] = useState(null);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
-  // console.log(editableProfile.photoURL);
 
   // Синхронізація editableProfile з profile
   useEffect(() => {
@@ -32,7 +31,7 @@ export const ProfileSection = () => {
     setUploading(true);
     try {
       const imageUrl = await uploadProfilePicture(image, profile.id); // profile.id як унікальний ідентифікатор
-      setEditableProfile((prev) => ({ ...prev, photoURL: imageUrl }));
+      setEditableProfile((prev) => ({ ...prev, customPhotoURL: imageUrl }));
       setImage(null);
       setUploading(false);
     } catch (err) {
@@ -59,9 +58,11 @@ export const ProfileSection = () => {
             <div>
               <img
                 src={
-                  editableProfile.photoURL || "https://via.placeholder.com/150" // Зображення за замовчуванням
+                  editableProfile.customPhotoURL ||
+                  editableProfile.photoURL ||
+                  "https://via.placeholder.com/150"
                 }
-                alt="Профіль"
+                alt="Profile"
                 style={{ width: 150, height: 150, borderRadius: "50%" }}
               />
               {isEditing && (

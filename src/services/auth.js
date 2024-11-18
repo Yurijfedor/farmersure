@@ -74,7 +74,7 @@ export const logInWithGoogle = async () => {
     await syncUserProfile(user);
 
     const userData = {
-      id: user.uid,
+      uid: user.uid,
       name: user.displayName,
       email: user.email,
       photoURL: user.photoURL, // URL фото профілю з Google

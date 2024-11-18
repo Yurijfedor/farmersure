@@ -31,6 +31,11 @@ export const uploadProfilePicture = async (file, userId) => {
     const storageRef = ref(storage, `profilePictures/${userId}`);
     await uploadBytes(storageRef, file);
     const downloadURL = await getDownloadURL(storageRef);
+
+    await updateDoc(doc(db, "users", userId), {
+      customPhotoURL: downloadURL, // Оновлюємо тільки customPhotoURL
+    });
+
     return downloadURL;
   } catch (error) {
     throw new Error("Не вдалося завантажити фото профілю.");
@@ -46,16 +51,19 @@ export const syncUserProfile = async (user) => {
       name: user.displayName || "",
       email: user.email || "",
       phone: "",
-      photoURL: user.photoURL || "", // Додаємо URL профілю
+      photoURL: user.photoURL || "",
+      customPhotoURL: "", // Додаємо це поле
     });
   } else if (!userDoc.data().photoURL && user.photoURL) {
     await updateDoc(doc(db, "users", user.uid), {
-      photoURL: user.photoURL, // Додаємо URL, якщо його немає в Firestore
+      photoURL: user.photoURL,
     });
   }
 };
 
 export const saveUserProfile = async (uid, data) => {
+  console.log(data);
+
   try {
     const userDocRef = doc(db, "users", uid);
     const userDoc = await getDoc(userDocRef);
@@ -66,5 +74,24 @@ export const saveUserProfile = async (uid, data) => {
     }
   } catch (error) {
     console.error("Помилка збереження профілю:", error.message);
+  }
+};
+
+export const updateUserProfile = async (uid, data) => {
+  console.log(data);
+
+  try {
+    const userDocRef = doc(db, "users", uid);
+    const userDoc = await getDoc(userDocRef);
+
+    // Оновлюємо дані тільки якщо документ існує
+    if (userDoc.exists()) {
+      await updateDoc(userDocRef, data);
+      console.log("Профіль успішно оновлено.");
+    } else {
+      console.log("Документ не знайдено. Немає чого оновлювати.");
+    }
+  } catch (error) {
+    console.error("Помилка оновлення профілю:", error.message);
   }
 };

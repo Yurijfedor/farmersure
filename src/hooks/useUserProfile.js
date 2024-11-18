@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 
-import { saveUserProfile, getUserProfile } from "../services/user";
+import {
+  saveUserProfile,
+  getUserProfile,
+  updateUserProfile,
+} from "../services/user";
 
 import db from "../firebase"; // Імпортуйте ваш екземпляр Firestore
 
@@ -14,7 +18,6 @@ export const useUserProfile = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?.uid;
-  console.log(profile);
 
   useEffect(() => {
     if (userId) {
@@ -31,9 +34,11 @@ export const useUserProfile = () => {
   }, [userId]);
 
   const updateProfile = async (userData) => {
+    console.log(userId);
+
     if (userId) {
       try {
-        await saveUserProfile(userData); // Зберігаємо/оновлюємо профіль в Firestore
+        await updateUserProfile(userId, userData); // Зберігаємо/оновлюємо профіль в Firestore
         setProfile(userData);
       } catch (err) {
         setError(err.message);

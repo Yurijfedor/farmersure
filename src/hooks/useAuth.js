@@ -11,42 +11,46 @@ export const useAuth = () => {
   const [isAuth, setIsAuth] = useState(false); // Стан для автентифікації
   const [isAdmin, setIsAdmin] = useState(false); // Стан для адміністратора
   const [loading, setLoading] = useState(true); // Стан завантаження
+  const [isAuthenticating, setIsAuthenticating] = useState(true); // Стан завершення процесу автентифікації
 
   useEffect(() => {
     const auth = getAuth();
     const db = getFirestore();
 
-    // Налаштування сесії тільки на час сесії браузера
     setPersistence(auth, browserSessionPersistence)
       .then(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
+            setIsAuthenticating(true); // Початок процесу автентифікації
             localStorage.setItem("user", JSON.stringify(user));
             setIsAuth(true);
 
             // Перевірка чи користувач є адміністратором
-            const adminDocRef = doc(db, "admins", user.uid);
-            const adminDoc = await getDoc(adminDocRef);
+            try {
+              const adminDocRef = doc(db, "admins", user.uid);
+              const adminDoc = await getDoc(adminDocRef);
 
-            if (adminDoc.exists()) {
-              setIsAdmin(true); // Якщо документ існує, користувач — адміністратор
-            } else {
-              setIsAdmin(false); // Інакше, користувач не адміністратор
+              setIsAdmin(adminDoc.exists());
+            } catch (error) {
+              console.error("Помилка перевірки адміністратора:", error);
             }
           } else {
             localStorage.removeItem("user");
             setIsAuth(false);
             setIsAdmin(false);
           }
-          setLoading(false); // Після зміни стану автентифікації закінчуємо завантаження
+          setIsAuthenticating(false); // Завершення процесу автентифікації
+          setLoading(false); // Завершення завантаження
         });
+
         return unsubscribe;
       })
       .catch((error) => {
         console.error("Помилка при налаштуванні persistence:", error);
-        setLoading(false); // Якщо є помилка, також припиняємо завантаження
+        setLoading(false);
+        setIsAuthenticating(false);
       });
   }, []);
 
-  return { isAuth, isAdmin, loading }; // Повертаємо isAdmin та isAuth
+  return { isAuth, isAdmin, loading, isAuthenticating }; // Додаємо isAuthenticating
 };
