@@ -143,7 +143,7 @@ export const categories = [
       {
         id: "81",
         title: "User Cabinet",
-        route: "dashboard",
+        route: "user",
       },
     ],
   },

@@ -71,16 +71,19 @@ export const BeeHiveCard = () => {
   const doneTasks = useSelector((state) =>
     selectDoneTasks(state, hiveId.hiveId)
   );
+  console.log(hive.lessee === "");
+
   const tasks =
     hive && hive.tasks && hive.tasks.length !== 0
-      ? !hive.lessee
-        ? doneTasks.concat(generateTasksForMonth(currentMonth, hiveId.hiveId))
-        : hive.tasks
+      ? [...hive.tasks]
+          .reverse()
+          .concat(generateTasksForMonth(currentMonth, hiveId.hiveId))
       : generateTasksForMonth(currentMonth, hiveId.hiveId); // Якщо немає завдань
 
   useEffect(() => {
     console.log("i am a reload!");
   }, []);
+  console.log(tasks);
 
   // useEffect(() => {
   //   if (hive && hive.tasks) {

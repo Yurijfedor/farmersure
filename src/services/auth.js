@@ -50,7 +50,8 @@ export const logInWithEmail = async (userData) => {
   try {
     const { email, password } = userData;
     const { user } = await signInWithEmailAndPassword(auth, email, password);
-
+    await syncUserProfile(user);
+    await saveUserProfile(user.uid, { uid: user.uid, email: user.email });
     // Необов'язкове оновлення локального профілю, якщо необхідно
     localStorage.setItem(
       "user",

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+
 import { logInWithEmail, logInWithGoogle } from "../../services/auth";
 import googlePng from "../../images/icons8-google-48.png";
+
 import {
   FormStyled,
   InputStyled,
@@ -15,10 +17,12 @@ export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const toPath = JSON.parse(localStorage.getItem("toRedirect"));
 
   const { mutate: loginWithEmail } = useMutation(logInWithEmail, {
     onSuccess: () => {
-      navigate(-2);
+      navigate(toPath);
+      localStorage.removeItem("toRedirect");
     },
     onError: (error) => {
       alert(error.message);
@@ -27,7 +31,8 @@ export const LoginForm = () => {
 
   const { mutate: loginWithGoogle } = useMutation(logInWithGoogle, {
     onSuccess: () => {
-      navigate(-2);
+      navigate(toPath);
+      localStorage.removeItem("toRedirect");
     },
     onError: (error) => {
       alert(error.message);

@@ -90,7 +90,7 @@ export const App = () => {
           </Route>
           <Route path="/dashboard">
             <Route element={<PrivateRoutes />}>
-              <Route path=":userId" element={<ClientDashboard />} />
+              <Route path="user" element={<ClientDashboard />} />
             </Route>
           </Route>
           <Route path="/login" element={<Login />} />

@@ -31,7 +31,11 @@ export const NavBar = ({ categories }) => {
     };
   }, [ref]);
 
-  const handleSubcategoryClick = () => {
+  const handleSubcategoryClick = (category, subcategory) => {
+    const redirect = `/${category.title.split(" ").join("")}/${
+      subcategory.route
+    }`;
+    localStorage.setItem("toRedirect", JSON.stringify(redirect));
     setIsOpen(false);
   };
 
@@ -63,21 +67,18 @@ export const NavBar = ({ categories }) => {
                 {category.subcategories.map((subcategory) => {
                   let toPath;
 
-                  if (subcategory.route === "dashboard") {
+                  if (
+                    subcategory.route === "user" ||
+                    subcategory.route === "rent"
+                  ) {
                     const user = JSON.parse(localStorage.getItem("user")); // Дістаємо об'єкт користувача
                     if (user && user.uid) {
                       toPath = `${category.title.split(" ").join("")}/${
-                        user.uid
+                        subcategory.route
                       }`;
                     } else {
                       toPath = "/login"; // Якщо користувач не знайдений, перенаправляємо на сторінку входу
                     }
-                  } else if (subcategory.route === "rent") {
-                    toPath = isAuth
-                      ? `${category.title.split(" ").join("")}/${
-                          subcategory.route
-                        }`
-                      : "/login";
                   } else {
                     toPath = `${category.title.split(" ").join("")}/${
                       subcategory.route
@@ -86,7 +87,12 @@ export const NavBar = ({ categories }) => {
 
                   return (
                     <SubcategoriesItem key={subcategory.id}>
-                      <Link to={toPath} onClick={handleSubcategoryClick}>
+                      <Link
+                        to={toPath}
+                        onClick={() =>
+                          handleSubcategoryClick(category, subcategory)
+                        }
+                      >
                         {subcategory.title}
                       </Link>
                     </SubcategoriesItem>
