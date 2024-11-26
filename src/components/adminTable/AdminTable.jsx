@@ -9,7 +9,7 @@ export const AdminTable = () => {
   const dispatch = useDispatch();
 
   const [statusUpdate, setStatusUpdate] = useState({});
-  const [newNotes, setNewNotes] = useState({});
+  const [newNotes, setNewNotes] = useState("");
 
   const handleStatusChange = (taskId, hiveId, property, newValue) => {
     if (!newValue) {
@@ -18,6 +18,10 @@ export const AdminTable = () => {
     }
     // Викликаємо асинхронний action
     dispatch(updateTaskStatusAsync({ hiveId, taskId, property, newValue }));
+  };
+
+  const handleNotesArea = (e) => {
+    setNewNotes(e.target.value === "" ? " " : e.target.value);
   };
 
   return (
@@ -46,8 +50,9 @@ export const AdminTable = () => {
             <td>{task.cost}</td>
             <td>
               <textarea
-                value={task.notes || ""}
-                onChange={(e) =>
+                value={newNotes === "" ? task.notes : newNotes}
+                onChange={handleNotesArea}
+                onBlur={(e) =>
                   handleStatusChange(
                     task.id,
                     task.hiveId,

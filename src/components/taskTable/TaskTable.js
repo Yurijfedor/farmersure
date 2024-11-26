@@ -21,6 +21,7 @@ export const TaskTable = React.memo(
     const dispatch = useDispatch();
     const [tempDate, setTempDate] = useState({});
     const [selectedExecutor, setSelectedExecutor] = useState({});
+    const [newNotes, setNewNotes] = useState({});
 
     const handleDateChange = (taskId, newDate) => {
       if (isDateValid(newDate)) {
@@ -32,6 +33,10 @@ export const TaskTable = React.memo(
 
     const handleExecutorChange = (taskId, executor) => {
       setSelectedExecutor({ ...selectedExecutor, [taskId]: executor });
+    };
+
+    const handleNotesChange = (taskId, note) => {
+      setNewNotes({ ...newNotes, [taskId]: note || " " });
     };
 
     const handleDateBlur = (taskId, property, newValue, e) => {
@@ -202,10 +207,14 @@ export const TaskTable = React.memo(
                   </td>
                   <td>
                     <textarea
-                      value={task.notes}
+                      value={newNotes[task.id] || task.notes || ""}
                       onChange={(e) =>
+                        handleNotesChange(task.id, e.target.value)
+                      }
+                      onBlur={(e) =>
                         handleDateBlur(task.id, "notes", e.target.value, e)
                       }
+                      disabled={task.status === "Under Review"}
                     />
                   </td>
                   <td>{task.status}</td>
