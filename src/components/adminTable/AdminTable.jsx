@@ -9,6 +9,7 @@ export const AdminTable = () => {
   const dispatch = useDispatch();
 
   const [statusUpdate, setStatusUpdate] = useState({});
+  const [newNotes, setNewNotes] = useState({});
 
   const handleStatusChange = (taskId, hiveId, property, newValue) => {
     if (!newValue) {
@@ -29,6 +30,7 @@ export const AdminTable = () => {
           <th>Executor</th>
           <th>Duration (min)</th>
           <th>Cost ($)</th>
+          <th>Notes</th>
           <th>Status</th>
           <th>Change Status</th>
         </tr>
@@ -42,6 +44,19 @@ export const AdminTable = () => {
             <td>{task.executor}</td>
             <td>{task.duration}</td>
             <td>{task.cost}</td>
+            <td>
+              <textarea
+                value={task.notes || ""}
+                onChange={(e) =>
+                  handleStatusChange(
+                    task.id,
+                    task.hiveId,
+                    "notes",
+                    e.target.value
+                  )
+                }
+              />
+            </td>
             <td>{statusUpdate[task.id] || task.status}</td>
             <td>
               <select

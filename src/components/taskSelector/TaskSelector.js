@@ -19,6 +19,7 @@ export const TaskSelector = ({ hiveId, tasks }) => {
     description: "",
     duration: "",
     costPerHour: "",
+    notes: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -70,6 +71,7 @@ export const TaskSelector = ({ hiveId, tasks }) => {
       description: "",
       duration: "",
       costPerHour: "",
+      notes: "",
     });
     setErrorMessage(""); // Очистити повідомлення про помилку після успішного додавання
   };

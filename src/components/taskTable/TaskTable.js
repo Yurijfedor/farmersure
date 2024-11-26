@@ -88,6 +88,7 @@ export const TaskTable = React.memo(
                 <th>Date & Time</th>
                 <th>Cost, $</th>
                 <th>Executor</th>
+                <th>Notes</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -198,6 +199,14 @@ export const TaskTable = React.memo(
                         <span>{task.executor}</span>
                       </div>
                     )}
+                  </td>
+                  <td>
+                    <textarea
+                      value={task.notes}
+                      onChange={(e) =>
+                        handleDateBlur(task.id, "notes", e.target.value, e)
+                      }
+                    />
                   </td>
                   <td>{task.status}</td>
                   <td>

@@ -56,7 +56,15 @@ export const CustomTaskForm = ({
         />
       </label>
       <br />
-
+      <label>
+        Примітки<span style={{ color: "red" }}> *</span>:
+        <textarea
+          name="notes"
+          value={customTask.notes}
+          onChange={handleCustomTaskChange}
+        />
+      </label>
+      <br />
       {/* Повідомлення про помилку */}
       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 

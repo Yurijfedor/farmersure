@@ -21,6 +21,7 @@ export const generateTasksForMonth = (currentMonth, hiveId) => {
       status: "Pending",
       executor: null,
       date: null,
+      notes: "",
     }));
   const user = JSON.parse(localStorage.getItem("user"));
   localStorage.setItem(`tasks-${hiveId}-${user.uid}`, JSON.stringify(tasks));
@@ -44,5 +45,6 @@ export const unifyTask = (task, hiveId) => {
     status: "Pending",
     executor: null,
     date: null,
+    notes: task.notes,
   };
 };
