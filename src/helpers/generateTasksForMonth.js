@@ -11,6 +11,7 @@ export const generateTasksForMonth = (currentMonth, hiveId) => {
     .filter((task) => task.month.includes(currentMonth))
     .map((task) => ({
       id: uuidv4(), // Unique ID for each task
+      // id: 1, // Unique ID for each task
       hiveId,
       name: task.name,
       purpose: task.purpose,

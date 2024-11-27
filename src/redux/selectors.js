@@ -20,14 +20,11 @@ export const selectTasksUnderReview = createSelector(
   }
 );
 
-export const selectDoneTasks = createSelector(
-  [selectHives, (_, hiveId) => hiveId], // Передаємо hiveId
-  (hives, hiveId) => {
-    const hive = hives.find((hive) => hive.id === hiveId); // Знаходимо вулик за id
-
-    return hive
-      ? hive.tasks.filter((task) => task.status === "Done") // Фільтруємо tasks
-      : []; // Повертаємо порожній масив, якщо вулика не знайдено
+export const selectTasksByStatus = createSelector(
+  [selectHives, (_, hiveId, status) => ({ hiveId, status })],
+  (hives, { hiveId, status }) => {
+    const hive = hives.find((hive) => hive.id === hiveId);
+    return hive ? hive.tasks.filter((task) => task.status === status) : [];
   }
 );
 

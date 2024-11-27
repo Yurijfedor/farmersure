@@ -57,6 +57,8 @@ export const useAddSingleTasks = () => {
 
   return useMutation(addSingleTask, {
     onSuccess: (data, variables) => {
+      console.log(data);
+
       // Оновлення кешу для цього вулика після успішного оновлення
       queryClient.invalidateQueries(["hive", variables.hiveId]);
     },

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 
 import { TaskSelector } from "../taskSelector/TaskSelector";
+import { TaskFilter } from "../taskFilter/TaskFilter";
 import { useUpdateHiveTasks } from "../../hooks/useHives";
 import { updateTasksStatus } from "../../redux/hivesSlice";
 import { executors } from "../../constants/executors"; // Імпортуємо масив виконавців
@@ -17,11 +18,11 @@ export const TaskTable = React.memo(
     onPlannedTasksTotalCostChange,
   }) => {
     const { mutate: updateTasks } = useUpdateHiveTasks();
-
     const dispatch = useDispatch();
     const [tempDate, setTempDate] = useState({});
     const [selectedExecutor, setSelectedExecutor] = useState({});
     const [newNotes, setNewNotes] = useState({});
+    const [filteredTasks, setFilteredTasks] = useState(tasks);
 
     const handleDateChange = (taskId, newDate) => {
       if (isDateValid(newDate)) {
@@ -29,6 +30,10 @@ export const TaskTable = React.memo(
       } else {
         alert("Виберіть дату не пізніше ніж за 24 години до початку!");
       }
+    };
+
+    const handleFilterChange = (tasks) => {
+      setFilteredTasks(tasks);
     };
 
     const handleExecutorChange = (taskId, executor) => {
@@ -57,7 +62,8 @@ export const TaskTable = React.memo(
 
           // Dispatch the updated task to update the state
           dispatch(updateTasksStatus({ hiveId, updatedTask })); // оновлюємо redux
-          updateTasks({ hiveId, tasks }); // оновлюємо firestore
+          const updatedTasks = tasks.filter((t) => t.status !== "Pending");
+          updateTasks({ hiveId, updatedTasks }); // оновлюємо firestore
         }
       } else {
         console.error("Task not found");
@@ -75,14 +81,20 @@ export const TaskTable = React.memo(
     }, [tasks]);
 
     useEffect(() => {
+      setFilteredTasks(tasks);
       onPlannedTasksTotalCostChange(getTotalCost()); // Передаємо нове значення загальної вартості
     }, [tasks, onPlannedTasksTotalCostChange, getTotalCost]);
 
     return (
       <>
         <h3>Планові роботи на {currentMonth} місяць</h3>
-        <TaskSelector hiveId={hiveId} tasks={tasks} />
-        {tasks.length > 0 ? (
+        <TaskFilter
+          hiveId={hiveId}
+          handleFilter={handleFilterChange}
+          tasks={tasks}
+        />
+        <TaskSelector hiveId={hiveId} />
+        {filteredTasks.length > 0 ? (
           <table>
             <thead>
               <tr>
@@ -99,7 +111,7 @@ export const TaskTable = React.memo(
               </tr>
             </thead>
             <tbody>
-              {tasks.map((task) => (
+              {filteredTasks.map((task) => (
                 <tr key={task.id}>
                   <td>{task.name}</td>
                   <td>{task.purpose}</td>
@@ -143,6 +155,7 @@ export const TaskTable = React.memo(
                             selectedExecutor[task.id] || task.executor || ""
                           }
                           onChange={(e) => {
+                            e.preventDefault();
                             handleExecutorChange(task.id, e.target.value);
                             handleDateBlur(
                               task.id,
@@ -227,7 +240,7 @@ export const TaskTable = React.memo(
                               ? onConfirmTask(task.id)
                               : alert("я ж прошу, вибери нормальну дату")
                           }
-                          disabled={task.executor === null}
+                          disabled={task.selectedExecutor === null}
                         >
                           Confirm
                         </button>

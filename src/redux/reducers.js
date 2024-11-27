@@ -6,7 +6,6 @@ export const updateTaskReducer = (state, action) => {
   const { hiveId, updatedTask } = action.payload;
   const hive = state.hives.find((hive) => hive.id === hiveId);
   console.log(updatedTask);
-
   if (hive) {
     hive.tasks = hive.tasks.map((task) => {
       // Якщо ID завдання дорівнює ID оновленого завдання, повертаємо оновлене
@@ -20,6 +19,7 @@ export const updateTaskReducer = (state, action) => {
 
 export const addTaskReducer = (state, action) => {
   const { hiveId, newTask } = action.payload;
+
   const hive = state.hives.find((hive) => hive.id === hiveId);
 
   if (hive) {
