@@ -16,6 +16,8 @@ export const TaskTable = React.memo(
     currentMonth,
     hiveId,
     onPlannedTasksTotalCostChange,
+    handleRequiredTasks,
+    useRequiredTasks,
   }) => {
     const { mutate: updateTasks } = useUpdateHiveTasks();
     const dispatch = useDispatch();
@@ -91,7 +93,8 @@ export const TaskTable = React.memo(
         <TaskFilter
           hiveId={hiveId}
           handleFilter={handleFilterChange}
-          tasks={tasks}
+          handleRequiredTasks={handleRequiredTasks}
+          useRequiredTasks={useRequiredTasks}
         />
         <TaskSelector hiveId={hiveId} />
         {filteredTasks.length > 0 ? (
@@ -118,26 +121,24 @@ export const TaskTable = React.memo(
                   <td>{task.description}</td>
                   <td>{task.duration}</td>
                   <td>
-                    <td>
-                      {task.status !== "Done" &&
-                      task.status !== "Under Review" ? (
-                        <input
-                          type="datetime-local"
-                          value={tempDate[task.id] || task.plannedDate || ""}
-                          onChange={(e) => {
-                            handleDateChange(task.id, e.target.value);
-                            handleDateBlur(
-                              task.id,
-                              "plannedDate",
-                              e.target.value,
-                              e
-                            );
-                          }}
-                        />
-                      ) : (
-                        <span>{task.plannedDate}</span>
-                      )}
-                    </td>
+                    {task.status !== "Done" &&
+                    task.status !== "Under Review" ? (
+                      <input
+                        type="datetime-local"
+                        value={tempDate[task.id] || task.plannedDate || ""}
+                        onChange={(e) => {
+                          handleDateChange(task.id, e.target.value);
+                          handleDateBlur(
+                            task.id,
+                            "plannedDate",
+                            e.target.value,
+                            e
+                          );
+                        }}
+                      />
+                    ) : (
+                      <span>{task.plannedDate}</span>
+                    )}
                   </td>
                   <td>{task.cost.toFixed(2)}</td>
                   <td>
@@ -247,7 +248,10 @@ export const TaskTable = React.memo(
                       )}
                     {task.status !== "Done" &&
                       task.status !== "Under Review" && (
-                        <button onClick={() => onDeleteTask(task.id)}>
+                        <button
+                          onClick={() => onDeleteTask(task.id)}
+                          disabled={task.priority === "обов'язкова"}
+                        >
                           Delete
                         </button>
                       )}

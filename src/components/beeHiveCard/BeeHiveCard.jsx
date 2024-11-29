@@ -14,9 +14,13 @@ import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
 import { Button } from "../button/Button";
 import { ContractModal } from "../сontractModal/ContractModal";
 import { useUpdateHiveTasks, useDeleteHiveTask } from "../../hooks/useHives";
-import { updateTasksStatus, removeTaskFromHive } from "../../redux/hivesSlice";
+import { fetchAllHives, fetchHiveById } from "../../redux/operations";
 import {
-  selectDoneTasks,
+  updateTasksStatus,
+  removeTaskFromHive,
+  updateHiveTasks,
+} from "../../redux/hivesSlice";
+import {
   selectHiveById,
   selectIsLoading,
   selectError,
@@ -25,7 +29,10 @@ import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
 import { calculateTotalRent } from "../../helpers/calculateRent";
 import { productPrices } from "../../constants/prices";
-import { generateTasksForMonth } from "../../helpers/generateTasksForMonth";
+import {
+  generateTasksForMonth,
+  generateMissingTasks,
+} from "../../helpers/generateTasksForMonth";
 import { calculateMandatoryTasksCost } from "../../helpers/calculateMandatoryTasksCost";
 
 import {
@@ -40,11 +47,11 @@ import {
   Wrapper,
 } from "./BeeHiveCard.styled";
 
-const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
-
 export const BeeHiveCard = () => {
+  // const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
+  const currentMonth = "червень";
+
   const hiveId = useParams();
-  const user = JSON.parse(localStorage.getItem("user"));
   const dispatch = useDispatch();
   const hive = useSelector((state) => selectHiveById(state, hiveId.hiveId));
   const isLoading = useSelector(selectIsLoading);
@@ -68,19 +75,46 @@ export const BeeHiveCard = () => {
     beeVenom: false,
   });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
-
-  const tasks =
-    hive && hive.tasks && hive.tasks.length !== 0
-      ? [...hive.tasks].concat(
-          generateTasksForMonth(currentMonth, hiveId.hiveId)
-        )
-      : generateTasksForMonth(currentMonth, hiveId.hiveId); // Якщо немає завдань
+  const [useRequiredTasks, setUseRequiredTasks] = useState(true);
 
   useEffect(() => {
-    console.log("i am a reload!");
-  }, []);
+    const requiredTasks = generateTasksForMonth(
+      currentMonth,
+      hiveId.hiveId,
+      useRequiredTasks
+    ); // Завдання для поточного місяця
+
+    const missingTasks = generateMissingTasks(
+      hive.tasks,
+      requiredTasks,
+      currentMonth,
+      hiveId.hiveId,
+      useRequiredTasks
+    );
+
+    if (missingTasks.length > 0) {
+      const newTasks = [...hive.tasks, ...missingTasks];
+      dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
+    } else if (missingTasks.length === 0 && useRequiredTasks) {
+      const newTasks = hive.tasks.filter(
+        (task) => task.status !== "Pending" || task.priority === "обов'язкова"
+      );
+      dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
+    } else {
+      console.log("All tasks for the current month are already present.");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMonth, dispatch, hiveId.hiveId, useRequiredTasks]);
+
+  const handleRequiredTasks = () => {
+    // dispatch(fetchHiveById(hiveId.hiveId));
+    setUseRequiredTasks((prevState) => !prevState);
+  };
 
   useLockBodyScroll(isModalOpen);
+  // useEffect(() => {
+  //   console.log(useRequiredTasks);
+  // }, [useRequiredTasks]);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -135,7 +169,7 @@ export const BeeHiveCard = () => {
   );
 
   const handleConfirmTask = (taskId) => {
-    const tasksToUpdate = tasks
+    const tasksToUpdate = hive.tasks
       .filter((task) => task.status !== "Pending" || task.id === taskId)
       .map((task) =>
         task.id === taskId ? { ...task, status: "Under Review" } : task
@@ -158,7 +192,7 @@ export const BeeHiveCard = () => {
   // Функція для видалення завдання
   const handleDeleteTask = (taskId) => {
     // Фільтруємо завдання, видаляючи вибране
-    const updatedTasks = tasks.filter(
+    const updatedTasks = hive.tasks.filter(
       (task) => task.id !== taskId && task.status !== "Pending"
     );
     // Оновлюємо Firestore, передаючи оновлений масив tasks
@@ -396,12 +430,14 @@ export const BeeHiveCard = () => {
       />
 
       <TaskTable
-        tasks={tasks}
+        tasks={hive.tasks}
         onConfirmTask={handleConfirmTask}
         onDeleteTask={handleDeleteTask}
         currentMonth={currentMonth}
         hiveId={hiveId.hiveId}
         onPlannedTasksTotalCostChange={handlePlannedTasksTotalCostChange}
+        handleRequiredTasks={handleRequiredTasks}
+        useRequiredTasks={useRequiredTasks}
       />
       <Button
         variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"

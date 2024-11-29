@@ -9,6 +9,7 @@ import {
   updateTaskReducer,
   addTaskReducer,
   removeTaskReducer,
+  updateHiveTasksReducer,
 } from "./reducers";
 
 const extraActions = [fetchAllHives, updateTaskStatusAsync]; // Додаємо async action
@@ -17,6 +18,7 @@ const getActions = (type) => extraActions.map((action) => action[type]);
 
 const hivesInitialState = {
   hives: [],
+  filteredTasks: [],
   isLoading: false,
   error: null,
 };
@@ -29,6 +31,7 @@ const hivesSlice = createSlice({
     updateTasksStatus: updateTaskReducer,
     addTaskToHive: addTaskReducer,
     removeTaskFromHive: removeTaskReducer,
+    updateHiveTasks: updateHiveTasksReducer,
   },
 
   extraReducers: (builder) => {
@@ -58,6 +61,10 @@ const hivesSlice = createSlice({
   },
 });
 
-export const { updateTasksStatus, addTaskToHive, removeTaskFromHive } =
-  hivesSlice.actions;
+export const {
+  updateTasksStatus,
+  addTaskToHive,
+  removeTaskFromHive,
+  updateHiveTasks,
+} = hivesSlice.actions;
 export const hivesReducer = hivesSlice.reducer;

@@ -2,13 +2,21 @@ import { v4 as uuidv4 } from "uuid";
 
 import { beekeepingTasks } from "../constants/beekeepingTasks";
 
-export const generateTasksForMonth = (currentMonth, hiveId) => {
+export const generateTasksForMonth = (
+  currentMonth,
+  hiveId,
+  useRequiredTasks
+) => {
   const now = new Date();
   const twoDaysBefore = new Date(now.getTime() + 49 * 60 * 60 * 1000); // 48 годин до поточної дати
   const plannedDate = twoDaysBefore.toISOString().slice(0, 16); // Призначення значення за замовчуванням
 
   const tasks = beekeepingTasks
-    .filter((task) => task.month.includes(currentMonth))
+    .filter(
+      (task) =>
+        task.month.includes(currentMonth) &&
+        (!useRequiredTasks || task.priority === "обов'язкова") // Логіка фільтрації
+    )
     .map((task) => ({
       id: uuidv4(), // Unique ID for each task
       // id: 1, // Unique ID for each task
@@ -23,6 +31,8 @@ export const generateTasksForMonth = (currentMonth, hiveId) => {
       executor: null,
       date: null,
       notes: "",
+      priority: task.priority || null,
+      frequency: task.frequency || null,
     }));
   const user = JSON.parse(localStorage.getItem("user"));
   localStorage.setItem(`tasks-${hiveId}-${user.uid}`, JSON.stringify(tasks));
@@ -40,12 +50,41 @@ export const unifyTask = (task, hiveId) => {
     name: task.name,
     purpose: task.purpose,
     description: task.description,
-    cost: task.duration * (task.costPerHour / 60),
+    cost: task.cost || task.duration * (task.costPerHour / 60),
     plannedDate,
     duration: task.duration,
     status: "Pending",
     executor: null,
     date: null,
-    notes: task.notes,
+    notes: task.notes || "",
+    priority: task.priority || null,
   };
+};
+
+export const generateMissingTasks = (
+  currentTasks,
+  requiredTasks,
+  currentMonth,
+  hiveId,
+  useRequiredTasks
+) => {
+  const missingTasks = [];
+
+  requiredTasks.forEach((task) => {
+    const currentTaskCount = currentTasks.filter(
+      (t) => t.name === task.name
+    ).length;
+
+    const requiredCount = task.frequency ? task.frequency[currentMonth] : 1; // Частота завдання для поточного місяця
+    if (currentTaskCount < requiredCount) {
+      const tasksToGenerate = requiredCount - currentTaskCount;
+
+      for (let i = 0; i < tasksToGenerate; i++) {
+        const newTask = unifyTask(task, hiveId); // Використовуємо unifyTask для створення нового завдання
+        missingTasks.push(newTask);
+      }
+    }
+  });
+
+  return missingTasks;
 };

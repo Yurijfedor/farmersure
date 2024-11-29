@@ -36,10 +36,13 @@ export const fetchHiveById = createAsyncThunk(
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        return {
+        const result = {
           id: docSnap.id,
           ...docSnap.data(),
         };
+        console.log(result);
+
+        return result;
       } else {
         return thunkAPI.rejectWithValue("Hive not found");
       }

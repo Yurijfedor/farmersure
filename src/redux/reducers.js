@@ -35,6 +35,15 @@ export const removeTaskReducer = (state, action) => {
   }
 };
 
+export const updateHiveTasksReducer = (state, action) => {
+  const { hiveId, newTasks } = action.payload; // Очікуємо об'єкт із ID вулика та новим масивом завдань
+  const hive = state.hives.find((hive) => hive.id === hiveId);
+
+  if (hive) {
+    hive.tasks = newTasks; // Замінюємо весь масив завдань
+  }
+};
+
 export const pendingReducer = (state) => {
   state.isLoading = true;
   state.error = null;

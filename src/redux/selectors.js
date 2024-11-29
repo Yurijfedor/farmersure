@@ -24,7 +24,9 @@ export const selectTasksByStatus = createSelector(
   [selectHives, (_, hiveId, status) => ({ hiveId, status })],
   (hives, { hiveId, status }) => {
     const hive = hives.find((hive) => hive.id === hiveId);
-    return hive ? hive.tasks.filter((task) => task.status === status) : [];
+    return hive && hive.tasks
+      ? hive.tasks.filter((task) => task.status === status)
+      : [];
   }
 );
 
