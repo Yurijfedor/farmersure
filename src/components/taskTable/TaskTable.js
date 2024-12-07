@@ -102,7 +102,6 @@ export const TaskTable = React.memo(
             <thead>
               <tr>
                 <th>Task</th>
-                <th>Purpose</th>
                 <th>Description</th>
                 <th>Duration, min</th>
                 <th>Date & Time</th>
@@ -117,7 +116,6 @@ export const TaskTable = React.memo(
               {filteredTasks.map((task) => (
                 <tr key={task.id}>
                   <td>{task.name}</td>
-                  <td>{task.purpose}</td>
                   <td>{task.description}</td>
                   <td>{task.duration}</td>
                   <td>

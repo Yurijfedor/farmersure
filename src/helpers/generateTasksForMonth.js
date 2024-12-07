@@ -5,21 +5,39 @@ import { beekeepingTasks } from "../constants/beekeepingTasks";
 export const generateTasksForMonth = (
   currentMonth,
   hiveId,
-  useRequiredTasks
+  selectedServices
 ) => {
   const now = new Date();
   const twoDaysBefore = new Date(now.getTime() + 49 * 60 * 60 * 1000); // 48 годин до поточної дати
   const plannedDate = twoDaysBefore.toISOString().slice(0, 16); // Призначення значення за замовчуванням
 
   const tasks = beekeepingTasks
-    .filter(
-      (task) =>
-        task.month.includes(currentMonth) &&
-        (!useRequiredTasks || task.priority === "обов'язкова") // Логіка фільтрації
-    )
+    .filter((task) => {
+      // Завдання має бути доступне для поточного місяця
+      const isCurrentMonth = task.month.includes(currentMonth);
+
+      // Завдання обов'язкове
+      const isRequiredTask = task.priority === "обов'язкова";
+
+      // Отримати список обраних сервісів
+      // const selectedServices = Object.entries(additionalServices)
+      //   .filter(([_, isSelected]) => isSelected) // Враховуються лише обрані сервіси
+      //   .map(([service]) => service);
+
+      // Додатковий сервіс відповідає завданню
+      const matchesSelectedServices =
+        Array.isArray(task.purpose) &&
+        task.purpose.length > 0 &&
+        task.purpose.some((purpose) => selectedServices.includes(purpose));
+
+      // Завдання додається, якщо:
+      // 1. Воно обов'язкове
+      // 2. Відповідає обраному сервісу
+      // 3. І все це доступне у поточному місяці
+      return isCurrentMonth || isRequiredTask || matchesSelectedServices;
+    })
     .map((task) => ({
-      id: uuidv4(), // Unique ID for each task
-      // id: 1, // Unique ID for each task
+      id: uuidv4(),
       hiveId,
       name: task.name,
       purpose: task.purpose,
@@ -34,8 +52,8 @@ export const generateTasksForMonth = (
       priority: task.priority || null,
       frequency: task.frequency || null,
     }));
-  const user = JSON.parse(localStorage.getItem("user"));
-  localStorage.setItem(`tasks-${hiveId}-${user.uid}`, JSON.stringify(tasks));
+  console.log(tasks);
+
   return tasks;
 };
 
@@ -65,8 +83,7 @@ export const generateMissingTasks = (
   currentTasks,
   requiredTasks,
   currentMonth,
-  hiveId,
-  useRequiredTasks
+  hiveId
 ) => {
   const missingTasks = [];
 

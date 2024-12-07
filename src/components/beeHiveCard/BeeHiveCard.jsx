@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
@@ -14,7 +14,6 @@ import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
 import { Button } from "../button/Button";
 import { ContractModal } from "../сontractModal/ContractModal";
 import { useUpdateHiveTasks, useDeleteHiveTask } from "../../hooks/useHives";
-import { fetchAllHives, fetchHiveById } from "../../redux/operations";
 import {
   updateTasksStatus,
   removeTaskFromHive,
@@ -76,45 +75,76 @@ export const BeeHiveCard = () => {
   });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
   const [useRequiredTasks, setUseRequiredTasks] = useState(true);
+  const selectedServices = useMemo(
+    () =>
+      Object.entries(additionalServices)
+        .filter(([_, isSelected]) => isSelected) // Враховуються лише обрані сервіси
+        .map(([service]) => service),
+    [additionalServices] // Виконується лише при зміні `additionalServices`
+  );
 
-  useEffect(() => {
-    const requiredTasks = generateTasksForMonth(
-      currentMonth,
-      hiveId.hiveId,
-      useRequiredTasks
-    ); // Завдання для поточного місяця
+  useEffect(
+    () => {
+      const requiredTasks = generateTasksForMonth(
+        currentMonth,
+        hiveId.hiveId,
+        selectedServices
+      ); // Завдання для поточного місяця
 
-    const missingTasks = generateMissingTasks(
-      hive.tasks,
-      requiredTasks,
-      currentMonth,
-      hiveId.hiveId,
-      useRequiredTasks
-    );
-
-    if (missingTasks.length > 0) {
-      const newTasks = [...hive.tasks, ...missingTasks];
-      dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
-    } else if (missingTasks.length === 0 && useRequiredTasks) {
-      const newTasks = hive.tasks.filter(
-        (task) => task.status !== "Pending" || task.priority === "обов'язкова"
+      const missingTasks = generateMissingTasks(
+        hive.tasks,
+        requiredTasks,
+        currentMonth,
+        hiveId.hiveId
       );
-      dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
-    } else {
-      console.log("All tasks for the current month are already present.");
-    }
+      console.log(hive.tasks);
+      console.log(missingTasks);
+      console.log(useRequiredTasks);
+      console.log(additionalServices);
+
+      // if (missingTasks.length > 0) {
+      //   const newTasks = [...hive.tasks, ...missingTasks];
+      //   dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
+      if (useRequiredTasks) {
+        const ttasks = [...hive.tasks, ...missingTasks];
+        const newTasks = ttasks.filter((task) => {
+          const matchesSelectedServices =
+            Array.isArray(task.purpose) &&
+            task.purpose.length > 0 &&
+            task.purpose.some((purpose) => selectedServices.includes(purpose));
+          console.log(matchesSelectedServices);
+
+          return (
+            task.status !== "Pending" ||
+            task.priority === "обов'язкова" ||
+            matchesSelectedServices
+          );
+        });
+        console.log(newTasks);
+        dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
+      } else {
+        console.log("All tasks for the current month are already present.");
+        const newTasks = [...hive.tasks, ...missingTasks];
+        dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentMonth, dispatch, hiveId.hiveId, useRequiredTasks]);
+    [
+      currentMonth,
+      dispatch,
+      hiveId.hiveId,
+      useRequiredTasks,
+      additionalServices, // Залежність доданого/знятного сервісу
+    ]
+  );
 
   const handleRequiredTasks = () => {
-    // dispatch(fetchHiveById(hiveId.hiveId));
-    setUseRequiredTasks((prevState) => !prevState);
+    setUseRequiredTasks((prevState) => {
+      return !prevState;
+    });
   };
 
   useLockBodyScroll(isModalOpen);
-  // useEffect(() => {
-  //   console.log(useRequiredTasks);
-  // }, [useRequiredTasks]);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
