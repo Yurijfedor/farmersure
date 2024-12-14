@@ -75,13 +75,18 @@ export const BeeHiveCard = () => {
   });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
   const [useRequiredTasks, setUseRequiredTasks] = useState(true);
-  const selectedServices = useMemo(
-    () =>
-      Object.entries(additionalServices)
-        .filter(([_, isSelected]) => isSelected) // Враховуються лише обрані сервіси
-        .map(([service]) => service),
-    [additionalServices] // Виконується лише при зміні `additionalServices`
-  );
+  const selectedServices = useMemo(() => {
+    const services = Object.entries(additionalServices)
+      .filter(([_, isSelected]) => isSelected) // Враховуються лише обрані сервіси
+      .map(([service]) => service);
+
+    if (agreeWithBasicTech) {
+      services.push("honey"); // Додається сервіс honey
+    }
+
+    return services;
+  }, [additionalServices, agreeWithBasicTech]); // Додано залежність `agreeWithBasicTech`
+  console.log(selectedServices);
 
   useEffect(
     () => {
@@ -97,10 +102,6 @@ export const BeeHiveCard = () => {
         currentMonth,
         hiveId.hiveId
       );
-      console.log(hive.tasks);
-      console.log(missingTasks);
-      console.log(useRequiredTasks);
-      console.log(additionalServices);
 
       // if (missingTasks.length > 0) {
       //   const newTasks = [...hive.tasks, ...missingTasks];
@@ -112,7 +113,6 @@ export const BeeHiveCard = () => {
             Array.isArray(task.purpose) &&
             task.purpose.length > 0 &&
             task.purpose.some((purpose) => selectedServices.includes(purpose));
-          console.log(matchesSelectedServices);
 
           return (
             task.status !== "Pending" ||
@@ -120,7 +120,6 @@ export const BeeHiveCard = () => {
             matchesSelectedServices
           );
         });
-        console.log(newTasks);
         dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
       } else {
         console.log("All tasks for the current month are already present.");
@@ -135,6 +134,7 @@ export const BeeHiveCard = () => {
       hiveId.hiveId,
       useRequiredTasks,
       additionalServices, // Залежність доданого/знятного сервісу
+      agreeWithBasicTech,
     ]
   );
 

@@ -52,8 +52,6 @@ export const generateTasksForMonth = (
       priority: task.priority || null,
       frequency: task.frequency || null,
     }));
-  console.log(tasks);
-
   return tasks;
 };
 
