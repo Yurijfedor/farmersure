@@ -44,6 +44,22 @@ export const updateHiveTasksReducer = (state, action) => {
   }
 };
 
+export const updateAgreeWithBasicTechReducer = (state, action) => {
+  const { hiveId, value } = action.payload;
+  const hive = state.hives.find((hive) => hive.id === hiveId);
+  if (hive) {
+    hive.agreeWithBasicTech = value;
+  }
+};
+
+export const updateAdditionalServicesReducer = (state, action) => {
+  const { hiveId, service, value } = action.payload;
+  const hive = state.hives.find((hive) => hive.id === hiveId);
+  if (hive) {
+    hive.additionalServices[service] = value;
+  }
+};
+
 export const pendingReducer = (state) => {
   state.isLoading = true;
   state.error = null;

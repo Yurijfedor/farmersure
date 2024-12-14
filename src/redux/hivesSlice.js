@@ -1,6 +1,11 @@
 import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 
-import { fetchAllHives, updateTaskStatusAsync } from "./operations";
+import {
+  fetchAllHives,
+  updateTaskStatusAsync,
+  updateAgreeWithBasicTech,
+  updateAdditionalService,
+} from "./operations";
 import {
   fetchAllHivesSuccessReducer,
   pendingReducer,
@@ -53,6 +58,20 @@ const hivesSlice = createSlice({
               ...hive.tasks.slice(taskIndex + 1),
             ];
           }
+        }
+      })
+      .addCase(updateAgreeWithBasicTech.fulfilled, (state, action) => {
+        const { hiveId, value } = action.payload;
+        const hive = state.hives.find((hive) => hive.id === hiveId);
+        if (hive) {
+          hive.agreeWithBasicTech = value;
+        }
+      })
+      .addCase(updateAdditionalService.fulfilled, (state, action) => {
+        const { hiveId, service, value } = action.payload;
+        const hive = state.hives.find((hive) => hive.id === hiveId);
+        if (hive) {
+          hive.additionalServices[service] = value;
         }
       })
       .addMatcher(isAnyOf(...getActions("pending")), pendingReducer)

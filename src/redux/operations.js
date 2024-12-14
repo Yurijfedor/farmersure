@@ -86,3 +86,32 @@ export const updateTaskStatusAsync = createAsyncThunk(
     }
   }
 );
+
+export const updateAgreeWithBasicTech = createAsyncThunk(
+  "hives/updateAgreeWithBasicTech",
+  async ({ hiveId, value }, thunkAPI) => {
+    try {
+      const docRef = doc(db, "hives", hiveId);
+      await updateDoc(docRef, { agreeWithBasicTech: value });
+
+      return { hiveId, value };
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);
+
+export const updateAdditionalService = createAsyncThunk(
+  "hives/updateAdditionalService",
+  async ({ hiveId, service, value }, thunkAPI) => {
+    try {
+      const docRef = doc(db, "hives", hiveId);
+      const fieldToUpdate = `additionalServices.${service}`;
+      await updateDoc(docRef, { [fieldToUpdate]: value });
+
+      return { hiveId, service, value };
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);

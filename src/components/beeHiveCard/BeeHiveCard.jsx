@@ -15,6 +15,10 @@ import { Button } from "../button/Button";
 import { ContractModal } from "../сontractModal/ContractModal";
 import { useUpdateHiveTasks, useDeleteHiveTask } from "../../hooks/useHives";
 import {
+  updateAgreeWithBasicTech,
+  updateAdditionalService,
+} from "../../redux/operations";
+import {
   updateTasksStatus,
   removeTaskFromHive,
   updateHiveTasks,
@@ -64,28 +68,27 @@ export const BeeHiveCard = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [agreeWithBasicTech, setAgreeWithBasicTech] = useState(false);
-  const [additionalServices, setAdditionalServices] = useState({
-    pollen: false,
-    propolis: false,
-    wax: false,
-    royalJelly: false,
-    droneHomogenate: false,
-    beeVenom: false,
-  });
+  // const [additionalServices, setAdditionalServices] = useState({
+  //   pollen: false,
+  //   propolis: false,
+  //   wax: false,
+  //   royalJelly: false,
+  //   droneHomogenate: false,
+  //   beeVenom: false,
+  // });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
   const [useRequiredTasks, setUseRequiredTasks] = useState(true);
   const selectedServices = useMemo(() => {
-    const services = Object.entries(additionalServices)
+    const services = Object.entries(hive.additionalServices)
       .filter(([_, isSelected]) => isSelected) // Враховуються лише обрані сервіси
       .map(([service]) => service);
 
-    if (agreeWithBasicTech) {
+    if (hive.agreeWithBasicTech) {
       services.push("honey"); // Додається сервіс honey
     }
 
     return services;
-  }, [additionalServices, agreeWithBasicTech]); // Додано залежність `agreeWithBasicTech`
+  }, [hive.additionalServices, hive.agreeWithBasicTech]); // Додано залежність `agreeWithBasicTech`
   console.log(selectedServices);
 
   useEffect(
@@ -133,8 +136,8 @@ export const BeeHiveCard = () => {
       dispatch,
       hiveId.hiveId,
       useRequiredTasks,
-      additionalServices, // Залежність доданого/знятного сервісу
-      agreeWithBasicTech,
+      hive.additionalServices, // Залежність доданого/знятного сервісу
+      hive.agreeWithBasicTech,
     ]
   );
 
@@ -180,22 +183,34 @@ export const BeeHiveCard = () => {
     setIsDragging(false);
   };
 
-  const handleCheckboxChange = (e) => {
-    setAgreeWithBasicTech(e.target.checked); // Оновлюємо стан при зміні чекбоксу
+  const handleBasicTechChange = (e) => {
+    dispatch(
+      updateAgreeWithBasicTech({
+        hiveId: hiveId.hiveId,
+        value: e.target.checked,
+      })
+    );
   };
 
   const handleAdditionalServiceChange = (e) => {
     const { name, checked } = e.target;
-    setAdditionalServices((prevServices) => ({
-      ...prevServices,
-      [name]: checked, // Оновлюємо стан відповідної додаткової послуги
-    }));
+    // setAdditionalServices((prevServices) => ({
+    //   ...prevServices,
+    //   [name]: checked, // Оновлюємо стан відповідної додаткової послуги
+    // }));
+    dispatch(
+      updateAdditionalService({
+        hiveId: hiveId.hiveId,
+        service: name,
+        value: checked,
+      })
+    );
   };
 
   const performance = calculatePerformance(
     hive,
-    additionalServices,
-    agreeWithBasicTech
+    hive.additionalServices,
+    hive.agreeWithBasicTech
   );
 
   const handleConfirmTask = (taskId) => {
@@ -336,8 +351,8 @@ export const BeeHiveCard = () => {
         <label>
           <input
             type="checkbox"
-            checked={agreeWithBasicTech}
-            onChange={handleCheckboxChange}
+            checked={hive.agreeWithBasicTech}
+            onChange={handleBasicTechChange}
           />
           Погоджуюсь застосовувати Базову технологію бджільництва
         </label>
@@ -345,7 +360,7 @@ export const BeeHiveCard = () => {
 
       {/* Виводимо поточний стан чекбоксу */}
       <p style={{ textAlign: "center", margin: "10px 0 20px 0" }}>
-        {agreeWithBasicTech
+        {hive.agreeWithBasicTech
           ? "Ви погодились застосовувати Базову технологію бджільництва"
           : "Ви ще не погодились застосовувати Базову технологію бджільництва"}
       </p>
@@ -362,7 +377,7 @@ export const BeeHiveCard = () => {
             <input
               type="checkbox"
               name="pollen"
-              checked={additionalServices.pollen}
+              checked={hive.additionalServices.pollen}
               onChange={handleAdditionalServiceChange}
             />
             Пилок
@@ -373,7 +388,7 @@ export const BeeHiveCard = () => {
             <input
               type="checkbox"
               name="propolis"
-              checked={additionalServices.propolis}
+              checked={hive.additionalServices.propolis}
               onChange={handleAdditionalServiceChange}
             />
             Прополіс
@@ -384,7 +399,7 @@ export const BeeHiveCard = () => {
             <input
               type="checkbox"
               name="wax"
-              checked={additionalServices.wax}
+              checked={hive.additionalServices.wax}
               onChange={handleAdditionalServiceChange}
             />
             Віск
@@ -395,7 +410,7 @@ export const BeeHiveCard = () => {
             <input
               type="checkbox"
               name="royalJelly"
-              checked={additionalServices.royalJelly}
+              checked={hive.additionalServices.royalJelly}
               onChange={handleAdditionalServiceChange}
             />
             Маточне молочко
@@ -406,7 +421,7 @@ export const BeeHiveCard = () => {
             <input
               type="checkbox"
               name="droneHomogenate"
-              checked={additionalServices.droneHomogenate}
+              checked={hive.additionalServices.droneHomogenate}
               onChange={handleAdditionalServiceChange}
             />
             Трутневий гомогенат
@@ -417,7 +432,7 @@ export const BeeHiveCard = () => {
             <input
               type="checkbox"
               name="beeVenom"
-              checked={additionalServices.beeVenom}
+              checked={hive.additionalServices.beeVenom}
               onChange={handleAdditionalServiceChange}
             />
             Бджолина отрута (сирець)
@@ -428,12 +443,14 @@ export const BeeHiveCard = () => {
       {/* Виведення стану додаткових послуг */}
       <Wrapper>
         <h4>Обрані послуги:</h4>
-        <p>{additionalServices.pollen && "Пилок"}</p>
-        <p>{additionalServices.propolis && "Прополіс"}</p>
-        <p>{additionalServices.wax && "Віск"}</p>
-        <p>{additionalServices.royalJelly && "Маточне молочко"}</p>
-        <p>{additionalServices.droneHomogenate && "Трутневий гомогенат"}</p>
-        <p>{additionalServices.beeVenom && "Бджолина отрута (сирець)"}</p>
+        <p>{hive.additionalServices.pollen && "Пилок"}</p>
+        <p>{hive.additionalServices.propolis && "Прополіс"}</p>
+        <p>{hive.additionalServices.wax && "Віск"}</p>
+        <p>{hive.additionalServices.royalJelly && "Маточне молочко"}</p>
+        <p>
+          {hive.additionalServices.droneHomogenate && "Трутневий гомогенат"}
+        </p>
+        <p>{hive.additionalServices.beeVenom && "Бджолина отрута (сирець)"}</p>
       </Wrapper>
       <Wrapper>
         <h3
