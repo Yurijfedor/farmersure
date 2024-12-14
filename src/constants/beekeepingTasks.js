@@ -2,7 +2,7 @@ export const beekeepingTasks = [
   {
     month: ["березень"],
     name: "Весняна ревізія",
-    purpose: [],
+    purpose: ["health", "honey"],
     description:
       "Огляд вулика на предмет життєздатності бджолосім'ї, виявлення можливих захворювань або загроз, і оцінка потреби в підгодівлі.",
     duration: 15, // хвилин
@@ -22,10 +22,9 @@ export const beekeepingTasks = [
       "серпень",
       "вересень",
       "жовтень",
-      "листопад",
     ],
     name: "Плановий огляд стану бджолосім'ї",
-    purpose: [],
+    purpose: ["health"],
     description:
       "Оцінка стану сім'ї, кількість бджіл, наявність матки, контроль ройового стану, кількість корму, можливі захворювання.",
     duration: 10,
@@ -40,15 +39,14 @@ export const beekeepingTasks = [
       серпень: 2,
       вересень: 2,
       жовтень: 2,
-      листопад: 2,
     },
   },
   {
     month: ["лютий", "березень"],
     name: "Підгодівля канді",
-    purpose: [],
+    purpose: ["health", "power"],
     description:
-      "Подача цукрової пасти (канді) для підгодівлі бджіл у зимово-весняний період.",
+      "Подача цукрової пасти (канді) для підгодівлі бджіл у зимово-весняний період при нестачі кормових запасів.",
     duration: 5,
     costPerHour: 10,
     priority: "необов'язкова",
@@ -56,9 +54,9 @@ export const beekeepingTasks = [
   {
     month: ["березень", "квітень", "серпень", "вересень"],
     name: "Підгодівля сиропом",
-    purpose: [],
+    purpose: ["health", "power"],
     description:
-      "Підгодівля бджіл цукровим сиропом для підтримки сили сім'ї або підготовки до зими.",
+      "Підгодівля бджіл цукровим сиропом для підтримки сили сім'ї, стимуляції яйцекладки або підготовки до зими.",
     duration: 5,
     costPerHour: 10,
     priority: "необов'язкова",
@@ -66,29 +64,39 @@ export const beekeepingTasks = [
   {
     month: ["березень", "квітень", "травень"],
     name: "Розширення сушю",
-    purpose: [],
+    purpose: ["power"],
     description:
       "Додавання суші для збільшення об'єму вулика і розширення медових рамок.",
     duration: 10,
     costPerHour: 15,
-    priority: "необов'язкова",
+    priority: "обов'язкова",
+    frequency: {
+      березень: 1,
+      квітень: 2,
+      травень: 4,
+    },
   },
   {
     month: ["квітень", "травень", "червень"],
     name: "Розширення вощиною",
-    purpose: [],
+    purpose: ["power", "wax"],
     description:
       "Додавання вощини для розширення гнізда і стимуляції бджолиних робіт.",
     duration: 10,
     costPerHour: 15,
-    priority: "необов'язкова",
+    priority: "обов'язкова",
+    frequency: {
+      квітень: 1,
+      травень: 3,
+      червень: 4,
+    },
   },
   {
     month: ["квітень", "травень"],
     name: "Розширення трутневою вощиною",
-    purpose: [],
+    purpose: ["health", "droneHomogenate"],
     description:
-      "Додавання трутневої вощини для регулювання популяції трутнів і як метод боротьби з кліщами.",
+      "Додавання трутневої вощини для регулювання популяції трутнів, для виробництва трутневого гомогенату а також як метод боротьби з кліщами Варроа.",
     duration: 10,
     costPerHour: 15,
     priority: "необов'язкова",
@@ -96,12 +104,16 @@ export const beekeepingTasks = [
   {
     month: ["березень", "вересень", "жовтень"],
     name: "Обробіток від кліща Варроа",
-    purpose: [],
+    purpose: ["health"],
     description:
       "Хімічний або природний обробіток вулика для знищення кліщів Варроа.",
     duration: 10,
     costPerHour: 15,
     priority: "обов'язкова",
+    frequency: {
+      квітень: 1,
+      жовтень: 1,
+    },
   },
   {
     month: [
@@ -115,7 +127,7 @@ export const beekeepingTasks = [
       "жовтень",
     ],
     name: "Заміна матки",
-    purpose: [],
+    purpose: ["power"],
     description:
       "Заміна старої або дефективної матки для поліпшення розвитку бджолосім'ї.",
     duration: 10,
@@ -131,10 +143,9 @@ export const beekeepingTasks = [
       "липень",
       "серпень",
       "вересень",
-      "жовтень",
     ],
     name: "Підсадка матки",
-    purpose: [],
+    purpose: ["power"],
     description:
       "Процедура введення нової матки в сім'ю для покращення її продуктивності.",
     duration: 10,
@@ -153,7 +164,7 @@ export const beekeepingTasks = [
       "жовтень",
     ],
     name: "Мічення матки",
-    purpose: [],
+    purpose: ["power"],
     description:
       "Мітка на матці для легкого визначення її у вулику під час оглядів.",
     duration: 10,
@@ -161,18 +172,9 @@ export const beekeepingTasks = [
     priority: "необов'язкова",
   },
   {
-    month: [
-      "березень",
-      "квітень",
-      "травень",
-      "червень",
-      "липень",
-      "серпень",
-      "вересень",
-      "жовтень",
-    ],
+    month: ["березень", "квітень", "травень", "червень", "липень", "серпень"],
     name: "Посадка матки в кліточку",
-    purpose: [],
+    purpose: ["power"],
     description:
       "Посадка матки у кліточку для забезпечення безпечного введення в сім'ю.",
     duration: 10,
@@ -180,7 +182,7 @@ export const beekeepingTasks = [
     priority: "необов'язкова",
   },
   {
-    month: ["квітень", "травень", "червень", "липень", "серпень", "грудень"],
+    month: ["квітень", "травень", "червень", "липень", "серпень"],
     name: "Збір прополісу",
     purpose: ["propolis"],
     description:
@@ -189,8 +191,10 @@ export const beekeepingTasks = [
     costPerHour: 15,
     priority: "необов'язкова",
     frequency: {
-      грудень: 1,
-      червень: 2,
+      травень: 2,
+      червень: 4,
+      липень: 4,
+      серпень: 3,
     },
   },
   {
@@ -203,8 +207,10 @@ export const beekeepingTasks = [
     costPerHour: 15,
     priority: "необов'язкова",
     frequency: {
-      грудень: 1,
-      червень: 2,
+      квітень: 5,
+      травень: 10,
+      червень: 10,
+      липень: 5,
     },
   },
   {
@@ -216,6 +222,9 @@ export const beekeepingTasks = [
     duration: 10,
     costPerHour: 15,
     priority: "необов'язкова",
+    frequency: {
+      травень: 1,
+    },
   },
   {
     month: ["квітень", "травень", "червень"],
@@ -226,6 +235,9 @@ export const beekeepingTasks = [
     duration: 20,
     costPerHour: 20,
     priority: "необов'язкова",
+    frequency: {
+      травень: 1,
+    },
   },
   {
     month: ["квітень", "травень", "червень"],
@@ -236,16 +248,23 @@ export const beekeepingTasks = [
     duration: 20,
     costPerHour: 20,
     priority: "необов'язкова",
+    frequency: {
+      травень: 1,
+    },
   },
   {
     month: ["квітень", "травень", "червень"],
     name: "Формування відводків",
-    purpose: [],
+    purpose: ["power"],
     description:
       "Формування відводків для створення нових бджолосімей або їх подальшого продажу.",
     duration: 30,
     costPerHour: 25,
     priority: "необов'язкова",
+    frequency: {
+      квітень: 2,
+      травень: 3,
+    },
   },
   {
     month: ["квітень", "травень", "червень"],
@@ -256,15 +275,22 @@ export const beekeepingTasks = [
     duration: 20,
     costPerHour: 15,
     priority: "необов'язкова",
+    frequency: {
+      квітень: 2,
+      травень: 2,
+    },
   },
   {
     month: ["березень"],
     name: "Збір бджолиного підмору",
-    purpose: [],
+    purpose: ["health"],
     description: "Збір бджолиного підмору для виготовлення настоянок і ліків.",
     duration: 20,
     costPerHour: 15,
     priority: "необов'язкова",
+    frequency: {
+      березень: 1,
+    },
   },
   {
     month: ["квітень", "травень", "червень", "липень"],
@@ -275,16 +301,24 @@ export const beekeepingTasks = [
     duration: 20,
     costPerHour: 20,
     priority: "необов'язкова",
+    frequency: {
+      травень: 1,
+      червень: 1,
+    },
   },
   {
     month: ["квітень", "травень", "червень", "липень"],
     name: "Вирізання маточників",
-    purpose: [],
+    purpose: ["power"],
     description:
       "Вирізання маточників для запобігання роїнню або контролю якості маток.",
     duration: 15,
     costPerHour: 15,
     priority: "необов'язкова",
+    frequency: {
+      квітень: 2,
+      травень: 2,
+    },
   },
   {
     month: ["травень", "червень", "липень", "серпень"],
@@ -294,6 +328,12 @@ export const beekeepingTasks = [
     duration: 15,
     costPerHour: 15,
     priority: "необов'язкова",
+    frequency: {
+      травень: 1,
+      червень: 2,
+      липень: 2,
+      серпень: 1,
+    },
   },
   {
     month: ["травень", "червень", "липень", "серпень"],
@@ -303,6 +343,12 @@ export const beekeepingTasks = [
     duration: 30,
     costPerHour: 10,
     priority: "необов'язкова",
+    frequency: {
+      травень: 1,
+      червень: 2,
+      липень: 2,
+      серпень: 1,
+    },
   },
   {
     month: [
@@ -313,7 +359,6 @@ export const beekeepingTasks = [
       "липень",
       "серпень",
       "вересень",
-      "жовтень",
     ],
     name: "Перетоплювання воску",
     purpose: ["wax"],
@@ -322,5 +367,14 @@ export const beekeepingTasks = [
     duration: 15,
     costPerHour: 10,
     priority: "необов'язкова",
+    frequency: {
+      березень: 1,
+      квітень: 1,
+      травень: 1,
+      червень: 1,
+      липень: 1,
+      серпень: 1,
+      вересень: 1,
+    },
   },
 ];
