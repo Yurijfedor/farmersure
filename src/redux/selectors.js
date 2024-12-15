@@ -3,6 +3,9 @@ import { createSelector } from "@reduxjs/toolkit";
 export const selectHives = (state) => state.hives.hives;
 export const selectIsLoading = (state) => state.hives.isLoading;
 export const selectError = (state) => state.hives.error;
+export const selectUserProfile = (state) => state.user.profile;
+export const selectIsProfileLoading = (state) => state.user.isLoading;
+export const selectProfileError = (state) => state.user.error;
 
 export const selectAllTasks = createSelector(
   [selectHives], // Отримуємо всі вулики з state

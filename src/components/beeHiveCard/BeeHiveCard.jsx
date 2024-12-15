@@ -17,6 +17,7 @@ import { useUpdateHiveTasks, useDeleteHiveTask } from "../../hooks/useHives";
 import {
   updateAgreeWithBasicTech,
   updateAdditionalService,
+  updateHiveProperty,
 } from "../../redux/operations";
 import {
   updateTasksStatus,
@@ -53,7 +54,7 @@ import {
 export const BeeHiveCard = () => {
   // const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
   const currentMonth = "червень";
-
+  const user = JSON.parse(localStorage.getItem("user"));
   const hiveId = useParams();
   const dispatch = useDispatch();
   const hive = useSelector((state) => selectHiveById(state, hiveId.hiveId));
@@ -68,14 +69,6 @@ export const BeeHiveCard = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  // const [additionalServices, setAdditionalServices] = useState({
-  //   pollen: false,
-  //   propolis: false,
-  //   wax: false,
-  //   royalJelly: false,
-  //   droneHomogenate: false,
-  //   beeVenom: false,
-  // });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
   const [useRequiredTasks, setUseRequiredTasks] = useState(true);
   const selectedServices = useMemo(() => {
@@ -89,7 +82,8 @@ export const BeeHiveCard = () => {
 
     return services;
   }, [hive.additionalServices, hive.agreeWithBasicTech]); // Додано залежність `agreeWithBasicTech`
-  console.log(selectedServices);
+
+  console.log(hive.lessee);
 
   useEffect(
     () => {
@@ -106,9 +100,6 @@ export const BeeHiveCard = () => {
         hiveId.hiveId
       );
 
-      // if (missingTasks.length > 0) {
-      //   const newTasks = [...hive.tasks, ...missingTasks];
-      //   dispatch(updateHiveTasks({ hiveId: hiveId.hiveId, newTasks }));
       if (useRequiredTasks) {
         const ttasks = [...hive.tasks, ...missingTasks];
         const newTasks = ttasks.filter((task) => {
@@ -194,10 +185,6 @@ export const BeeHiveCard = () => {
 
   const handleAdditionalServiceChange = (e) => {
     const { name, checked } = e.target;
-    // setAdditionalServices((prevServices) => ({
-    //   ...prevServices,
-    //   [name]: checked, // Оновлюємо стан відповідної додаткової послуги
-    // }));
     dispatch(
       updateAdditionalService({
         hiveId: hiveId.hiveId,
@@ -243,7 +230,6 @@ export const BeeHiveCard = () => {
     // Оновлюємо Firestore, передаючи оновлений масив tasks
     deleteTask({ hiveId: hiveId.hiveId, tasks: updatedTasks });
     // Оновлюємо локальний стан
-    // setTasks(updatedTasks);
     dispatch(removeTaskFromHive({ hiveId: hiveId.hiveId, taskId }));
   };
 
@@ -265,8 +251,22 @@ export const BeeHiveCard = () => {
   `;
 
   const handleSignContract = () => {
-    // Логіка для списання суми з балансу користувача
-    handleCloseContractModal();
+    try {
+      // Викликаємо асинхронну дію для оновлення властивості "lessee"
+      dispatch(
+        updateHiveProperty({
+          hiveId: hiveId.hiveId,
+          property: "lessee",
+          value: user.email,
+        })
+      );
+
+      // Закриваємо модалку після підписання контракту
+      handleCloseContractModal();
+    } catch (error) {
+      console.error("Error signing contract:", error);
+      // Тут можна додати обробку помилок
+    }
   };
 
   const handlePlannedTasksTotalCostChange = (newTotalCost) => {
@@ -486,27 +486,32 @@ export const BeeHiveCard = () => {
         handleRequiredTasks={handleRequiredTasks}
         useRequiredTasks={useRequiredTasks}
       />
-      <Button
-        variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
-        size="large" // Розмір кнопки, наприклад "large"
-        onClick={handleOpenContractModal} // Функція для відкриття модалки
-      >
-        Оформити договір оренди на наступний місяць ( $
-        {(totalRent + plannedTasksTotalCost).toFixed(2)} )
-        <br />
-        управління бджолосім'єю онлайн, збір доступних продуктів бджільництва
-      </Button>
-      <Button
-        variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
-        size="large" // Розмір кнопки, наприклад "large"
-        onClick={handleOpenContractModal} // Функція для відкриття модалки
-      >
-        Оформити договір оренди на 6 місяців - повний сезон ($
-        {(totalRent * 6 + calculateMandatoryTasksCost()).toFixed(2)})
-        <br />
-        управління бджолосім'єю онлайн, гарантоване отримання базового набору
-        продуктів бджільництва
-      </Button>
+      {!hive.lessee && (
+        <>
+          <Button
+            variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
+            size="large" // Розмір кнопки, наприклад "large"
+            onClick={handleOpenContractModal} // Функція для відкриття модалки
+          >
+            Оформити договір оренди на наступний місяць ($
+            {(totalRent + plannedTasksTotalCost).toFixed(2)})
+            <br />
+            управління бджолосім'єю онлайн, збір доступних продуктів
+            бджільництва
+          </Button>
+          <Button
+            variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
+            size="large" // Розмір кнопки, наприклад "large"
+            onClick={handleOpenContractModal} // Функція для відкриття модалки
+          >
+            Оформити договір оренди на повний сезон ($
+            {(totalRent * 6 + calculateMandatoryTasksCost()).toFixed(2)})
+            <br />
+            управління бджолосім'єю онлайн, гарантоване отримання базового
+            набору продуктів бджільництва
+          </Button>
+        </>
+      )}
       {/* Модалка для договору */}
       <ContractModal
         isOpen={isContractModalOpen}

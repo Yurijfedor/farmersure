@@ -79,7 +79,12 @@ export const TaskTable = React.memo(
     };
 
     const getTotalCost = useCallback(() => {
-      return tasks.reduce((total, task) => total + (task.cost || 0), 0);
+      return tasks.reduce((total, task) => {
+        if (task.status === "Done") {
+          return total; // Пропускаємо завдання зі статусом "Done"
+        }
+        return total + (task.cost || 0);
+      }, 0);
     }, [tasks]);
 
     useEffect(() => {

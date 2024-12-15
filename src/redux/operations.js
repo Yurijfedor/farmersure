@@ -8,9 +8,13 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-import db from "../firebase";
+import {
+  getUserProfile,
+  saveUserProfile,
+  updateUserProfile,
+} from "../services/user";
 
-import { updateTasksStatus } from "./hivesSlice";
+import db from "../firebase";
 
 export const fetchAllHives = createAsyncThunk(
   "hives/fetchAll",
@@ -87,6 +91,20 @@ export const updateTaskStatusAsync = createAsyncThunk(
   }
 );
 
+export const updateHiveProperty = createAsyncThunk(
+  "hives/updateHiveProperty",
+  async ({ hiveId, property, value }, thunkAPI) => {
+    try {
+      const docRef = doc(db, "hives", hiveId);
+      await updateDoc(docRef, { [property]: value }); // Оновлюємо властивість за допомогою динамічного ключа
+
+      return { hiveId, property, value }; // Повертаємо значення для подальшого використання
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e.message); // Якщо сталася помилка
+    }
+  }
+);
+
 export const updateAgreeWithBasicTech = createAsyncThunk(
   "hives/updateAgreeWithBasicTech",
   async ({ hiveId, value }, thunkAPI) => {
@@ -112,6 +130,45 @@ export const updateAdditionalService = createAsyncThunk(
       return { hiveId, service, value };
     } catch (e) {
       return thunkAPI.rejectWithValue(e.message);
+    }
+  }
+);
+
+// Async thunk to fetch user profile
+export const fetchUserProfile = createAsyncThunk(
+  "user/fetchUserProfile",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const profile = await getUserProfile(userId);
+      return profile;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Async thunk to save user profile
+export const saveProfile = createAsyncThunk(
+  "user/saveProfile",
+  async ({ uid, data }, { rejectWithValue }) => {
+    try {
+      await saveUserProfile(uid, data);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Async thunk to update user profile
+export const updateProfile = createAsyncThunk(
+  "user/updateProfile",
+  async ({ uid, data }, { rejectWithValue }) => {
+    try {
+      await updateUserProfile(uid, data);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   }
 );

@@ -50,14 +50,19 @@ export const logInWithEmail = async (userData) => {
   try {
     const { email, password } = userData;
     const { user } = await signInWithEmailAndPassword(auth, email, password);
+
+    const userProfile = {
+      uid: user.uid,
+      email: user.email,
+    };
+
     await syncUserProfile(user);
-    await saveUserProfile(user.uid, { uid: user.uid, email: user.email });
-    // Необов'язкове оновлення локального профілю, якщо необхідно
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ uid: user.uid, email: user.email })
-    );
-    return true;
+    await saveUserProfile(user.uid, userProfile);
+
+    // Збереження профілю в localStorage
+    localStorage.setItem("user", JSON.stringify(userProfile));
+
+    return userProfile; // Повертаємо профіль користувача
   } catch (error) {
     console.error("Помилка входу:", error.message);
     throw new Error(error.message);
@@ -72,22 +77,20 @@ export const logInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const { user } = await signInWithPopup(auth, provider);
 
-    await syncUserProfile(user);
-
-    const userData = {
+    const userProfile = {
       uid: user.uid,
       name: user.displayName,
       email: user.email,
       photoURL: user.photoURL, // URL фото профілю з Google
     };
 
-    // Збереження даних користувача у Firestore
-    await saveUserProfile(user.uid, userData);
+    await syncUserProfile(user);
+    await saveUserProfile(user.uid, userProfile);
 
-    // Збереження в localStorage
-    localStorage.setItem("user", JSON.stringify(userData));
+    // Збереження профілю в localStorage
+    localStorage.setItem("user", JSON.stringify(userProfile));
 
-    return true;
+    return userProfile; // Повертаємо профіль користувача
   } catch (error) {
     console.log(error);
     throw new Error(error.message);

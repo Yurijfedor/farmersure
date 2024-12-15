@@ -53,6 +53,7 @@ export const syncUserProfile = async (user) => {
       phone: "",
       photoURL: user.photoURL || "",
       customPhotoURL: "", // Додаємо це поле
+      balance: user.balance || 0,
     });
   } else if (!userDoc.data().photoURL && user.photoURL) {
     await updateDoc(doc(db, "users", user.uid), {

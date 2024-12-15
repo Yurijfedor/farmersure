@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 
+import { setUserProfile } from "../../redux/userSlice";
+import { fetchUserProfile } from "../../redux/operations";
 import { logInWithEmail, logInWithGoogle } from "../../services/auth";
+import { useUserProfile } from "../../hooks/useUserProfile";
 import googlePng from "../../images/icons8-google-48.png";
 
 import {
@@ -17,11 +21,14 @@ export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { profile, loading, error, updateProfile } = useUserProfile();
   const toPath = JSON.parse(localStorage.getItem("toRedirect"));
 
   const { mutate: loginWithEmail } = useMutation(logInWithEmail, {
-    onSuccess: () => {
+    onSuccess: (user) => {
       navigate(toPath);
+      dispatch(fetchUserProfile(user.uid));
       localStorage.removeItem("toRedirect");
     },
     onError: (error) => {
@@ -30,8 +37,9 @@ export const LoginForm = () => {
   });
 
   const { mutate: loginWithGoogle } = useMutation(logInWithGoogle, {
-    onSuccess: () => {
+    onSuccess: (user) => {
       navigate(toPath);
+      dispatch(fetchUserProfile(user.uid));
       localStorage.removeItem("toRedirect");
     },
     onError: (error) => {

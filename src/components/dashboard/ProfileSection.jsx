@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 import { useUserProfile } from "../../hooks/useUserProfile";
 import { uploadProfilePicture } from "../../services/user";
+import {
+  selectUserProfile,
+  selectIsProfileLoading,
+  selectProfileError,
+} from "../../redux/selectors";
 
 export const ProfileSection = () => {
-  const { profile, loading, error, updateProfile } = useUserProfile();
+  const profile = useSelector(selectUserProfile);
+  const loading = useSelector(selectIsProfileLoading);
+  const error = useSelector(selectProfileError);
+  const { updateProfile } = useUserProfile();
   const [isEditing, setIsEditing] = useState(false);
   const [editableProfile, setEditableProfile] = useState(null);
   const [image, setImage] = useState(null);
@@ -34,6 +43,7 @@ export const ProfileSection = () => {
       setEditableProfile((prev) => ({ ...prev, customPhotoURL: imageUrl }));
       setImage(null);
       setUploading(false);
+      updateProfile(editableProfile);
     } catch (err) {
       console.error("Помилка завантаження фото:", err);
       setUploading(false);
@@ -86,6 +96,7 @@ export const ProfileSection = () => {
                 <input
                   type="text"
                   name="name"
+                  placeholder="name"
                   value={editableProfile.name}
                   onChange={(e) =>
                     setEditableProfile((prev) => ({
@@ -97,6 +108,7 @@ export const ProfileSection = () => {
                 <input
                   type="email"
                   name="email"
+                  placeholder="email"
                   value={editableProfile.email}
                   onChange={(e) =>
                     setEditableProfile((prev) => ({
@@ -108,6 +120,7 @@ export const ProfileSection = () => {
                 <input
                   type="tel"
                   name="phone"
+                  placeholder="phone"
                   value={editableProfile.phone}
                   onChange={(e) =>
                     setEditableProfile((prev) => ({
