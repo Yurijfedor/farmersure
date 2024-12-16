@@ -1,7 +1,7 @@
 import React from "react";
 
 import { ProfileSection } from "../components/dashboard/ProfileSection";
-// import BalanceSection from "../components/BalanceSection";
+import { BalanceSection } from "../components/dashboard/BalanceSection";
 // import RentedHivesSection from "../components/RentedHivesSection";
 // import TasksSection from "../components/TasksSection";
 
@@ -10,7 +10,7 @@ const ClientDashboard = () => {
     <div>
       <h1>Кабінет клієнта</h1>
       <ProfileSection />
-      {/* <BalanceSection /> */}
+      <BalanceSection />
       {/* <RentedHivesSection /> */}
       {/* <TasksSection /> */}
     </div>

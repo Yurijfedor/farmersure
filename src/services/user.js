@@ -17,7 +17,6 @@ const storage = getStorage();
 export const getUserProfile = async (userId) => {
   const userRef = doc(db, "users", userId);
   const userDoc = await getDoc(userRef);
-  console.log(userDoc);
 
   if (userDoc.exists()) {
     return userDoc.data();
@@ -63,8 +62,6 @@ export const syncUserProfile = async (user) => {
 };
 
 export const saveUserProfile = async (uid, data) => {
-  console.log(data);
-
   try {
     const userDocRef = doc(db, "users", uid);
     const userDoc = await getDoc(userDocRef);
