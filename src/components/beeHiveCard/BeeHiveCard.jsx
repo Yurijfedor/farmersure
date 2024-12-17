@@ -257,7 +257,7 @@ export const BeeHiveCard = () => {
         updateHiveProperty({
           hiveId: hiveId.hiveId,
           property: "lessee",
-          value: user.email,
+          value: user.uid,
         })
       );
 

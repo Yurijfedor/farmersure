@@ -8,7 +8,6 @@ import { Modal } from "../modal/Modal";
 export const BalanceSection = () => {
   const dispatch = useDispatch();
   const userProfile = useSelector(selectUserProfile);
-  console.log(userProfile);
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
