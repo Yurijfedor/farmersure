@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfarmersure=self.webpackChunkfarmersure||[]).push([[627],{973:function(e,r,u){u.r(r);var s=u(3329);r.default=function(){return(0,s.jsx)("div",{children:"Hello!I am Problems"})}}}]);
+//# sourceMappingURL=627.84f9700f.chunk.js.map

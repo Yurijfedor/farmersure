@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/22.63559af4.chunk.js","mappings":"iIAIA,UAJc,WACZ,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,oBACd,C","sources":["pages/Store.jsx"],"sourcesContent":["const Store = () => {\r\n  return <div>Hello!I am Store</div>;\r\n};\r\n\r\nexport default Store;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

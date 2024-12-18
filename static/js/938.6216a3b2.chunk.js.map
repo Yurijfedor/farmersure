@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/938.6216a3b2.chunk.js","mappings":"iIAIA,UAJoB,WAClB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,0BACd,C","sources":["pages/OurContacts.jsx"],"sourcesContent":["const OurContacts = () => {\r\n  return <div>Hello!I am OurContacts</div>;\r\n};\r\n\r\nexport default OurContacts;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

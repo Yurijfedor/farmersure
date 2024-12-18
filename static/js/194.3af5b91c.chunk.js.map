@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/194.3af5b91c.chunk.js","mappings":"gIAIA,UAJoB,WAClB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,0BACd,C","sources":["pages/OurServices.jsx"],"sourcesContent":["const OurServices = () => {\r\n  return <div>Hello!I am OurServices</div>;\r\n};\r\n\r\nexport default OurServices;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

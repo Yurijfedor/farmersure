@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/987.38c5d6f3.chunk.js","mappings":"kIAIA,UAJoB,WAClB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,0BACd,C","sources":["pages/Maintenance.jsx"],"sourcesContent":["const Maintenance = () => {\r\n  return <div>Hello!I am Maintenance</div>;\r\n};\r\n\r\nexport default Maintenance;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

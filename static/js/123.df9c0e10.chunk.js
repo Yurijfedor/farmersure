@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfarmersure=self.webpackChunkfarmersure||[]).push([[123],{7123:function(e,r,s){s.r(r);var u=s(3329);r.default=function(){return(0,u.jsx)("div",{children:"Hello!I am FreshNews"})}}}]);
+//# sourceMappingURL=123.df9c0e10.chunk.js.map

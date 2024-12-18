@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/451.90206916.chunk.js","mappings":"kIAIA,UAJwB,WACtB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,8BACd,C","sources":["pages/Recommendations.jsx"],"sourcesContent":["const Recommendations = () => {\r\n  return <div>Hello!I am Recommendations</div>;\r\n};\r\n\r\nexport default Recommendations;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

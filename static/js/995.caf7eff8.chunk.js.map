@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/995.caf7eff8.chunk.js","mappings":"iIAIA,UAJmB,WACjB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,yBACd,C","sources":["pages/Production.jsx"],"sourcesContent":["const Production = () => {\r\n  return <div>Hello!I am Production</div>;\r\n};\r\n\r\nexport default Production;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

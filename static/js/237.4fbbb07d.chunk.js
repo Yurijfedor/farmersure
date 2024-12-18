@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfarmersure=self.webpackChunkfarmersure||[]).push([[237],{7237:function(e,r,u){u.r(r);var n=u(3329);r.default=function(){return(0,n.jsx)("div",{children:"Hello!I am Achievements"})}}}]);
+//# sourceMappingURL=237.4fbbb07d.chunk.js.map

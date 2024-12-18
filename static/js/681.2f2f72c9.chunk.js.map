@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/681.2f2f72c9.chunk.js","mappings":"gIAIA,UAJmB,WACjB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,yBACd,C","sources":["pages/OurCompany.jsx"],"sourcesContent":["const OurCompany = () => {\r\n  return <div>Hello!I am OurCompany</div>;\r\n};\r\n\r\nexport default OurCompany;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

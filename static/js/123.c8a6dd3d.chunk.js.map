@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/123.c8a6dd3d.chunk.js","mappings":"iIAIA,UAJkB,WAChB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,wBACd,C","sources":["pages/FreshNews.jsx"],"sourcesContent":["const FreshNews = () => {\r\n  return <div>Hello!I am FreshNews</div>;\r\n};\r\n\r\nexport default FreshNews;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

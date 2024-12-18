@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/473.093e33f6.chunk.js","mappings":"iIAIA,UAJoB,WAClB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,0BACd,C","sources":["pages/ContactInfo.jsx"],"sourcesContent":["const ContactInfo = () => {\r\n  return <div>Hello!I am ContactInfo</div>;\r\n};\r\n\r\nexport default ContactInfo;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

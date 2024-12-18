@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/374.4b354709.chunk.js","mappings":"kIAIA,UAJmB,WACjB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,yBACd,C","sources":["pages/Beekeeping.jsx"],"sourcesContent":["const Beekeeping = () => {\r\n  return <div>Hello!I am Beekeeping</div>;\r\n};\r\n\r\nexport default Beekeeping;\r\n"],"names":["_jsx","children"],"sourceRoot":""}

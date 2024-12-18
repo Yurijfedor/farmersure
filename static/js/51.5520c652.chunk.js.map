@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/51.5520c652.chunk.js","mappings":"iIAIA,UAJmB,WACjB,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,yBACd,C","sources":["pages/Contacting.jsx"],"sourcesContent":["const Contacting = () => {\r\n  return <div>Hello!I am Contacting</div>;\r\n};\r\n\r\nexport default Contacting;\r\n"],"names":["_jsx","children"],"sourceRoot":""}
