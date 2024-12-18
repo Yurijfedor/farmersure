@@ -39,3 +39,26 @@ export const selectHiveById = createSelector(
     return hives.find((hive) => hive.id === hiveId) || null; // Повертаємо вулик або null, якщо не знайдено
   }
 );
+
+// Новий селектор для підсумовування вартості завдань
+export const selectPlannedTasksCost = createSelector(
+  [selectHives, selectUserProfile], // Отримуємо вулики та профіль користувача
+  (hives, userProfile) => {
+    if (!userProfile) return 0;
+
+    const userId = userProfile.id;
+
+    // Фільтруємо вулики, які орендує поточний користувач
+    const userHives = hives.filter((hive) => hive.lessee === userId);
+
+    // Збираємо всі завдання зі статусами "Under Review" і "Approved"
+    const plannedTasks = userHives.flatMap((hive) =>
+      hive.tasks.filter(
+        (task) => task.status === "Under Review" || task.status === "Approved"
+      )
+    );
+
+    // Підсумовуємо їхню вартість
+    return plannedTasks.reduce((total, task) => total + task.cost, 0);
+  }
+);

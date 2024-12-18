@@ -35,22 +35,30 @@ export const AdminTable = () => {
         return;
       }
 
-      const userProfile = await getUserProfile(lesseeId);
-      if (!userProfile || !userProfile.balance) {
-        console.error("Профіль користувача не знайдено або баланс не вказано.");
-        return;
+      // Якщо статус змінюється на "Done", виконуємо перевірку балансу та списуємо кошти
+      if (newValue === "Done") {
+        const userProfile = await getUserProfile(lesseeId);
+        if (!userProfile || typeof userProfile.balance !== "number") {
+          console.error(
+            "Профіль користувача не знайдено або баланс не вказано."
+          );
+          return;
+        }
+
+        const updatedBalance = userProfile.balance - taskCost;
+        if (updatedBalance < 0) {
+          alert(
+            "Недостатньо коштів на балансі користувача для завершення завдання."
+          );
+          return;
+        }
+
+        const userRef = doc(db, "users", lesseeId);
+        await updateDoc(userRef, { balance: updatedBalance });
+        console.log("Баланс користувача оновлено.");
       }
 
-      const updatedBalance = userProfile.balance - taskCost;
-      if (updatedBalance < 0) {
-        console.error("Недостатньо коштів на балансі користувача.");
-        return;
-      }
-
-      const userRef = doc(db, "users", lesseeId);
-      await updateDoc(userRef, { balance: updatedBalance });
-      console.log("Баланс користувача оновлено.");
-
+      // Оновлюємо статус завдання незалежно від його нового значення
       dispatch(
         updateTaskStatusAsync({ hiveId: hive.id, taskId, property, newValue })
       );

@@ -28,6 +28,8 @@ import {
   selectHiveById,
   selectIsLoading,
   selectError,
+  selectUserProfile,
+  selectPlannedTasksCost,
 } from "../../redux/selectors";
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
@@ -71,6 +73,9 @@ export const BeeHiveCard = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
   const [useRequiredTasks, setUseRequiredTasks] = useState(true);
+  const userBalance = useSelector(selectUserProfile).balance;
+  const plannedTasksCost = useSelector(selectPlannedTasksCost);
+
   const selectedServices = useMemo(() => {
     const services = Object.entries(hive.additionalServices)
       .filter(([_, isSelected]) => isSelected) // Враховуються лише обрані сервіси
@@ -201,6 +206,24 @@ export const BeeHiveCard = () => {
   );
 
   const handleConfirmTask = (taskId) => {
+    const currentTask = hive.tasks.find((task) => task.id === taskId);
+
+    if (!currentTask) {
+      console.error("Завдання не знайдено");
+      return;
+    }
+
+    const remainingBalance = userBalance - plannedTasksCost;
+
+    if (
+      currentTask.status !== "Approved" &&
+      remainingBalance < currentTask.cost
+    ) {
+      alert(
+        "Недостатньо коштів на балансі для виконання цього завдання. Будь ласка, поповніть баланс."
+      );
+      return;
+    }
     const tasksToUpdate = hive.tasks
       .filter((task) => task.status !== "Pending" || task.id === taskId)
       .map((task) =>
