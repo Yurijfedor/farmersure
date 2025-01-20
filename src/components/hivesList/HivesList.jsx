@@ -26,11 +26,11 @@ export const HivesList = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user ? user.uid : null;
 
-    if (hive.lessee === "") {
+    if (hive.lessee.uid === "") {
       // If lessee is an empty string, allow access
       console.log(`Navigating to hive card: ${hive.id}`);
       navigate(`/ourservices/hive_card/${hive.id}`); // Navigate to hive card
-    } else if (hive.lessee === userId) {
+    } else if (hive.lessee.uid === userId) {
       // If lessee matches the logged-in user, allow access
       console.log(`Navigating to hive card: ${hive.id}`);
       navigate(`/ourservices/hive_card/${hive.id}`); // Navigate to hive card
@@ -53,7 +53,7 @@ export const HivesList = () => {
         data.length !== 0 &&
         data.map((hive) => {
           return (
-            <ItemStyled key={hive.id} type={hive.lessee}>
+            <ItemStyled key={hive.id} type={hive.lessee.uid}>
               <div
                 onClick={() => handleHiveClick(hive)} // Call the new handler
               >

@@ -96,7 +96,9 @@ export const updateHiveProperty = createAsyncThunk(
   async ({ hiveId, property, value }, thunkAPI) => {
     try {
       const docRef = doc(db, "hives", hiveId);
-      await updateDoc(docRef, { [property]: value }); // Оновлюємо властивість за допомогою динамічного ключа
+      await updateDoc(docRef, {
+        [property !== "lessee" ? property : `${property}.uid`]: value,
+      }); // Оновлюємо властивість за допомогою динамічного ключа
 
       return { hiveId, property, value }; // Повертаємо значення для подальшого використання
     } catch (e) {

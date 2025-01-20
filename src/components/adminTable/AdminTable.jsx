@@ -29,7 +29,7 @@ export const AdminTable = () => {
     }
 
     try {
-      const lesseeId = hive?.lessee;
+      const lesseeId = hive?.lessee.uid;
       if (!lesseeId) {
         console.error("Властивість 'lessee' не знайдена у вулику.");
         return;

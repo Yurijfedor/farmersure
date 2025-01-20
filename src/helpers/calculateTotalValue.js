@@ -1,23 +1,22 @@
-export const calculateTotalValue = (prices, calculatePerformance) => {
-  const {
-    honey,
-    pollenAmount,
-    propolisAmount,
-    waxAmount,
-    royalJellyAmount,
-    droneHomogenateAmount,
-    beeVenomAmount,
-  } = calculatePerformance;
-
-  // Розрахунок загальної вартості продукції
-  const totalValue =
-    honey * prices.honey +
-    pollenAmount * prices.pollen +
-    propolisAmount * prices.propolis +
-    waxAmount * prices.wax +
-    royalJellyAmount * prices.royalJelly +
-    droneHomogenateAmount * prices.droneHomogenate +
-    beeVenomAmount * prices.beeVenom;
+export const calculateTotalValue = (
+  prices,
+  calculatePerformance,
+  product,
+  productAmount
+) => {
+  if (product && productAmount) {
+    // Якщо переданий конкретний продукт, повертаємо тільки його вартість
+    return productAmount * prices[product];
+  }
+  const totalValue = Object.entries(calculatePerformance).reduce(
+    (acc, [key, value]) => {
+      if (value && prices[key]) {
+        return acc + value * prices[key];
+      }
+      return acc;
+    },
+    0
+  );
 
   return totalValue.toFixed(2); // Округлюємо до двох знаків після коми
 };

@@ -1,15 +1,11 @@
-export const calculatePerformance = (
-  hive,
-  additionalServices,
-  agreeWithBasicTech
-) => {
+export const calculatePerformance = (hive) => {
   const { power } = hive; // Сила сім'ї
   const { pollen, propolis, wax, royalJelly, droneHomogenate, beeVenom } =
-    additionalServices; // Додаткові послуги
+    hive.additionalServices; // Додаткові послуги
 
   // Мед
   let honey = 0;
-  if (agreeWithBasicTech) {
+  if (hive.agreeWithBasicTech) {
     if (power >= 9) honey = 15;
     else if (power === 8) honey = 12;
     else if (power === 7) honey = 11;
@@ -79,11 +75,11 @@ export const calculatePerformance = (
 
   return {
     honey,
-    pollenAmount,
-    propolisAmount,
-    waxAmount,
-    royalJellyAmount,
-    droneHomogenateAmount,
-    beeVenomAmount,
+    pollen: pollenAmount,
+    propolis: propolisAmount,
+    wax: waxAmount,
+    royalJelly: royalJellyAmount,
+    droneHomogenate: droneHomogenateAmount,
+    beeVenom: beeVenomAmount,
   };
 };

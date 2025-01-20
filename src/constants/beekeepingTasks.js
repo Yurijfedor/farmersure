@@ -351,6 +351,20 @@ export const beekeepingTasks = [
     },
   },
   {
+    month: ["вересень", "жовтень"],
+    name: "дератизація",
+    purpose: ["health"],
+    description:
+      "Роботи повязані із знищенням гризунів на територіях зимівлі бджолосімей.",
+    duration: 5,
+    costPerHour: 7,
+    priority: "обов'язкова",
+    frequency: {
+      вересень: 1,
+      жовтень: 2,
+    },
+  },
+  {
     month: [
       "березень",
       "квітень",

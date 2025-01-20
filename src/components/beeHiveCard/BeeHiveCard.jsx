@@ -34,7 +34,6 @@ import {
 import { ageOfQueen } from "../../helpers/ageOfQueen";
 import { calculatePerformance } from "../../helpers/calculatePerformance";
 import { calculateTotalRent } from "../../helpers/calculateRent";
-import { productPrices } from "../../constants/prices";
 import {
   generateTasksForMonth,
   generateMissingTasks,
@@ -73,7 +72,7 @@ export const BeeHiveCard = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
   const [useRequiredTasks, setUseRequiredTasks] = useState(true);
-  const userBalance = useSelector(selectUserProfile).balance;
+  const userProfile = useSelector(selectUserProfile);
   const plannedTasksCost = useSelector(selectPlannedTasksCost);
 
   const selectedServices = useMemo(() => {
@@ -87,8 +86,6 @@ export const BeeHiveCard = () => {
 
     return services;
   }, [hive.additionalServices, hive.agreeWithBasicTech]); // Додано залежність `agreeWithBasicTech`
-
-  console.log(hive.lessee);
 
   useEffect(
     () => {
@@ -199,21 +196,22 @@ export const BeeHiveCard = () => {
     );
   };
 
-  const performance = calculatePerformance(
-    hive,
-    hive.additionalServices,
-    hive.agreeWithBasicTech
-  );
+  const performance = calculatePerformance(hive);
 
   const handleConfirmTask = (taskId) => {
-    const currentTask = hive.tasks.find((task) => task.id === taskId);
+    console.log(hive.lessee.uid === userProfile.id);
 
+    if (hive.lessee.uid !== userProfile.id) {
+      alert("Вам потрібно оформити договір оренди на цей вулик");
+      return;
+    }
+    const currentTask = hive.tasks.find((task) => task.id === taskId);
     if (!currentTask) {
       console.error("Завдання не знайдено");
       return;
     }
 
-    const remainingBalance = userBalance - plannedTasksCost;
+    const remainingBalance = userProfile.balance - plannedTasksCost;
 
     if (
       currentTask.status !== "Approved" &&
@@ -387,11 +385,7 @@ export const BeeHiveCard = () => {
           ? "Ви погодились застосовувати Базову технологію бджільництва"
           : "Ви ще не погодились застосовувати Базову технологію бджільництва"}
       </p>
-      <PerformanceScale
-        prices={productPrices}
-        performance={performance}
-        power={hive.power}
-      />
+      <PerformanceScale hive={hive} />
       {/* Група чекбоксів для додаткових послуг */}
       <Wrapper>
         <h3 style={{ marginBottom: "20px" }}>Додаткові послуги:</h3>
@@ -509,7 +503,7 @@ export const BeeHiveCard = () => {
         handleRequiredTasks={handleRequiredTasks}
         useRequiredTasks={useRequiredTasks}
       />
-      {!hive.lessee && (
+      {!hive.lessee.uid && (
         <>
           <Button
             variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"

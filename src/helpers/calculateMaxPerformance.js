@@ -1,71 +1,79 @@
 import { productPrices } from "../constants/prices";
 
-export const calculateMaxPerformance = (power) => {
-  // Мед
-  let honey = 0;
+export const calculateMaxPerformance = (power, product) => {
+  const performanceMap = {
+    honey: 0,
+    pollen: 0,
+    propolis: 0,
+    wax: 0,
+    royalJelly: 0,
+    droneHomogenate: 0,
+    beeVenom: 0,
+  };
 
-  if (power >= 9) honey = 15;
-  else if (power === 8) honey = 12;
-  else if (power === 7) honey = 11;
-  else if (power === 6) honey = 10;
-  else if (power === 5) honey = 9;
+  if (power >= 9) {
+    Object.assign(performanceMap, {
+      honey: 15,
+      pollen: 1,
+      propolis: 0.1,
+      wax: 0.35,
+      royalJelly: 0.1,
+      droneHomogenate: 0.15,
+      beeVenom: 0.002,
+    });
+  } else if (power === 8) {
+    Object.assign(performanceMap, {
+      honey: 12,
+      pollen: 0.9,
+      propolis: 0.08,
+      wax: 0.25,
+      royalJelly: 0.08,
+      droneHomogenate: 0.1,
+      beeVenom: 0.0015,
+    });
+  } else if (power === 7) {
+    Object.assign(performanceMap, {
+      honey: 11,
+      pollen: 0.8,
+      propolis: 0.07,
+      wax: 0.2,
+      royalJelly: 0.05,
+      droneHomogenate: 0.08,
+      beeVenom: 0.001,
+    });
+  } else if (power === 6) {
+    Object.assign(performanceMap, {
+      honey: 10,
+      pollen: 0.6,
+      propolis: 0.06,
+      wax: 0.15,
+      royalJelly: 0.03,
+      droneHomogenate: 0.06,
+      beeVenom: 0.0008,
+    });
+  } else if (power === 5) {
+    Object.assign(performanceMap, {
+      honey: 9,
+      pollen: 0.5,
+      propolis: 0.05,
+      wax: 0.1,
+      royalJelly: 0.02,
+      droneHomogenate: 0.05,
+      beeVenom: 0.0005,
+    });
+  }
 
-  // Пилок
-  let pollenAmount = 0;
+  if (product) {
+    // Якщо переданий конкретний продукт, повертаємо тільки його вартість
+    const productAmount = performanceMap[product];
+    return productAmount * productPrices[product];
+  }
 
-  if (power >= 9) pollenAmount = 1;
-  else if (power === 8) pollenAmount = 0.9;
-  else if (power === 7) pollenAmount = 0.8;
-  else if (power === 6) pollenAmount = 0.6;
-  else if (power === 5) pollenAmount = 0.5;
-
-  // Прополіс
-  let propolisAmount = 0;
-  if (power >= 9) propolisAmount = 0.1;
-  else if (power === 8) propolisAmount = 0.08;
-  else if (power === 7) propolisAmount = 0.07;
-  else if (power === 6) propolisAmount = 0.06;
-  else if (power === 5) propolisAmount = 0.05;
-
-  // Віск
-  let waxAmount = 0;
-  if (power >= 9) waxAmount = 0.35;
-  else if (power === 8) waxAmount = 0.25;
-  else if (power === 7) waxAmount = 0.2;
-  else if (power === 6) waxAmount = 0.15;
-  else if (power === 5) waxAmount = 0.1;
-
-  // Маточне молочко
-  let royalJellyAmount = 0;
-  if (power >= 9) royalJellyAmount = 0.1;
-  else if (power === 8) royalJellyAmount = 0.08;
-  else if (power === 7) royalJellyAmount = 0.05;
-  else if (power === 6) royalJellyAmount = 0.03;
-  else if (power === 5) royalJellyAmount = 0.02;
-
-  // Трутневий гомогенат
-  let droneHomogenateAmount = 0;
-  if (power >= 9) droneHomogenateAmount = 0.15;
-  else if (power === 8) droneHomogenateAmount = 0.1;
-  else if (power === 7) droneHomogenateAmount = 0.08;
-  else if (power === 6) droneHomogenateAmount = 0.06;
-  else if (power === 5) droneHomogenateAmount = 0.05;
-  // Бджолина отрута
-  let beeVenomAmount = 0;
-  if (power >= 9) beeVenomAmount = 0.002;
-  else if (power === 8) beeVenomAmount = 0.0015;
-  else if (power === 7) beeVenomAmount = 0.001;
-  else if (power === 6) beeVenomAmount = 0.0008;
-  else if (power === 5) beeVenomAmount = 0.0005;
-
-  const maxAmount =
-    honey * productPrices.honey +
-    pollenAmount * productPrices.pollen +
-    propolisAmount * productPrices.propolis +
-    waxAmount * productPrices.wax +
-    royalJellyAmount * productPrices.royalJelly +
-    droneHomogenateAmount * productPrices.droneHomogenate +
-    beeVenomAmount * productPrices.beeVenom;
+  // Якщо продукт не вказаний, повертаємо загальну вартість
+  const maxAmount = Object.entries(performanceMap).reduce(
+    (acc, [key, value]) => acc + value * (productPrices[key] || 0),
+    0
+  );
 
   return maxAmount;
 };
