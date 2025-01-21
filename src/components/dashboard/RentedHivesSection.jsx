@@ -7,6 +7,13 @@ import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { Button } from "../button/Button";
 import { Modal } from "../modal/Modal";
 
+import {
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "./RentedHivesSection.styled";
+
 export const RentedHivesSection = () => {
   const [selectedHive, setSelectedHive] = useState(null);
   const [modalType, setModalType] = useState(null);
@@ -25,49 +32,42 @@ export const RentedHivesSection = () => {
   return (
     <div className="rented-hives-section">
       <h2>Орендовані вулики</h2>
-      <table>
+      <Table>
         <thead>
           <tr>
-            <th>№</th>
-            <th>Фото</th>
-            <th>Порода</th>
-            <th>Система</th>
-            <th>Потужність</th>
-            <th>Продуктивність</th>
-            <th>Тип оренди</th>
-            <th>Дії</th>
+            <TableHeader>№</TableHeader>
+            <TableHeader>Фото</TableHeader>
+            <TableHeader>Потужність</TableHeader>
+            <TableHeader>Продуктивність</TableHeader>
+            <TableHeader>Тип оренди</TableHeader>
+            <TableHeader>Дії</TableHeader>
           </tr>
         </thead>
         <tbody>
           {hives.map((hive, index) => (
-            <tr key={hive.id}>
-              <td>{index + 1}</td>
-              <td>
-                <img
-                  src={hive.photoURL}
-                  alt={`Вулик ${hive.number}`}
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    objectFit: "cover",
-                  }}
-                />
-              </td>
-              <td>{hive.breed}</td>
-              <td>{hive.system}</td>
-              <td>{hive.power}</td>
-              <td>
-                <div>
-                  <strong>Мед:</strong>{" "}
-                  <PerformanceScale hive={hive} product={"honey"} />
-                  <strong>Прополіс:</strong>
-                  <PerformanceScale hive={hive} product={"propolis"} />
-                  <strong>Віск:</strong>
-                  <PerformanceScale hive={hive} product={"wax"} />
+            <TableRow key={hive.id}>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>
+                <img src={hive.photoURL} alt={`Вулик ${hive.number}`} />
+              </TableCell>
+              <TableCell>{hive.power}</TableCell>
+              <TableCell>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <PerformanceScale hive={hive} product={"honey"} />
+                    <PerformanceScale hive={hive} product={"propolis"} />
+                    <PerformanceScale hive={hive} product={"wax"} />
+                    <PerformanceScale hive={hive} product={"royalJelly"} />
+                  </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <PerformanceScale hive={hive} product={"droneHomogenate"} />
+                    <PerformanceScale hive={hive} product={"pollen"} />
+                    <PerformanceScale hive={hive} product={"beeVenom"} />
+                  </div>
                 </div>
-              </td>
-              <td>{hive.rentalType || "Не встановлено"}</td>
-              <td>
+              </TableCell>
+              <TableCell>{hive.rentalType || "Не встановлено"}</TableCell>
+              <TableCell>
                 <Button
                   variant="formBtn"
                   size="medium"
@@ -89,11 +89,11 @@ export const RentedHivesSection = () => {
                 >
                   Замовити онлайн-відеоогляд
                 </Button>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
         </tbody>
-      </table>
+      </Table>
 
       {modalType && (
         <Modal onClose={closeModal}>

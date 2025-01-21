@@ -1,6 +1,6 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import cover from '../../images/cover.png';
+import cover from "../../images/cover.png";
 
 export const Container = styled.div`
   width: 360px;
@@ -8,7 +8,7 @@ export const Container = styled.div`
   margin: 0 auto;
   @media (min-width: 1280px) {
     width: 1280px;
-    padding: 0 210px;
+    padding: 0 21px;
   }
 `;
 

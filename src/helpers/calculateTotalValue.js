@@ -6,7 +6,10 @@ export const calculateTotalValue = (
 ) => {
   if (product && productAmount) {
     // Якщо переданий конкретний продукт, повертаємо тільки його вартість
-    return productAmount * prices[product];
+    const value = productAmount * prices[product];
+    console.log(value);
+
+    return value;
   }
   const totalValue = Object.entries(calculatePerformance).reduce(
     (acc, [key, value]) => {

@@ -63,7 +63,7 @@ export const calculateMaxPerformance = (power, product) => {
     });
   }
 
-  if (product) {
+  if (product !== "") {
     // Якщо переданий конкретний продукт, повертаємо тільки його вартість
     const productAmount = performanceMap[product];
     return productAmount * productPrices[product];
@@ -75,5 +75,5 @@ export const calculateMaxPerformance = (power, product) => {
     0
   );
 
-  return maxAmount;
+  return maxAmount.toFixed(2);
 };
