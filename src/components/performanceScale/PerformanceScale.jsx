@@ -21,9 +21,18 @@ export const PerformanceScale = ({ hive, product = "" }) => {
   // Визначаємо ширину шкали залежно від нормалізованого значення
   const scaleWidth = Math.min(100, (totalValue / maxPerformance) * 100) + "%"; // Ділимо на менший коефіцієнт
 
+  const productTranslations = {
+    honey: "Мед",
+    wax: "Віск",
+    pollen: "Пилок",
+    propolis: "Прополіс",
+    royalJelly: "Маточне молочко",
+    droneHomogenate: "Трутневий гомогенат",
+    beeVenom: "Бджолина отрута",
+  };
+
   return (
-    <div>
-      {/* Шкала продуктивності */}
+    hive.productivity[product] !== 0 && (
       <div
         style={
           product !== ""
@@ -46,9 +55,9 @@ export const PerformanceScale = ({ hive, product = "" }) => {
           }
         >
           {product !== ""
-            ? `${product}: $${(
+            ? `${productTranslations[product] || product}: $${(
                 hive.productivity[product] * productPrices[product]
-              ).toFixed(2)} (${hive.productivity[product]} kg)`
+              ).toFixed(2)} (${hive.productivity[product]} кг)`
             : `Вартість продукції: $${totalValue}`}
         </div>
         <div>
@@ -111,6 +120,6 @@ export const PerformanceScale = ({ hive, product = "" }) => {
           </div>
         </div>
       </div>
-    </div>
+    )
   );
 };

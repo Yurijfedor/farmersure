@@ -4,6 +4,7 @@ export const ButtonStyled = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 10px 0;
   padding: 10px;
   border: 1px solid gray;
   border-radius: 5px;
@@ -26,6 +27,12 @@ export const ButtonStyled = styled.button`
     variant === "formBtn" &&
     css`
       width: 100%;
+    `}
+
+    ${({ size }) =>
+    size === "small" &&
+    css`
+      padding: 5px;
     `}
 
     ${({ size }) =>

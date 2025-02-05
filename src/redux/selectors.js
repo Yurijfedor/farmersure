@@ -62,3 +62,10 @@ export const selectPlannedTasksCost = createSelector(
     return plannedTasks.reduce((total, task) => total + task.cost, 0);
   }
 );
+
+export const selectHivesByLessee = createSelector(
+  [selectHives, (_, uid) => uid], // Отримуємо всі вулики та uid як аргумент
+  (hives, uid) => {
+    return hives.filter((hive) => hive.lessee?.uid === uid); // Фільтруємо вулики за uid орендаря
+  }
+);

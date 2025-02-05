@@ -9,6 +9,8 @@ import {
   selectProfileError,
 } from "../../redux/selectors";
 
+import { Button } from "../button/Button";
+
 export const ProfileSection = () => {
   const profile = useSelector(selectUserProfile);
   const loading = useSelector(selectIsProfileLoading);
@@ -82,12 +84,13 @@ export const ProfileSection = () => {
                     accept="image/*"
                     onChange={handleImageChange}
                   />
-                  <button
+                  <Button
+                    size="small"
                     onClick={handleImageUpload}
                     disabled={!image || uploading}
                   >
                     {uploading ? "Завантаження..." : "Завантажити фото"}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -129,14 +132,18 @@ export const ProfileSection = () => {
                     }))
                   }
                 />
-                <button onClick={handleSave}>Зберегти</button>
+                <Button size="small" onClick={handleSave}>
+                  Зберегти
+                </Button>
               </div>
             ) : (
               <div>
                 <p>Ім'я: {editableProfile.name}</p>
                 <p>Електронна пошта: {editableProfile.email}</p>
                 <p>Телефон: {editableProfile.phone}</p>
-                <button onClick={() => setIsEditing(true)}>Редагувати</button>
+                <Button size="small" onClick={() => setIsEditing(true)}>
+                  Редагувати
+                </Button>
               </div>
             )}
           </div>

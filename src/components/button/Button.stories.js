@@ -1,43 +1,43 @@
-import { Button } from './Button';
+import { Button } from "./Button";
 
 export default {
-  title: 'Button',
+  title: "Button",
   component: Button,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      type: 'string',
-      description: 'appearance option',
-      defaultValue: 'default',
-      options: ['default', 'filterBtn', 'formBtn'],
+      type: "string",
+      description: "appearance option",
+      defaultValue: "default",
+      options: ["default", "filterBtn", "formBtn"],
       control: {
-        type: 'radio',
+        type: "radio",
       },
     },
 
     size: {
-      type: 'string',
-      description: 'size option',
-      options: ['medium', 'large'],
+      type: "string",
+      description: "size option",
+      options: ["small", "medium", "large"],
       control: {
-        type: 'radio',
+        type: "radio",
       },
     },
 
     type: {
-      type: 'string',
-      description: 'type of button',
-      defaultValue: 'button',
-      options: ['button', 'submit'],
+      type: "string",
+      description: "type of button",
+      defaultValue: "button",
+      options: ["button", "submit"],
       control: {
-        type: 'radio',
+        type: "radio",
       },
     },
 
     children: {
-      type: 'string',
-      name: 'label',
-      defaultValue: 'click me',
+      type: "string",
+      name: "label",
+      defaultValue: "click me",
     },
   },
 };
@@ -46,6 +46,6 @@ const Template = (arg) => <Button {...arg} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  children: 'click me!',
-  variant: 'default',
+  children: "click me!",
+  variant: "default",
 };

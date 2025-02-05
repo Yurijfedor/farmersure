@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
-import { selectHives } from "../../redux/selectors";
+import { selectHives, selectHivesByLessee } from "../../redux/selectors";
+import { updateHiveProperty } from "../../redux/operations";
 
 import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { Button } from "../button/Button";
@@ -15,9 +16,11 @@ import {
 } from "./RentedHivesSection.styled";
 
 export const RentedHivesSection = () => {
+  const dispatch = useDispatch();
+  const user = JSON.parse(localStorage.getItem("user"));
   const [selectedHive, setSelectedHive] = useState(null);
   const [modalType, setModalType] = useState(null);
-  const hives = useSelector(selectHives);
+  const hives = useSelector((state) => selectHivesByLessee(state, user.uid));
 
   const openModal = (hive, type) => {
     setSelectedHive(hive);
@@ -29,6 +32,25 @@ export const RentedHivesSection = () => {
     setModalType(null);
   };
 
+  const handleSignContract = (hiveId) => {
+    try {
+      // Викликаємо асинхронну дію для оновлення властивості "lessee"
+      dispatch(
+        updateHiveProperty({
+          hiveId: hiveId.hiveId,
+          property: "lessee",
+          value: user.uid,
+        })
+      );
+
+      // Закриваємо модалку після підписання контракту
+      closeModal();
+    } catch (error) {
+      console.error("Error signing contract:", error);
+      // Тут можна додати обробку помилок
+    }
+  };
+
   return (
     <div className="rented-hives-section">
       <h2>Орендовані вулики</h2>
@@ -37,7 +59,7 @@ export const RentedHivesSection = () => {
           <tr>
             <TableHeader>№</TableHeader>
             <TableHeader>Фото</TableHeader>
-            <TableHeader>Потужність</TableHeader>
+            <TableHeader>Сила</TableHeader>
             <TableHeader>Продуктивність</TableHeader>
             <TableHeader>Тип оренди</TableHeader>
             <TableHeader>Дії</TableHeader>
@@ -50,23 +72,31 @@ export const RentedHivesSection = () => {
               <TableCell>
                 <img src={hive.photoURL} alt={`Вулик ${hive.number}`} />
               </TableCell>
-              <TableCell>{hive.power}</TableCell>
+              <TableCell>{`${hive.power} рамок`}</TableCell>
               <TableCell>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <PerformanceScale hive={hive} product={"honey"} />
-                    <PerformanceScale hive={hive} product={"propolis"} />
-                    <PerformanceScale hive={hive} product={"wax"} />
-                    <PerformanceScale hive={hive} product={"royalJelly"} />
-                  </div>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <PerformanceScale hive={hive} product={"droneHomogenate"} />
-                    <PerformanceScale hive={hive} product={"pollen"} />
-                    <PerformanceScale hive={hive} product={"beeVenom"} />
-                  </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <PerformanceScale hive={hive} product={"honey"} />
+                  <PerformanceScale hive={hive} product={"pollen"} />
+                  <PerformanceScale hive={hive} product={"propolis"} />
+                  <PerformanceScale hive={hive} product={"royalJelly"} />
+                  <PerformanceScale hive={hive} product={"droneHomogenate"} />
+                  <PerformanceScale hive={hive} product={"wax"} />
+                  <PerformanceScale hive={hive} product={"beeVenom"} />
                 </div>
               </TableCell>
-              <TableCell>{hive.rentalType || "Не встановлено"}</TableCell>
+              <TableCell>
+                {hive.lessee.type === "monthly"
+                  ? "помісячна"
+                  : hive.lessee.type === "seasonal"
+                  ? "до кінця сезону"
+                  : "не встановлено"}
+              </TableCell>
               <TableCell>
                 <Button
                   variant="formBtn"
@@ -96,7 +126,7 @@ export const RentedHivesSection = () => {
       </Table>
 
       {modalType && (
-        <Modal onClose={closeModal}>
+        <Modal isOpen={openModal} onClose={closeModal}>
           <h3>
             {modalType === "extendMonthly"
               ? "Продовження оренди"
@@ -105,7 +135,6 @@ export const RentedHivesSection = () => {
               : "Відеоогляд"}
           </h3>
           <p>Вулик: {selectedHive.number}</p>
-          <Button onClick={closeModal}>Закрити</Button>
         </Modal>
       )}
     </div>
