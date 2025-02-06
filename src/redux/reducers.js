@@ -60,6 +60,15 @@ export const updateAdditionalServicesReducer = (state, action) => {
   }
 };
 
+export const updateHiveReducer = (state, action) => {
+  const { id, updates } = action.payload;
+  const hive = state.hives.find((hive) => hive.id === id);
+
+  if (hive) {
+    Object.assign(hive, updates);
+  }
+};
+
 export const pendingReducer = (state) => {
   state.isLoading = true;
   state.error = null;

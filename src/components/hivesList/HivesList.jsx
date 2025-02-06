@@ -1,7 +1,11 @@
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+
 import { parse, differenceInMonths, getYear } from "date-fns";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 import { useHivesQuery } from "../../hooks/useHives";
+import { checkBeehiveRentals } from "../../services/hives";
 import { heartFull as HeartFull } from "../../images";
 
 import {
@@ -19,8 +23,13 @@ import {
 } from "./HivesList.styled";
 
 export const HivesList = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize navigate
   const { data, isSuccess } = useHivesQuery();
+
+  useEffect(() => {
+    checkBeehiveRentals(dispatch);
+  }, [dispatch]);
 
   const handleHiveClick = (hive) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -53,11 +62,11 @@ export const HivesList = () => {
         data.length !== 0 &&
         data.map((hive) => {
           return (
-            <ItemStyled key={hive.id} type={hive.lessee.uid}>
+            <ItemStyled key={hive.id}>
               <div
                 onClick={() => handleHiveClick(hive)} // Call the new handler
               >
-                <ImageWrapp>
+                <ImageWrapp type={hive.lessee.uid}>
                   <ImgStyled
                     src={`${hive.photoURL}`}
                     alt={`hive number ${hive.number}`}

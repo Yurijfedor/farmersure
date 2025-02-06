@@ -15,6 +15,7 @@ import {
   addTaskReducer,
   removeTaskReducer,
   updateHiveTasksReducer,
+  updateHiveReducer,
 } from "./reducers";
 
 const extraActions = [fetchAllHives, updateTaskStatusAsync]; // Додаємо async action
@@ -37,6 +38,7 @@ const hivesSlice = createSlice({
     addTaskToHive: addTaskReducer,
     removeTaskFromHive: removeTaskReducer,
     updateHiveTasks: updateHiveTasksReducer,
+    updateHive: updateHiveReducer,
   },
 
   extraReducers: (builder) => {
@@ -85,5 +87,6 @@ export const {
   addTaskToHive,
   removeTaskFromHive,
   updateHiveTasks,
+  updateHive,
 } = hivesSlice.actions;
 export const hivesReducer = hivesSlice.reducer;

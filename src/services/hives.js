@@ -10,6 +10,8 @@ import {
 
 import db from "../firebase";
 
+import { updateHive } from "../redux/hivesSlice";
+
 export const fetchAllHives = async () => {
   const querySnapshot = await getDocs(collection(db, "hives"));
   const data = querySnapshot.docs.map((doc) => ({
@@ -106,4 +108,58 @@ export const addTaskToConfirmationCollection = async (task) => {
       `Task with ID ${task.id} already exists in the confirmation collection`
     );
   }
+};
+
+export const checkBeehiveRentals = async (dispatch) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Скидаємо час
+
+  const beehivesRef = collection(db, "hives");
+  const querySnapshot = await getDocs(beehivesRef);
+
+  querySnapshot.forEach(async (docSnap) => {
+    const beehive = docSnap.data();
+    const { lessee, history } = beehive;
+
+    if (lessee?.endDate) {
+      const endDate = new Date(lessee.endDate);
+
+      if (endDate < today) {
+        // Створюємо об'єкт для історії
+        const historyEntry = {
+          uid: lessee.uid,
+          startDate: lessee.startDate,
+          endDate: lessee.endDate,
+          type: lessee.type, // Якщо потрібно зберігати тип
+        };
+
+        // Оновлюємо історію
+        const newHistory = [...(history || []), historyEntry];
+
+        // Оновлюємо Firestore
+        const beehiveRef = doc(db, "hives", docSnap.id);
+        await updateDoc(beehiveRef, {
+          "lessee.uid": "",
+          "lessee.startDate": "",
+          "lessee.endDate": "",
+          "lessee.history": newHistory, // Додаємо оновлену історію
+        });
+
+        // Оновлюємо Redux-стан
+        dispatch(
+          updateHive({
+            id: docSnap.id,
+            updates: {
+              lessee: {
+                uid: "",
+                startDate: "",
+                endDate: "",
+                history: newHistory,
+              },
+            },
+          })
+        );
+      }
+    }
+  });
 };

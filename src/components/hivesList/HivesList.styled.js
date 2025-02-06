@@ -16,6 +16,22 @@ export const HivesListStyled = styled.ul`
 
 export const ImageWrapp = styled.div`
   position: relative;
+  ${({ type }) =>
+    type !== "" &&
+    `
+    &::before {
+      content: "Rented";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.7);
+      color: #999;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      z-index: 1;
+    }
+  `}
 `;
 
 export const ImageText = styled.p`
@@ -58,22 +74,7 @@ export const ItemStyled = styled.li`
   box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2), 0px 3px 4px rgba(0, 0, 0, 0.12),
     0px 2px 4px rgba(0, 0, 0, 0.14);
   border-radius: 4px;
-  ${({ type }) =>
-    type !== "" &&
-    `
-    &::before {
-      content: "Rented";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: rgba(255, 255, 255, 0.7);
-      color: #999;
-      padding: 0.5rem;
-      border-radius: 0.25rem;
-      z-index: 1;
-    }
-  `}
+
   @media (min-width: 1440px) {
     width: 280px;
   }

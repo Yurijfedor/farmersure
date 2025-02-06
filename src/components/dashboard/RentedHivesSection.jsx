@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { selectHives, selectHivesByLessee } from "../../redux/selectors";
+import { selectHivesByLessee } from "../../redux/selectors";
 import { updateHiveProperty } from "../../redux/operations";
 
 import { PerformanceScale } from "../performanceScale/PerformanceScale";
@@ -21,6 +21,7 @@ export const RentedHivesSection = () => {
   const [selectedHive, setSelectedHive] = useState(null);
   const [modalType, setModalType] = useState(null);
   const hives = useSelector((state) => selectHivesByLessee(state, user.uid));
+  console.log(hives);
 
   const openModal = (hive, type) => {
     setSelectedHive(hive);
