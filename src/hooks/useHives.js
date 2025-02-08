@@ -8,6 +8,7 @@ import {
   addTaskToConfirmationCollection,
   addSingleTask,
   updateTaskStatus,
+  checkBeehiveRentals,
 } from "../services/hives";
 
 export const useHivesQuery = () => {
@@ -84,12 +85,30 @@ export const useDeleteHiveTask = () => {
 
 // Мутація для додавання завдань до колекції завдань для підтвердження
 export const useAddTaskToConfirmation = () => {
+  const queryClient = useQueryClient();
+
   return useMutation(addTaskToConfirmationCollection, {
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       console.log("Task added to confirmation collection");
+
+      // Інвалідація кешу конкретного вулика
+      queryClient.invalidateQueries(["hive", variables.hiveId]);
     },
     onError: (error) => {
       console.error("Error adding task to confirmation collection:", error);
+    },
+  });
+};
+
+export const useCheckBeehiveRentals = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(checkBeehiveRentals, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["hives"]);
+    },
+    onError: (error) => {
+      console.error("Error checking beehive rentals:", error);
     },
   });
 };

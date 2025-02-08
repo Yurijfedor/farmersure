@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 
 // import { useHivesQuery } from "./hooks/useHives";
 import { fetchAllHives } from "./redux/operations";
+// import { checkBeehiveRentals } from "./services/hives";
+import { useCheckBeehiveRentals } from "./hooks/useHives";
 
 import PrivateRoutes from "./PrivateRoutes/PrivateRoutes";
 
@@ -45,7 +47,7 @@ export const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllHives()); // Завантаження глобальних даних
+    dispatch(fetchAllHives());
   }, [dispatch]);
 
   return (

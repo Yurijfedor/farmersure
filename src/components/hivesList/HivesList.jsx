@@ -5,7 +5,8 @@ import { parse, differenceInMonths, getYear } from "date-fns";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 import { useHivesQuery } from "../../hooks/useHives";
-import { checkBeehiveRentals } from "../../services/hives";
+import { fetchAllHives } from "../../redux/operations";
+import { useCheckBeehiveRentals } from "../../hooks/useHives";
 import { heartFull as HeartFull } from "../../images";
 
 import {
@@ -26,10 +27,15 @@ export const HivesList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize navigate
   const { data, isSuccess } = useHivesQuery();
+  const { mutateAsync: checkBeehiveRentalsMutate } = useCheckBeehiveRentals();
 
   useEffect(() => {
-    checkBeehiveRentals(dispatch);
-  }, [dispatch]);
+    const init = async () => {
+      await checkBeehiveRentalsMutate();
+      dispatch(fetchAllHives());
+    };
+    init();
+  }, [checkBeehiveRentalsMutate, dispatch]);
 
   const handleHiveClick = (hive) => {
     const user = JSON.parse(localStorage.getItem("user"));

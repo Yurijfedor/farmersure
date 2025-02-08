@@ -96,13 +96,25 @@ export const updateHiveProperty = createAsyncThunk(
   async ({ hiveId, property, value }, thunkAPI) => {
     try {
       const docRef = doc(db, "hives", hiveId);
-      await updateDoc(docRef, {
-        [property !== "lessee" ? property : `${property}.uid`]: value,
-      }); // Оновлюємо властивість за допомогою динамічного ключа
+      let updateData;
 
-      return { hiveId, property, value }; // Повертаємо значення для подальшого використання
+      if (property === "lessee" && typeof value === "object") {
+        // Якщо property === "lessee", формуємо вкладені оновлення
+        updateData = Object.assign(
+          {},
+          ...Object.entries(value).map(([key, val]) => ({
+            [`${property}.${key}`]: val,
+          }))
+        );
+      } else {
+        // В іншому випадку просто оновлюємо значення властивості
+        updateData = { [property]: value };
+      }
+
+      await updateDoc(docRef, updateData);
+      return { hiveId, property, value };
     } catch (e) {
-      return thunkAPI.rejectWithValue(e.message); // Якщо сталася помилка
+      return thunkAPI.rejectWithValue(e.message);
     }
   }
 );

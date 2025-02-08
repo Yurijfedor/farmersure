@@ -23,6 +23,7 @@ import {
   updateTasksStatus,
   removeTaskFromHive,
   updateHiveTasks,
+  updateHive,
 } from "../../redux/hivesSlice";
 import {
   selectHiveById,
@@ -53,8 +54,8 @@ import {
 } from "./BeeHiveCard.styled";
 
 export const BeeHiveCard = () => {
-  // const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
-  const currentMonth = "червень";
+  const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
+  // const currentMonth = "червень";
   const user = JSON.parse(localStorage.getItem("user"));
   const hiveId = useParams();
   const dispatch = useDispatch();
@@ -278,7 +279,24 @@ export const BeeHiveCard = () => {
         updateHiveProperty({
           hiveId: hiveId.hiveId,
           property: "lessee",
-          value: user.uid,
+          value: {
+            uid: user.uid,
+            startDate: "2024-02-10",
+            endDate: "2024-08-10",
+          },
+        })
+      );
+
+      dispatch(
+        updateHive({
+          id: hiveId.hiveId,
+          updates: {
+            lessee: {
+              uid: user.uid,
+              startDate: "2024-02-10",
+              endDate: "2024-08-10",
+            },
+          },
         })
       );
 
@@ -503,7 +521,7 @@ export const BeeHiveCard = () => {
         handleRequiredTasks={handleRequiredTasks}
         useRequiredTasks={useRequiredTasks}
       />
-      {!hive.lessee.uid && (
+      {hive.lessee.uid === "" && (
         <>
           <Button
             variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
