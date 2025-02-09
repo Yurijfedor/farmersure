@@ -54,8 +54,8 @@ import {
 } from "./BeeHiveCard.styled";
 
 export const BeeHiveCard = () => {
-  const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
-  // const currentMonth = "червень";
+  // const currentMonth = new Date().toLocaleString("uk-UA", { month: "long" });
+  const currentMonth = "червень";
   const user = JSON.parse(localStorage.getItem("user"));
   const hiveId = useParams();
   const dispatch = useDispatch();
@@ -73,6 +73,7 @@ export const BeeHiveCard = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [plannedTasksTotalCost, setPlannedTasksTotalCost] = useState(0);
   const [useRequiredTasks, setUseRequiredTasks] = useState(true);
+  const [contractType, setContractType] = useState(null);
   const userProfile = useSelector(selectUserProfile);
   const plannedTasksCost = useSelector(selectPlannedTasksCost);
 
@@ -255,7 +256,8 @@ export const BeeHiveCard = () => {
     dispatch(removeTaskFromHive({ hiveId: hiveId.hiveId, taskId }));
   };
 
-  const handleOpenContractModal = () => {
+  const handleOpenContractModal = (contractType) => {
+    setContractType(contractType);
     setIsContractModalOpen(true);
   };
 
@@ -272,39 +274,56 @@ export const BeeHiveCard = () => {
     Умови договору: __________
   `;
 
-  const handleSignContract = () => {
+  const handleSignContract = (contractType) => {
     try {
-      // Викликаємо асинхронну дію для оновлення властивості "lessee"
+      const today = new Date();
+      const startDate = today.toISOString().split("T")[0]; // Поточна дата у форматі YYYY-MM-DD
+      let endDate;
+
+      if (contractType === "monthly") {
+        // Отримуємо останній день поточного місяця
+        const lastDayOfMonth = new Date(
+          Date.UTC(today.getFullYear(), today.getMonth() + 1, 0)
+        );
+        endDate = lastDayOfMonth.toISOString().split("T")[0];
+      } else {
+        // 31 серпня поточного року
+        endDate = new Date(Date.UTC(today.getFullYear(), 7, 31))
+          .toISOString()
+          .split("T")[0];
+      }
+
+      // Оновлюємо Firestore
       dispatch(
         updateHiveProperty({
           hiveId: hiveId.hiveId,
           property: "lessee",
           value: {
             uid: user.uid,
-            startDate: "2024-02-10",
-            endDate: "2024-08-10",
+            startDate,
+            endDate,
+            type: contractType,
           },
         })
       );
 
+      // Оновлюємо локальний стейт
       dispatch(
         updateHive({
           id: hiveId.hiveId,
           updates: {
             lessee: {
               uid: user.uid,
-              startDate: "2024-02-10",
-              endDate: "2024-08-10",
+              startDate,
+              endDate,
+              type: contractType,
             },
           },
         })
       );
-
-      // Закриваємо модалку після підписання контракту
       handleCloseContractModal();
     } catch (error) {
-      console.error("Error signing contract:", error);
-      // Тут можна додати обробку помилок
+      console.error("Помилка підписання договору:", error);
     }
   };
 
@@ -526,7 +545,7 @@ export const BeeHiveCard = () => {
           <Button
             variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
             size="large" // Розмір кнопки, наприклад "large"
-            onClick={handleOpenContractModal} // Функція для відкриття модалки
+            onClick={() => handleOpenContractModal("monthly")} // Функція для відкриття модалки
           >
             Оформити договір оренди на наступний місяць ($
             {(totalRent + plannedTasksTotalCost).toFixed(2)})
@@ -537,7 +556,7 @@ export const BeeHiveCard = () => {
           <Button
             variant="formBtn" // Вибираємо один з варіантів стилів, наприклад "formBtn"
             size="large" // Розмір кнопки, наприклад "large"
-            onClick={handleOpenContractModal} // Функція для відкриття модалки
+            onClick={() => handleOpenContractModal("seasonal")} // Функція для відкриття модалки
           >
             Оформити договір оренди на повний сезон ($
             {(totalRent * 6 + calculateMandatoryTasksCost()).toFixed(2)})
@@ -553,6 +572,7 @@ export const BeeHiveCard = () => {
         onClose={handleCloseContractModal}
         contractText={contractText}
         onSignContract={handleSignContract}
+        contractType={contractType}
       />
     </>
   );

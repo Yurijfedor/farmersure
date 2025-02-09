@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { Suspense } from "react";
 
@@ -11,6 +13,7 @@ import { NavBar } from "../nav/Nav";
 
 const Layout = () => {
   const { isAuth } = useAuth();
+
   return (
     <Suspense>
       <HeaderContainer>

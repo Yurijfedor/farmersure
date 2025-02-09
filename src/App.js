@@ -45,10 +45,13 @@ const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 
 export const App = () => {
   const dispatch = useDispatch();
+  const { mutateAsync: checkBeehiveRentalsMutate } = useCheckBeehiveRentals();
 
   useEffect(() => {
+    checkBeehiveRentalsMutate();
     dispatch(fetchAllHives());
-  }, [dispatch]);
+    console.log("я відпрацював");
+  }, [checkBeehiveRentalsMutate, dispatch]);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

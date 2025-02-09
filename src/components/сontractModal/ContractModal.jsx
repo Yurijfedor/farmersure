@@ -8,12 +8,13 @@ export const ContractModal = ({
   onClose,
   contractText,
   onSignContract,
+  contractType,
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ContractContent
         contractText={contractText}
-        onSignContract={onSignContract}
+        onSignContract={() => onSignContract(contractType)}
       />
     </Modal>
   );

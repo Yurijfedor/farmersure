@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
 
 import {
   fetchAllHives,
@@ -10,6 +11,8 @@ import {
   updateTaskStatus,
   checkBeehiveRentals,
 } from "../services/hives";
+
+import { updateHive } from "../redux/hivesSlice";
 
 export const useHivesQuery = () => {
   return useQuery({
@@ -102,9 +105,16 @@ export const useAddTaskToConfirmation = () => {
 
 export const useCheckBeehiveRentals = () => {
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
 
   return useMutation(checkBeehiveRentals, {
-    onSuccess: () => {
+    onSuccess: (updatedHives) => {
+      // Оновлюємо Redux-стор для кожного зміненого вулика
+      updatedHives.forEach(({ id, updates }) => {
+        dispatch(updateHive({ id, updates }));
+      });
+
+      // Інвалідуємо кеш, щоб отримати актуальні дані
       queryClient.invalidateQueries(["hives"]);
     },
     onError: (error) => {

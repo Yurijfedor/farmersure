@@ -111,14 +111,15 @@ export const addTaskToConfirmationCollection = async (task) => {
 };
 
 export const checkBeehiveRentals = async () => {
-  // Прибираємо dispatch з аргументів
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Скидаємо час
+  today.setHours(0, 0, 0, 0);
 
   const beehivesRef = collection(db, "hives");
   const querySnapshot = await getDocs(beehivesRef);
 
-  querySnapshot.forEach(async (docSnap) => {
+  const updatedHives = [];
+
+  for (const docSnap of querySnapshot.docs) {
     const beehive = docSnap.data();
     const { lessee } = beehive;
 
@@ -126,7 +127,6 @@ export const checkBeehiveRentals = async () => {
       const endDate = new Date(lessee.endDate);
 
       if (endDate < today) {
-        // Створюємо об'єкт для історії
         const historyEntry = {
           uid: lessee.uid,
           startDate: lessee.startDate,
@@ -134,20 +134,33 @@ export const checkBeehiveRentals = async () => {
           type: lessee.type,
         };
 
-        // Оновлюємо історію
         const newHistory = [...(lessee.history || []), historyEntry];
 
-        // Оновлюємо Firestore
         const beehiveRef = doc(db, "hives", docSnap.id);
         await updateDoc(beehiveRef, {
           "lessee.uid": "",
           "lessee.startDate": "",
           "lessee.endDate": "",
+          "lessee.type": "",
           "lessee.history": newHistory,
+        });
+
+        // Додаємо оновлений вулик у масив для Redux
+        updatedHives.push({
+          id: docSnap.id,
+          updates: {
+            lessee: {
+              uid: "",
+              startDate: "",
+              endDate: "",
+              type: "",
+              history: newHistory,
+            },
+          },
         });
       }
     }
-  });
+  }
 
-  return true; // Додаємо, щоб `onSuccess` міг спрацювати
+  return updatedHives; // Повертаємо масив оновлених вуликів
 };

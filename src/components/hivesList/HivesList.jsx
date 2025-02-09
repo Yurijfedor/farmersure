@@ -29,13 +29,13 @@ export const HivesList = () => {
   const { data, isSuccess } = useHivesQuery();
   const { mutateAsync: checkBeehiveRentalsMutate } = useCheckBeehiveRentals();
 
-  useEffect(() => {
-    const init = async () => {
-      await checkBeehiveRentalsMutate();
-      dispatch(fetchAllHives());
-    };
-    init();
-  }, [checkBeehiveRentalsMutate, dispatch]);
+  // useEffect(() => {
+  //   const init = async () => {
+  //     await checkBeehiveRentalsMutate();
+  //     dispatch(fetchAllHives());
+  //   };
+  //   init();
+  // }, [checkBeehiveRentalsMutate, dispatch]);
 
   const handleHiveClick = (hive) => {
     const user = JSON.parse(localStorage.getItem("user"));

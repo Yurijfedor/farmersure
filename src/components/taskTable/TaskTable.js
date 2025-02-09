@@ -273,7 +273,7 @@ export const TaskTable = React.memo(
             </tbody>
           </table>
         ) : (
-          <p>No tasks for this month</p>
+          <p>No required tasks for this month</p>
         )}
       </>
     );

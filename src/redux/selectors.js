@@ -49,7 +49,7 @@ export const selectPlannedTasksCost = createSelector(
     const userId = userProfile.id;
 
     // Фільтруємо вулики, які орендує поточний користувач
-    const userHives = hives.filter((hive) => hive.lessee === userId);
+    const userHives = hives.filter((hive) => hive.lessee.uid === userId);
 
     // Збираємо всі завдання зі статусами "Under Review" і "Approved"
     const plannedTasks = userHives.flatMap((hive) =>
@@ -59,7 +59,9 @@ export const selectPlannedTasksCost = createSelector(
     );
 
     // Підсумовуємо їхню вартість
-    return plannedTasks.reduce((total, task) => total + task.cost, 0);
+    const result = plannedTasks.reduce((total, task) => total + task.cost, 0);
+
+    return result;
   }
 );
 
