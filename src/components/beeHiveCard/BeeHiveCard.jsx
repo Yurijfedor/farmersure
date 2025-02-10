@@ -279,6 +279,7 @@ export const BeeHiveCard = () => {
       const today = new Date();
       const startDate = today.toISOString().split("T")[0]; // Поточна дата у форматі YYYY-MM-DD
       let endDate;
+      let totalCost;
 
       if (contractType === "monthly") {
         // Отримуємо останній день поточного місяця
@@ -286,14 +287,27 @@ export const BeeHiveCard = () => {
           Date.UTC(today.getFullYear(), today.getMonth() + 1, 0)
         );
         endDate = lastDayOfMonth.toISOString().split("T")[0];
-      } else {
+        totalCost = totalRent + plannedTasksTotalCost;
+      } else if (contractType === "seasonal") {
         // 31 серпня поточного року
         endDate = new Date(Date.UTC(today.getFullYear(), 7, 31))
           .toISOString()
           .split("T")[0];
+
+        const monthsLeft = 8 - today.getMonth(); // Кількість місяців до кінця серпня
+        totalCost = totalRent * monthsLeft + calculateMandatoryTasksCost();
       }
 
-      // Оновлюємо Firestore
+      // Перевірка балансу
+      if (userProfile.balance < totalCost) {
+        const deficit = totalCost - userProfile.balance;
+        alert(
+          `Недостатньо коштів! Поповніть баланс на ${deficit.toFixed(2)} грн.`
+        );
+        return;
+      }
+
+      // Оновлення Firestore
       dispatch(
         updateHiveProperty({
           hiveId: hiveId.hiveId,
@@ -307,7 +321,7 @@ export const BeeHiveCard = () => {
         })
       );
 
-      // Оновлюємо локальний стейт
+      // Оновлення локального стейту
       dispatch(
         updateHive({
           id: hiveId.hiveId,
@@ -321,6 +335,7 @@ export const BeeHiveCard = () => {
           },
         })
       );
+
       handleCloseContractModal();
     } catch (error) {
       console.error("Помилка підписання договору:", error);

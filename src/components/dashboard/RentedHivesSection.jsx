@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { selectHivesByLessee } from "../../redux/selectors";
+import { selectHivesByLessee, selectUserProfile } from "../../redux/selectors";
 import { updateHiveProperty } from "../../redux/operations";
+import { updateHive } from "../../redux/hivesSlice";
 
 import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { Button } from "../button/Button";
 import { Modal } from "../modal/Modal";
+import { ContractModal } from "../сontractModal/ContractModal";
 
 import {
   Table,
@@ -20,38 +22,82 @@ export const RentedHivesSection = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [selectedHive, setSelectedHive] = useState(null);
   const [modalType, setModalType] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const hives = useSelector((state) => selectHivesByLessee(state, user.uid));
-  console.log(hives);
+  const userProfile = useSelector(selectUserProfile);
 
   const openModal = (hive, type) => {
     setSelectedHive(hive);
     setModalType(type);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setSelectedHive(null);
     setModalType(null);
+    setIsModalOpen(false);
   };
 
-  const handleSignContract = (hiveId) => {
+  const handleExtendContract = (hive) => {
     try {
-      // Викликаємо асинхронну дію для оновлення властивості "lessee"
+      const currentEndDate = new Date(hive.lessee.endDate);
+      const today = new Date();
+
+      // Переконуємось, що продовження можливе тільки, якщо поточний договір активний
+      if (currentEndDate < today) {
+        alert("Ваш договір вже завершився. Оформіть новий.");
+        return;
+      }
+
+      // Отримуємо останній день наступного місяця
+      const nextMonth = new Date(currentEndDate);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      const lastDayOfNextMonth = new Date(
+        Date.UTC(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0)
+      );
+      const newEndDate = lastDayOfNextMonth.toISOString().split("T")[0];
+
+      const extensionCost = totalRent + plannedTaskTotalCost;
+
+      // Перевірка балансу
+      if (userProfile.balance < extensionCost) {
+        const deficit = extensionCost - userProfile.balance;
+        alert(
+          `Недостатньо коштів! Поповніть баланс на ${deficit.toFixed(2)} грн.`
+        );
+        return;
+      }
+
+      // Оновлення Firestore
       dispatch(
         updateHiveProperty({
-          hiveId: hiveId.hiveId,
+          hiveId: hive.id,
           property: "lessee",
-          value: user.uid,
+          value: {
+            ...hive.lessee,
+            endDate: newEndDate,
+          },
         })
       );
 
-      // Закриваємо модалку після підписання контракту
-      closeModal();
+      // Оновлення локального стейту
+      dispatch(
+        updateHive({
+          id: hive.id,
+          updates: {
+            lessee: {
+              ...hive.lessee,
+              endDate: newEndDate,
+            },
+          },
+        })
+      );
+
+      alert(`Оренду продовжено до ${newEndDate}`);
     } catch (error) {
-      console.error("Error signing contract:", error);
-      // Тут можна додати обробку помилок
+      console.error("Помилка продовження оренди:", error);
     }
   };
-
   return (
     <div className="rented-hives-section">
       <h2>Орендовані вулики</h2>
@@ -127,16 +173,23 @@ export const RentedHivesSection = () => {
       </Table>
 
       {modalType && (
-        <Modal isOpen={openModal} onClose={closeModal}>
-          <h3>
-            {modalType === "extendMonthly"
-              ? "Продовження оренди"
-              : modalType === "extendSeason"
-              ? "Сезонна оренда"
-              : "Відеоогляд"}
-          </h3>
-          <p>Вулик: {selectedHive.number}</p>
-        </Modal>
+        // <Modal isOpen={openModal} onClose={closeModal}>
+        //   <h3>
+        //     {modalType === "extendMonthly"
+        //       ? "Продовження оренди"
+        //       : modalType === "extendSeason"
+        //       ? "Сезонна оренда"
+        //       : "Відеоогляд"}
+        //   </h3>
+        //   <p>Вулик: {selectedHive.number}</p>
+        // </Modal>
+        <ContractModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onSignContract={handleExtendContract}
+          contractType={modalType}
+          hive={selectedHive}
+        />
       )}
     </div>
   );
