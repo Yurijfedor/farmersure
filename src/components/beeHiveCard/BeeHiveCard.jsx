@@ -18,6 +18,7 @@ import {
   updateAgreeWithBasicTech,
   updateAdditionalService,
   updateHiveProperty,
+  updateProfile,
 } from "../../redux/operations";
 import {
   updateTasksStatus,
@@ -280,6 +281,7 @@ export const BeeHiveCard = () => {
       const startDate = today.toISOString().split("T")[0]; // Поточна дата у форматі YYYY-MM-DD
       let endDate;
       let totalCost;
+      const monthsLeft = 8 - today.getMonth(); // Кількість місяців до кінця серпня
 
       if (contractType === "monthly") {
         // Отримуємо останній день поточного місяця
@@ -294,7 +296,6 @@ export const BeeHiveCard = () => {
           .toISOString()
           .split("T")[0];
 
-        const monthsLeft = 8 - today.getMonth(); // Кількість місяців до кінця серпня
         totalCost = totalRent * monthsLeft + calculateMandatoryTasksCost();
       }
 
@@ -306,6 +307,14 @@ export const BeeHiveCard = () => {
         );
         return;
       }
+
+      const newBalance = parseFloat(
+        userProfile.balance -
+          (contractType === "monthly"
+            ? totalRent
+            : totalRent * monthsLeft
+          ).toFixed(2)
+      );
 
       // Оновлення Firestore
       dispatch(
@@ -333,6 +342,14 @@ export const BeeHiveCard = () => {
               type: contractType,
             },
           },
+        })
+      );
+
+      // Оновлення балансу через Redux-операцію
+      dispatch(
+        updateProfile({
+          uid: userProfile.id,
+          data: { balance: newBalance }, // Передаємо дані в потрібному форматі
         })
       );
 

@@ -14,7 +14,9 @@ export const BalanceSection = () => {
   const [amount, setAmount] = useState("");
 
   const handleAddBalance = () => {
-    const newBalance = userProfile.balance + parseFloat(amount);
+    const newBalance = parseFloat(
+      (Number(userProfile.balance) + Number(amount)).toFixed(2)
+    );
 
     // Оновлення балансу через Redux-операцію
     dispatch(

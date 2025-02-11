@@ -14,15 +14,17 @@ export const ContractModal = ({
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      {contractType !== "monthly" && contractType !== "seasonal"} ?
-      <ExtendContractContent
-        onSignContract={() => onSignContract(hive, contractType)}
-      />
-      :
-      <ContractContent
-        contractText={contractText}
-        onSignContract={() => onSignContract(contractType)}
-      />
+      {contractType !== "monthly" && contractType !== "seasonal" ? (
+        <ExtendContractContent
+          onSignContract={onSignContract}
+          contractType={contractType}
+        />
+      ) : (
+        <ContractContent
+          contractText={contractText}
+          onSignContract={() => onSignContract(contractType)}
+        />
+      )}
     </Modal>
   );
 };

@@ -2,9 +2,13 @@ import React from "react";
 
 import { Button } from "../button/Button";
 
-export const ExtendContractContent = ({ onSignContract }) => {
+export const ExtendContractContent = ({ onSignContract, contractType }) => {
+  const today = new Date();
+  const endOfSeasone = new Date(Date.UTC(today.getFullYear(), 7, 31))
+    .toISOString()
+    .split("T")[0];
+
   const getNextMonthName = () => {
-    const today = new Date();
     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1);
     return nextMonth.toLocaleString("uk-UA", { month: "long" });
   };
@@ -12,7 +16,15 @@ export const ExtendContractContent = ({ onSignContract }) => {
   return (
     <div>
       <h2>Продовження оренди</h2>
-      <p>Продовжити оренду на {getNextMonthName()}</p>
+      <p>
+        {`Продовжити оренду ${
+          contractType === "extendMonthly"
+            ? `на ${getNextMonthName()}`
+            : contractType === "extendSeason"
+            ? `до ${endOfSeasone}`
+            : ""
+        }`}
+      </p>
       <Button variant="formBtn" onClick={onSignContract}>
         Продовжити оренду
       </Button>

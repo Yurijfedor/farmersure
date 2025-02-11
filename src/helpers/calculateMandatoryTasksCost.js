@@ -15,3 +15,46 @@ export const calculateMandatoryTasksCost = () => {
     }, 0);
   return data;
 };
+
+export const calculateMandatoryTasksCostForNextPeriod = (modalType) => {
+  const currentMonthIndex = new Date().getMonth();
+  const months = [
+    "січень",
+    "лютий",
+    "березень",
+    "квітень",
+    "травень",
+    "червень",
+    "липень",
+    "серпень",
+    "вересень",
+    "жовтень",
+    "листопад",
+    "грудень",
+  ];
+  const nextMonthIndex = (currentMonthIndex + 1) % 12;
+
+  const startMonthIndex = nextMonthIndex;
+  let endMonthIndex = nextMonthIndex;
+
+  if (modalType === "extendSeason") {
+    endMonthIndex = 7; // серпень
+  }
+
+  return beekeepingTasks.reduce((totalCost, task) => {
+    if (task.priority !== "обов'язкова" || !task.frequency) return totalCost;
+
+    const costPerMinute = task.costPerHour / 60;
+
+    return months.reduce((sum, month, index) => {
+      if (
+        index >= startMonthIndex &&
+        index <= endMonthIndex &&
+        task.frequency[month]
+      ) {
+        return sum + task.duration * costPerMinute * task.frequency[month];
+      }
+      return sum;
+    }, totalCost);
+  }, 0);
+};

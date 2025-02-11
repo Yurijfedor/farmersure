@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { selectHivesByLessee, selectUserProfile } from "../../redux/selectors";
-import { updateHiveProperty } from "../../redux/operations";
+import {
+  selectHivesByLessee,
+  selectPlannedTasksCost,
+  selectUserProfile,
+} from "../../redux/selectors";
+import { updateHiveProperty, updateProfile } from "../../redux/operations";
 import { updateHive } from "../../redux/hivesSlice";
 
 import { PerformanceScale } from "../performanceScale/PerformanceScale";
 import { Button } from "../button/Button";
 import { Modal } from "../modal/Modal";
 import { ContractModal } from "../сontractModal/ContractModal";
+import { calculateTotalRent } from "../../helpers/calculateRent";
+import { calculateMandatoryTasksCostForNextPeriod } from "../../helpers/calculateMandatoryTasksCost";
 
 import {
   Table,
@@ -25,6 +31,7 @@ export const RentedHivesSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const hives = useSelector((state) => selectHivesByLessee(state, user.uid));
   const userProfile = useSelector(selectUserProfile);
+  const plannedTaskTotalCost = useSelector(selectPlannedTasksCost);
 
   const openModal = (hive, type) => {
     setSelectedHive(hive);
@@ -38,26 +45,33 @@ export const RentedHivesSection = () => {
     setIsModalOpen(false);
   };
 
-  const handleExtendContract = (hive) => {
+  const handleExtendContract = () => {
     try {
-      const currentEndDate = new Date(hive.lessee.endDate);
+      const currentEndDate = new Date(selectedHive.lessee.endDate);
       const today = new Date();
-
-      // Переконуємось, що продовження можливе тільки, якщо поточний договір активний
-      if (currentEndDate < today) {
-        alert("Ваш договір вже завершився. Оформіть новий.");
-        return;
-      }
-
+      const monthsLeft = 8 - today.getMonth(); // Кількість місяців до кінця серпня
       // Отримуємо останній день наступного місяця
       const nextMonth = new Date(currentEndDate);
       nextMonth.setMonth(nextMonth.getMonth() + 1);
       const lastDayOfNextMonth = new Date(
         Date.UTC(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0)
       );
-      const newEndDate = lastDayOfNextMonth.toISOString().split("T")[0];
-
-      const extensionCost = totalRent + plannedTaskTotalCost;
+      const newEndDate =
+        modalType === "extendMonthly"
+          ? lastDayOfNextMonth.toISOString().split("T")[0]
+          : new Date(Date.UTC(today.getFullYear(), 7, 31))
+              .toISOString()
+              .split("T")[0];
+      const totalRent = calculateTotalRent(
+        selectedHive.hiveComponents,
+        selectedHive.power
+      );
+      const extensionCost =
+        modalType === "extendMonthly"
+          ? totalRent
+          : totalRent * monthsLeft +
+            calculateMandatoryTasksCostForNextPeriod(modalType) +
+            plannedTaskTotalCost;
 
       // Перевірка балансу
       if (userProfile.balance < extensionCost) {
@@ -68,13 +82,20 @@ export const RentedHivesSection = () => {
         return;
       }
 
+      const newBalance = parseFloat(
+        (
+          userProfile.balance -
+          (modalType === "extendMonthly" ? totalRent : totalRent * monthsLeft)
+        ).toFixed(2)
+      );
+
       // Оновлення Firestore
       dispatch(
         updateHiveProperty({
-          hiveId: hive.id,
+          hiveId: selectedHive.id,
           property: "lessee",
           value: {
-            ...hive.lessee,
+            ...selectedHive.lessee,
             endDate: newEndDate,
           },
         })
@@ -83,21 +104,105 @@ export const RentedHivesSection = () => {
       // Оновлення локального стейту
       dispatch(
         updateHive({
-          id: hive.id,
+          id: selectedHive.id,
           updates: {
             lessee: {
-              ...hive.lessee,
+              ...selectedHive.lessee,
               endDate: newEndDate,
             },
           },
         })
       );
 
+      // Оновлення балансу через Redux-операцію
+      dispatch(
+        updateProfile({
+          uid: userProfile.id,
+          data: { balance: newBalance }, // Передаємо дані в потрібному форматі
+        })
+      );
+
       alert(`Оренду продовжено до ${newEndDate}`);
+      closeModal();
     } catch (error) {
       console.error("Помилка продовження оренди:", error);
     }
   };
+  console.log(selectedHive);
+
+  const handleCancelContract = () => {
+    try {
+      const today = new Date();
+      const endDate = new Date(selectedHive.lessee.endDate);
+
+      // Розрахунок компенсації за невикористаний період
+      const remainingMonths =
+        (endDate.getFullYear() - today.getFullYear()) * 12 +
+        (endDate.getMonth() - today.getMonth());
+      const refundAmount =
+        remainingMonths > 0
+          ? calculateTotalRent(
+              selectedHive.hiveComponents,
+              selectedHive.power
+            ) * remainingMonths
+          : 0;
+
+      // Оновлення балансу користувача
+      const newBalance = parseFloat(
+        (Number(userProfile.balance) + refundAmount).toFixed(2)
+      );
+
+      // Оновлення Firestore (очищаємо дані оренди)
+      dispatch(
+        updateHiveProperty({
+          hiveId: selectedHive.hiveId,
+          property: "lessee",
+          value: {
+            uid: user.uid,
+            startDate,
+            endDate,
+            type: contractType,
+          },
+        })
+      );
+
+      // Оновлення локального стейту
+      dispatch(
+        updateHive({
+          id: selectedHive.id,
+          updates: {
+            lessee: {
+              ...selectedHive.lessee,
+              endDate: null,
+            },
+          },
+        })
+      );
+
+      // Оновлення балансу користувача
+      dispatch(
+        updateProfile({
+          uid: userProfile.id,
+          data: { balance: newBalance },
+        })
+      );
+
+      alert(`Оренду скасовано. Вам повернуто ${refundAmount.toFixed(2)} грн.`);
+      closeModal();
+    } catch (error) {
+      console.error("Помилка скасування оренди:", error);
+    }
+  };
+
+  const today = new Date();
+  const nextMonthLastDay = new Date(
+    today.getFullYear(),
+    today.getMonth() + 2,
+    0
+  ) // Останній день наступного місяця
+    .toISOString()
+    .split("T")[0]; // Приводимо до формату YYYY-MM-DD
+
   return (
     <div className="rented-hives-section">
       <h2>Орендовані вулики</h2>
@@ -109,6 +214,7 @@ export const RentedHivesSection = () => {
             <TableHeader>Сила</TableHeader>
             <TableHeader>Продуктивність</TableHeader>
             <TableHeader>Тип оренди</TableHeader>
+            <TableHeader>Дата закінчення оренди</TableHeader>
             <TableHeader>Дії</TableHeader>
           </tr>
         </thead>
@@ -144,27 +250,39 @@ export const RentedHivesSection = () => {
                   ? "до кінця сезону"
                   : "не встановлено"}
               </TableCell>
+              <TableCell>{hive.lessee.endDate}</TableCell>
               <TableCell>
-                <Button
-                  variant="formBtn"
-                  size="medium"
-                  onClick={() => openModal(hive, "extendMonthly")}
-                >
-                  Продовжити на місяць
-                </Button>
-                <Button
-                  variant="formBtn"
-                  size="medium"
-                  onClick={() => openModal(hive, "extendSeason")}
-                >
-                  Продовжити до кінця сезону
-                </Button>
+                {hive.lessee.endDate < nextMonthLastDay && (
+                  <Button
+                    variant="formBtn"
+                    size="medium"
+                    onClick={() => openModal(hive, "extendMonthly")}
+                  >
+                    Продовжити на місяць
+                  </Button>
+                )}
+                {hive.lessee.endDate !== "2025-08-31" && (
+                  <Button
+                    variant="formBtn"
+                    size="medium"
+                    onClick={() => openModal(hive, "extendSeason")}
+                  >
+                    Продовжити до кінця сезону
+                  </Button>
+                )}
                 <Button
                   variant="formBtn"
                   size="medium"
                   onClick={() => openModal(hive, "videoReview")}
                 >
                   Замовити онлайн-відеоогляд
+                </Button>
+                <Button
+                  variant="formBtn"
+                  size="medium"
+                  onClick={() => handleCancelContract()}
+                >
+                  скасувати договір оренди
                 </Button>
               </TableCell>
             </TableRow>
@@ -173,16 +291,6 @@ export const RentedHivesSection = () => {
       </Table>
 
       {modalType && (
-        // <Modal isOpen={openModal} onClose={closeModal}>
-        //   <h3>
-        //     {modalType === "extendMonthly"
-        //       ? "Продовження оренди"
-        //       : modalType === "extendSeason"
-        //       ? "Сезонна оренда"
-        //       : "Відеоогляд"}
-        //   </h3>
-        //   <p>Вулик: {selectedHive.number}</p>
-        // </Modal>
         <ContractModal
           isOpen={isModalOpen}
           onClose={closeModal}
