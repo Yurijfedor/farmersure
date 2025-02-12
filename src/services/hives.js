@@ -110,7 +110,7 @@ export const addTaskToConfirmationCollection = async (task) => {
   }
 };
 
-export const checkBeehiveRentals = async () => {
+export const checkBeehiveRentals = async (hiveId = null) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -123,29 +123,30 @@ export const checkBeehiveRentals = async () => {
     const beehive = docSnap.data();
     const { lessee } = beehive;
 
+    // Якщо передано hiveId, перевіряємо тільки цей вулик
+    if (hiveId && docSnap.id !== hiveId) continue;
+
     if (lessee?.endDate) {
       const endDate = new Date(lessee.endDate);
 
-      if (endDate < today) {
+      if (endDate < today || hiveId) {
         const historyEntry = {
           uid: lessee.uid,
           startDate: lessee.startDate,
           endDate: lessee.endDate,
           type: lessee.type,
+          cancelledAt: hiveId ? today.toISOString() : undefined, // Вказуємо дату скасування
         };
-
-        const newHistory = [...(lessee.history || []), historyEntry];
 
         const beehiveRef = doc(db, "hives", docSnap.id);
         await updateDoc(beehiveRef, {
+          "lessee.history": arrayUnion(historyEntry),
           "lessee.uid": "",
           "lessee.startDate": "",
           "lessee.endDate": "",
           "lessee.type": "",
-          "lessee.history": newHistory,
         });
 
-        // Додаємо оновлений вулик у масив для Redux
         updatedHives.push({
           id: docSnap.id,
           updates: {
@@ -154,7 +155,6 @@ export const checkBeehiveRentals = async () => {
               startDate: "",
               endDate: "",
               type: "",
-              history: newHistory,
             },
           },
         });
@@ -162,5 +162,5 @@ export const checkBeehiveRentals = async () => {
     }
   }
 
-  return updatedHives; // Повертаємо масив оновлених вуликів
+  return updatedHives;
 };

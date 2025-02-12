@@ -107,18 +107,35 @@ export const useCheckBeehiveRentals = () => {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
-  return useMutation(checkBeehiveRentals, {
+  return useMutation(() => checkBeehiveRentals(), {
     onSuccess: (updatedHives) => {
-      // Оновлюємо Redux-стор для кожного зміненого вулика
       updatedHives.forEach(({ id, updates }) => {
         dispatch(updateHive({ id, updates }));
       });
 
-      // Інвалідуємо кеш, щоб отримати актуальні дані
       queryClient.invalidateQueries(["hives"]);
     },
     onError: (error) => {
       console.error("Error checking beehive rentals:", error);
+    },
+  });
+};
+
+export const useCancelBeehiveRental = () => {
+  const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+
+  return useMutation((hiveId) => checkBeehiveRentals(hiveId), {
+    onSuccess: (updatedHives) => {
+      updatedHives.forEach(({ id, updates }) => {
+        dispatch(updateHive({ id, updates }));
+      });
+
+      queryClient.invalidateQueries(["hives"]);
+      alert("Оренду успішно скасовано!");
+    },
+    onError: (error) => {
+      console.error("Error canceling beehive rental:", error);
     },
   });
 };

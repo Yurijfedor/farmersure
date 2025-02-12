@@ -15,6 +15,7 @@ import { Modal } from "../modal/Modal";
 import { ContractModal } from "../сontractModal/ContractModal";
 import { calculateTotalRent } from "../../helpers/calculateRent";
 import { calculateMandatoryTasksCostForNextPeriod } from "../../helpers/calculateMandatoryTasksCost";
+import { useCancelBeehiveRental } from "../../hooks/useHives";
 
 import {
   Table,
@@ -32,6 +33,7 @@ export const RentedHivesSection = () => {
   const hives = useSelector((state) => selectHivesByLessee(state, user.uid));
   const userProfile = useSelector(selectUserProfile);
   const plannedTaskTotalCost = useSelector(selectPlannedTasksCost);
+  const { mutate: cancelRental } = useCancelBeehiveRental();
 
   const openModal = (hive, type) => {
     setSelectedHive(hive);
@@ -128,7 +130,6 @@ export const RentedHivesSection = () => {
       console.error("Помилка продовження оренди:", error);
     }
   };
-  console.log(selectedHive);
 
   const handleCancelContract = () => {
     try {
@@ -139,6 +140,8 @@ export const RentedHivesSection = () => {
       const remainingMonths =
         (endDate.getFullYear() - today.getFullYear()) * 12 +
         (endDate.getMonth() - today.getMonth());
+      console.log(remainingMonths);
+
       const refundAmount =
         remainingMonths > 0
           ? calculateTotalRent(
@@ -152,32 +155,7 @@ export const RentedHivesSection = () => {
         (Number(userProfile.balance) + refundAmount).toFixed(2)
       );
 
-      // Оновлення Firestore (очищаємо дані оренди)
-      dispatch(
-        updateHiveProperty({
-          hiveId: selectedHive.hiveId,
-          property: "lessee",
-          value: {
-            uid: user.uid,
-            startDate,
-            endDate,
-            type: contractType,
-          },
-        })
-      );
-
-      // Оновлення локального стейту
-      dispatch(
-        updateHive({
-          id: selectedHive.id,
-          updates: {
-            lessee: {
-              ...selectedHive.lessee,
-              endDate: null,
-            },
-          },
-        })
-      );
+      cancelRental(selectedHive.id);
 
       // Оновлення балансу користувача
       dispatch(
@@ -280,7 +258,7 @@ export const RentedHivesSection = () => {
                 <Button
                   variant="formBtn"
                   size="medium"
-                  onClick={() => handleCancelContract()}
+                  onClick={() => openModal(hive, "cancelContract")}
                 >
                   скасувати договір оренди
                 </Button>
@@ -294,7 +272,11 @@ export const RentedHivesSection = () => {
         <ContractModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          onSignContract={handleExtendContract}
+          onSignContract={
+            modalType === "cancelContract"
+              ? handleCancelContract
+              : handleExtendContract
+          }
           contractType={modalType}
           hive={selectedHive}
         />
