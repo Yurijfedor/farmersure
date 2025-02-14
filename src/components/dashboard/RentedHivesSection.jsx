@@ -68,10 +68,12 @@ export const RentedHivesSection = () => {
         selectedHive.hiveComponents,
         selectedHive.power
       );
+      const monthsToExtend = monthsLeft - currentEndDate.getMonth();
+
       const extensionCost =
         modalType === "extendMonthly"
           ? totalRent
-          : totalRent * monthsLeft +
+          : totalRent * monthsToExtend +
             calculateMandatoryTasksCostForNextPeriod(modalType) +
             plannedTaskTotalCost;
 
@@ -87,7 +89,9 @@ export const RentedHivesSection = () => {
       const newBalance = parseFloat(
         (
           userProfile.balance -
-          (modalType === "extendMonthly" ? totalRent : totalRent * monthsLeft)
+          (modalType === "extendMonthly"
+            ? totalRent
+            : totalRent * monthsToExtend)
         ).toFixed(2)
       );
 
@@ -141,13 +145,24 @@ export const RentedHivesSection = () => {
         (endDate.getFullYear() - today.getFullYear()) * 12 +
         (endDate.getMonth() - today.getMonth());
       console.log(remainingMonths);
+      const rentalStartDate = new Date(selectedHive.lessee.startDate); // Дата початку оренди
+      const timeSinceStart = today - rentalStartDate; // Різниця в мілісекундах
+      const isImmediateCancellation = timeSinceStart < 24 * 60 * 60 * 1000; // Менше доби
+
+      const monthsToRefund =
+        isImmediateCancellation && remainingMonths >= 0
+          ? remainingMonths + 1 // Якщо скасування одразу, повертаємо ще один місяць
+          : remainingMonths > 0
+          ? remainingMonths
+          : 0;
+      console.log(monthsToRefund);
 
       const refundAmount =
-        remainingMonths > 0
+        monthsToRefund > 0
           ? calculateTotalRent(
               selectedHive.hiveComponents,
               selectedHive.power
-            ) * remainingMonths
+            ) * monthsToRefund
           : 0;
 
       // Оновлення балансу користувача

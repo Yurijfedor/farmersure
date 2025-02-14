@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { Suspense } from "react";
 
@@ -15,14 +13,14 @@ const Layout = () => {
   const { isAuth } = useAuth();
 
   return (
-    <Suspense>
+    <Suspense fallback={<div>...Loading</div>}>
       <HeaderContainer>
         <Logo />
         <NavBar categories={categories} />
         {isAuth ? <LogOut /> : <AuthNav />}
       </HeaderContainer>
       <Container>
-        <Outlet fallback={<div>...Loading</div>} />
+        <Outlet />
       </Container>
     </Suspense>
   );
