@@ -8,7 +8,7 @@ export const StreamViewer = () => {
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const socket = new WebSocket(`${protocol}://localhost:8080`);
+    const socket = new WebSocket(`${protocol}://192.168.0.103:8080`);
 
     socket.onmessage = async (event) => {
       const message = JSON.parse(event.data);
