@@ -27,12 +27,16 @@ export const StreamViewer = () => {
 
           // Перевірка стану перед установленням remoteDescription
           if (peerConnection.current.signalingState === "stable") {
-            await peerConnection.current.setRemoteDescription(
-              new RTCSessionDescription(message.offer)
-            );
-            const answer = await peerConnection.current.createAnswer();
-            await peerConnection.current.setLocalDescription(answer);
-            socket.current.send(JSON.stringify({ answer }));
+            try {
+              await peerConnection.current.setRemoteDescription(
+                new RTCSessionDescription(message.offer)
+              );
+              const answer = await peerConnection.current.createAnswer();
+              await peerConnection.current.setLocalDescription(answer);
+              socket.current.send(JSON.stringify({ answer }));
+            } catch (error) {
+              console.error("❌ Помилка при обробці offer:", error);
+            }
           } else {
             console.warn(
               "⚠️ Неправильний стан для установки remoteDescription:",
@@ -44,9 +48,13 @@ export const StreamViewer = () => {
           console.log("🎥 Отримано answer:", message.answer);
 
           if (peerConnection.current.signalingState === "have-local-offer") {
-            await peerConnection.current.setRemoteDescription(
-              new RTCSessionDescription(message.answer)
-            );
+            try {
+              await peerConnection.current.setRemoteDescription(
+                new RTCSessionDescription(message.answer)
+              );
+            } catch (error) {
+              console.error("❌ Помилка при обробці answer:", error);
+            }
           } else {
             console.warn(
               "⚠️ Неправильний стан для установки answer:",
@@ -56,9 +64,21 @@ export const StreamViewer = () => {
         } else if (message.iceCandidate) {
           // Отримання iceCandidate
           console.log("🧊 Отримано iceCandidate:", message.iceCandidate);
-          await peerConnection.current.addIceCandidate(
-            new RTCIceCandidate(message.iceCandidate)
-          );
+
+          // Перевірка на наявність remoteDescription перед додаванням iceCandidate
+          if (peerConnection.current.remoteDescription) {
+            try {
+              await peerConnection.current.addIceCandidate(
+                new RTCIceCandidate(message.iceCandidate)
+              );
+            } catch (error) {
+              console.error("❌ Помилка при додаванні iceCandidate:", error);
+            }
+          } else {
+            console.warn(
+              "⚠️ Немає remoteDescription, iceCandidate не можна додати"
+            );
+          }
         } else {
           console.warn("⚠️ Невідоме повідомлення:", message);
         }
