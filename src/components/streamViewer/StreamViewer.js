@@ -26,7 +26,10 @@ export const StreamViewer = () => {
           console.log("🎥 Отримано offer:", message.offer);
 
           // Перевірка стану перед установленням remoteDescription
-          if (peerConnection.current.signalingState === "stable") {
+          if (
+            peerConnection.current.signalingState === "stable" ||
+            peerConnection.current.signalingState === "have-local-offer"
+          ) {
             try {
               await peerConnection.current.setRemoteDescription(
                 new RTCSessionDescription(message.offer)
@@ -39,7 +42,7 @@ export const StreamViewer = () => {
             }
           } else {
             console.warn(
-              "⚠️ Неправильний стан для установки remoteDescription:",
+              "⚠️ Неправильний стан для установки remoteDescription: ",
               peerConnection.current.signalingState
             );
           }
@@ -57,7 +60,7 @@ export const StreamViewer = () => {
             }
           } else {
             console.warn(
-              "⚠️ Неправильний стан для установки answer:",
+              "⚠️ Неправильний стан для установки answer: ",
               peerConnection.current.signalingState
             );
           }
@@ -84,7 +87,7 @@ export const StreamViewer = () => {
         }
       } catch (error) {
         console.error(
-          "❌ Помилка при парсингу повідомлення від сервера:",
+          "❌ Помилка при парсингу повідомлення від сервера: ",
           error
         );
       }
