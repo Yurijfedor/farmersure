@@ -24,18 +24,35 @@ export const StreamViewer = () => {
         if (message.offer) {
           // Отримання offer та створення answer
           console.log("🎥 Отримано offer:", message.offer);
-          await peerConnection.current.setRemoteDescription(
-            new RTCSessionDescription(message.offer)
-          );
-          const answer = await peerConnection.current.createAnswer();
-          await peerConnection.current.setLocalDescription(answer);
-          socket.current.send(JSON.stringify({ answer }));
+
+          // Перевірка стану перед установленням remoteDescription
+          if (peerConnection.current.signalingState === "stable") {
+            await peerConnection.current.setRemoteDescription(
+              new RTCSessionDescription(message.offer)
+            );
+            const answer = await peerConnection.current.createAnswer();
+            await peerConnection.current.setLocalDescription(answer);
+            socket.current.send(JSON.stringify({ answer }));
+          } else {
+            console.warn(
+              "⚠️ Неправильний стан для установки remoteDescription:",
+              peerConnection.current.signalingState
+            );
+          }
         } else if (message.answer) {
           // Отримання answer
           console.log("🎥 Отримано answer:", message.answer);
-          await peerConnection.current.setRemoteDescription(
-            new RTCSessionDescription(message.answer)
-          );
+
+          if (peerConnection.current.signalingState === "have-local-offer") {
+            await peerConnection.current.setRemoteDescription(
+              new RTCSessionDescription(message.answer)
+            );
+          } else {
+            console.warn(
+              "⚠️ Неправильний стан для установки answer:",
+              peerConnection.current.signalingState
+            );
+          }
         } else if (message.iceCandidate) {
           // Отримання iceCandidate
           console.log("🧊 Отримано iceCandidate:", message.iceCandidate);
