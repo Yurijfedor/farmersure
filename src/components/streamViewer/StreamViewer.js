@@ -4,14 +4,11 @@ export const StreamViewer = () => {
   const videoRef = useRef(null);
   const socket = useRef(null);
   const peerConnection = useRef(null);
-  const [socketConnected, setSocketConnected] = useState(false);
-  const iceCandidateQueue = useRef([]); // Черга для ICE кандидатів
+  const iceCandidateQueue = useRef([]);
+  const [streamReady, setStreamReady] = useState(false);
 
   // Ініціалізація PeerConnection
   const initializePeerConnection = () => {
-    if (peerConnection.current) {
-      peerConnection.current.close();
-    }
     peerConnection.current = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
@@ -20,8 +17,12 @@ export const StreamViewer = () => {
       console.log("✅ Отримано потік:", event.streams);
       if (event.streams && event.streams[0] && videoRef.current) {
         videoRef.current.srcObject = event.streams[0];
+        setStreamReady(true);
+        videoRef.current
+          .play()
+          .catch((e) => console.error("❌ Помилка автозапуску:", e));
       } else {
-        console.warn("❗ Не вдалося підключити потік до video елементу");
+        console.warn("❗ Потік отримано, але не вдалося підключити до video");
       }
     };
 
@@ -31,6 +32,10 @@ export const StreamViewer = () => {
         if (socket.current?.readyState === WebSocket.OPEN) {
           socket.current.send(
             JSON.stringify({ iceCandidate: event.candidate })
+          );
+        } else {
+          console.warn(
+            "⚠️ WebSocket не відкритий для надсилання ICE candidate"
           );
         }
       }
@@ -42,22 +47,6 @@ export const StreamViewer = () => {
         peerConnection.current.iceConnectionState
       );
     };
-  };
-
-  // Надсилання offer
-  const sendOffer = async () => {
-    try {
-      const offer = await peerConnection.current.createOffer();
-      await peerConnection.current.setLocalDescription(offer);
-      if (socket.current?.readyState === WebSocket.OPEN) {
-        socket.current.send(JSON.stringify({ offer }));
-        console.log("🎥 Надсилаємо новий offer:", offer);
-      } else {
-        console.warn("⚠️ WebSocket не готовий для відправки offer");
-      }
-    } catch (error) {
-      console.error("❌ Помилка при створенні offer:", error);
-    }
   };
 
   // Обробка ICE кандидатів із черги
@@ -76,14 +65,11 @@ export const StreamViewer = () => {
   };
 
   useEffect(() => {
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    socket.current = new WebSocket(`${protocol}://192.168.0.103:8080`);
+    socket.current = new WebSocket("wss://192.168.0.103:8080");
 
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
-      setSocketConnected(true);
       initializePeerConnection();
-      sendOffer();
     };
 
     socket.current.onmessage = async (event) => {
@@ -91,53 +77,32 @@ export const StreamViewer = () => {
         const message = JSON.parse(event.data);
         console.log("📩 Повідомлення від сервера:", message);
 
-        if (!peerConnection.current) {
-          console.warn("⚠️ peerConnection не ініціалізований");
-          return;
-        }
-
         if (message.offer) {
           console.log("🎥 Отримано offer:", message.offer);
           const signalingState = peerConnection.current.signalingState;
           console.log("Текущий стан:", signalingState);
 
-          if (
-            signalingState === "stable" ||
-            signalingState === "have-local-offer"
-          ) {
+          if (signalingState === "stable") {
             try {
               await peerConnection.current.setRemoteDescription(
                 new RTCSessionDescription(message.offer)
               );
               console.log("✅ RemoteDescription встановлено");
 
-              if (signalingState === "stable") {
-                const answer = await peerConnection.current.createAnswer();
-                await peerConnection.current.setLocalDescription(answer);
-                if (socket.current?.readyState === WebSocket.OPEN) {
-                  socket.current.send(JSON.stringify({ answer }));
-                  console.log("✅ Answer надіслано:", answer);
-                }
+              const answer = await peerConnection.current.createAnswer();
+              await peerConnection.current.setLocalDescription(answer);
+              if (socket.current?.readyState === WebSocket.OPEN) {
+                socket.current.send(JSON.stringify({ answer }));
+                console.log("✅ Answer надіслано:", answer);
+              } else {
+                console.warn("⚠️ WebSocket не відкритий для надсилання answer");
               }
-              await processIceCandidates(); // Обробляємо ICE кандидати після remoteDescription
+              await processIceCandidates();
             } catch (error) {
               console.error("❌ Помилка при обробці offer:", error);
             }
           } else {
             console.warn("⚠️ Неправильний стан для offer:", signalingState);
-          }
-        } else if (message.answer) {
-          console.log("🎥 Отримано answer:", message.answer);
-          if (peerConnection.current.signalingState === "have-local-offer") {
-            try {
-              await peerConnection.current.setRemoteDescription(
-                new RTCSessionDescription(message.answer)
-              );
-              console.log("✅ RemoteDescription (answer) встановлено");
-              await processIceCandidates();
-            } catch (error) {
-              console.error("❌ Помилка при обробці answer:", error);
-            }
           }
         } else if (message.iceCandidate) {
           console.log("🧊 Отримано iceCandidate:", message.iceCandidate);
@@ -159,7 +124,7 @@ export const StreamViewer = () => {
           }
         }
       } catch (error) {
-        console.error("❌ Помилка при парсингу повідомлення:", error);
+        console.error("❌ Помилка при обробці повідомлення:", error);
       }
     };
 
@@ -168,8 +133,7 @@ export const StreamViewer = () => {
     };
 
     socket.current.onclose = () => {
-      console.log("⚠️ WebSocket з'єднання закрито");
-      setSocketConnected(false);
+      console.log("⚠️ WebSocket закрито");
       if (peerConnection.current) {
         peerConnection.current.close();
         peerConnection.current = null;
@@ -182,5 +146,30 @@ export const StreamViewer = () => {
     };
   }, []);
 
-  return <video ref={videoRef} autoPlay playsInline />;
+  // Ручний запуск відтворення
+  const handlePlay = () => {
+    if (videoRef.current) {
+      videoRef.current
+        .play()
+        .then(() => console.log("▶️ Відео відтворюється"))
+        .catch((e) => console.error("❌ Помилка відтворення:", e));
+    }
+  };
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        style={{ width: "640px", height: "480px", border: "1px solid black" }}
+      />
+      <br />
+      <button onClick={handlePlay} disabled={!streamReady}>
+        Play Video
+      </button>
+      {!streamReady && <p>Очікування потоку...</p>}
+    </div>
+  );
 };
