@@ -5,21 +5,34 @@ export const StreamViewer = () => {
   const socket = useRef(null);
   const peerConnection = useRef(null);
   const [socketConnected, setSocketConnected] = useState(false);
+  const iceCandidateQueue = useRef([]); // Черга для ICE кандидатів
 
-  // Функція для ініціалізації WebRTC
+  // Ініціалізація PeerConnection
   const initializePeerConnection = () => {
     if (peerConnection.current) {
-      peerConnection.current.close(); // Закриваємо попереднє з'єднання, якщо є
+      peerConnection.current.close();
     }
     peerConnection.current = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
     peerConnection.current.ontrack = (event) => {
+      console.log("✅ Отримано потік:", event.streams);
       if (event.streams && event.streams[0] && videoRef.current) {
         videoRef.current.srcObject = event.streams[0];
       } else {
         console.warn("❗ Не вдалося підключити потік до video елементу");
+      }
+    };
+
+    peerConnection.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        console.log("🧊 Надсилаємо ICE candidate:", event.candidate);
+        if (socket.current?.readyState === WebSocket.OPEN) {
+          socket.current.send(
+            JSON.stringify({ iceCandidate: event.candidate })
+          );
+        }
       }
     };
 
@@ -28,29 +41,37 @@ export const StreamViewer = () => {
         "🧊 ICE Connection State:",
         peerConnection.current.iceConnectionState
       );
-      if (peerConnection.current.iceConnectionState === "disconnected") {
-        console.warn("⚠️ WebRTC з'єднання розірвано");
-      }
     };
   };
 
-  // Функція для відправки offer
+  // Надсилання offer
   const sendOffer = async () => {
     try {
-      if (!peerConnection.current) {
-        console.warn("⚠️ peerConnection ще не ініціалізований");
-        return;
-      }
       const offer = await peerConnection.current.createOffer();
       await peerConnection.current.setLocalDescription(offer);
       if (socket.current?.readyState === WebSocket.OPEN) {
         socket.current.send(JSON.stringify({ offer }));
         console.log("🎥 Надсилаємо новий offer:", offer);
       } else {
-        console.warn("⚠️ WebSocket не готовий до відправки offer");
+        console.warn("⚠️ WebSocket не готовий для відправки offer");
       }
     } catch (error) {
       console.error("❌ Помилка при створенні offer:", error);
+    }
+  };
+
+  // Обробка ICE кандидатів із черги
+  const processIceCandidates = async () => {
+    while (iceCandidateQueue.current.length) {
+      const candidate = iceCandidateQueue.current.shift();
+      try {
+        await peerConnection.current.addIceCandidate(
+          new RTCIceCandidate(candidate)
+        );
+        console.log("🧊 Додано ICE candidate з черги:", candidate);
+      } catch (error) {
+        console.error("❌ Помилка при додаванні ICE candidate з черги:", error);
+      }
     }
   };
 
@@ -61,8 +82,8 @@ export const StreamViewer = () => {
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
       setSocketConnected(true);
-      initializePeerConnection(); // Ініціалізуємо peerConnection при підключенні
-      sendOffer(); // Надсилаємо offer одразу після підключення
+      initializePeerConnection();
+      sendOffer();
     };
 
     socket.current.onmessage = async (event) => {
@@ -71,45 +92,74 @@ export const StreamViewer = () => {
         console.log("📩 Повідомлення від сервера:", message);
 
         if (!peerConnection.current) {
-          console.warn(
-            "⚠️ peerConnection ще не ініціалізований для обробки повідомлення"
-          );
+          console.warn("⚠️ peerConnection не ініціалізований");
           return;
         }
 
         if (message.offer) {
           console.log("🎥 Отримано offer:", message.offer);
-          if (peerConnection.current.signalingState === "stable") {
+          const signalingState = peerConnection.current.signalingState;
+          console.log("Текущий стан:", signalingState);
+
+          if (
+            signalingState === "stable" ||
+            signalingState === "have-local-offer"
+          ) {
             try {
               await peerConnection.current.setRemoteDescription(
                 new RTCSessionDescription(message.offer)
               );
-              const answer = await peerConnection.current.createAnswer();
-              await peerConnection.current.setLocalDescription(answer);
-              if (socket.current?.readyState === WebSocket.OPEN) {
-                socket.current.send(JSON.stringify({ answer }));
+              console.log("✅ RemoteDescription встановлено");
+
+              if (signalingState === "stable") {
+                const answer = await peerConnection.current.createAnswer();
+                await peerConnection.current.setLocalDescription(answer);
+                if (socket.current?.readyState === WebSocket.OPEN) {
+                  socket.current.send(JSON.stringify({ answer }));
+                  console.log("✅ Answer надіслано:", answer);
+                }
               }
+              await processIceCandidates(); // Обробляємо ICE кандидати після remoteDescription
             } catch (error) {
               console.error("❌ Помилка при обробці offer:", error);
             }
+          } else {
+            console.warn("⚠️ Неправильний стан для offer:", signalingState);
           }
         } else if (message.answer) {
           console.log("🎥 Отримано answer:", message.answer);
           if (peerConnection.current.signalingState === "have-local-offer") {
-            await peerConnection.current.setRemoteDescription(
-              new RTCSessionDescription(message.answer)
-            );
+            try {
+              await peerConnection.current.setRemoteDescription(
+                new RTCSessionDescription(message.answer)
+              );
+              console.log("✅ RemoteDescription (answer) встановлено");
+              await processIceCandidates();
+            } catch (error) {
+              console.error("❌ Помилка при обробці answer:", error);
+            }
           }
         } else if (message.iceCandidate) {
           console.log("🧊 Отримано iceCandidate:", message.iceCandidate);
           if (peerConnection.current.remoteDescription) {
-            await peerConnection.current.addIceCandidate(
-              new RTCIceCandidate(message.iceCandidate)
+            try {
+              await peerConnection.current.addIceCandidate(
+                new RTCIceCandidate(message.iceCandidate)
+              );
+              console.log("🧊 Додано ICE candidate:", message.iceCandidate);
+            } catch (error) {
+              console.error("❌ Помилка при додаванні ICE candidate:", error);
+            }
+          } else {
+            iceCandidateQueue.current.push(message.iceCandidate);
+            console.log(
+              "🧊 ICE candidate додано в чергу:",
+              message.iceCandidate
             );
           }
         }
       } catch (error) {
-        console.error("❌ Помилка при обробці повідомлення:", error);
+        console.error("❌ Помилка при парсингу повідомлення:", error);
       }
     };
 
