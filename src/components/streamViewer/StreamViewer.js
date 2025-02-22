@@ -7,8 +7,10 @@ export const StreamViewer = () => {
   const iceCandidateQueue = useRef([]);
   const [streamReady, setStreamReady] = useState(false);
 
-  // Ініціалізація PeerConnection
   const initializePeerConnection = () => {
+    if (peerConnection.current) {
+      peerConnection.current.close(); // Закриваємо старе з’єднання
+    }
     peerConnection.current = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
@@ -21,8 +23,6 @@ export const StreamViewer = () => {
         videoRef.current
           .play()
           .catch((e) => console.error("❌ Помилка автозапуску:", e));
-      } else {
-        console.warn("❗ Потік отримано, але не вдалося підключити до video");
       }
     };
 
@@ -32,10 +32,6 @@ export const StreamViewer = () => {
         if (socket.current?.readyState === WebSocket.OPEN) {
           socket.current.send(
             JSON.stringify({ iceCandidate: event.candidate })
-          );
-        } else {
-          console.warn(
-            "⚠️ WebSocket не відкритий для надсилання ICE candidate"
           );
         }
       }
@@ -49,7 +45,6 @@ export const StreamViewer = () => {
     };
   };
 
-  // Обробка ICE кандидатів із черги
   const processIceCandidates = async () => {
     while (iceCandidateQueue.current.length) {
       const candidate = iceCandidateQueue.current.shift();
@@ -82,39 +77,30 @@ export const StreamViewer = () => {
           const signalingState = peerConnection.current.signalingState;
           console.log("Текущий стан:", signalingState);
 
-          if (signalingState === "stable") {
-            try {
-              await peerConnection.current.setRemoteDescription(
-                new RTCSessionDescription(message.offer)
-              );
-              console.log("✅ RemoteDescription встановлено");
-
-              const answer = await peerConnection.current.createAnswer();
-              await peerConnection.current.setLocalDescription(answer);
-              if (socket.current?.readyState === WebSocket.OPEN) {
-                socket.current.send(JSON.stringify({ answer }));
-                console.log("✅ Answer надіслано:", answer);
-              } else {
-                console.warn("⚠️ WebSocket не відкритий для надсилання answer");
-              }
-              await processIceCandidates();
-            } catch (error) {
-              console.error("❌ Помилка при обробці offer:", error);
-            }
-          } else {
-            console.warn("⚠️ Неправильний стан для offer:", signalingState);
+          if (signalingState !== "stable") {
+            console.warn("⚠️ Перезапуск з’єднання через новий offer");
+            initializePeerConnection();
           }
+
+          await peerConnection.current.setRemoteDescription(
+            new RTCSessionDescription(message.offer)
+          );
+          console.log("✅ RemoteDescription встановлено");
+
+          const answer = await peerConnection.current.createAnswer();
+          await peerConnection.current.setLocalDescription(answer);
+          if (socket.current?.readyState === WebSocket.OPEN) {
+            socket.current.send(JSON.stringify({ answer }));
+            console.log("✅ Answer надіслано:", answer);
+          }
+          await processIceCandidates();
         } else if (message.iceCandidate) {
           console.log("🧊 Отримано iceCandidate:", message.iceCandidate);
           if (peerConnection.current.remoteDescription) {
-            try {
-              await peerConnection.current.addIceCandidate(
-                new RTCIceCandidate(message.iceCandidate)
-              );
-              console.log("🧊 Додано ICE candidate:", message.iceCandidate);
-            } catch (error) {
-              console.error("❌ Помилка при додаванні ICE candidate:", error);
-            }
+            await peerConnection.current.addIceCandidate(
+              new RTCIceCandidate(message.iceCandidate)
+            );
+            console.log("🧊 Додано ICE candidate:", message.iceCandidate);
           } else {
             iceCandidateQueue.current.push(message.iceCandidate);
             console.log(
@@ -134,10 +120,7 @@ export const StreamViewer = () => {
 
     socket.current.onclose = () => {
       console.log("⚠️ WebSocket закрито");
-      if (peerConnection.current) {
-        peerConnection.current.close();
-        peerConnection.current = null;
-      }
+      if (peerConnection.current) peerConnection.current.close();
     };
 
     return () => {
@@ -146,7 +129,6 @@ export const StreamViewer = () => {
     };
   }, []);
 
-  // Ручний запуск відтворення
   const handlePlay = () => {
     if (videoRef.current) {
       videoRef.current
