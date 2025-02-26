@@ -8,11 +8,16 @@ export const StreamViewer = () => {
   const [streamReady, setStreamReady] = useState(false);
 
   const initializePeerConnection = () => {
-    if (peerConnection.current) {
-      peerConnection.current.close(); // Закриваємо старе з’єднання
-    }
+    if (peerConnection.current) peerConnection.current.close();
     peerConnection.current = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        {
+          urls: "turn:openrelay.metered.ca:80",
+          username: "openrelayproject",
+          credential: "openrelayproject",
+        },
+      ],
     });
 
     peerConnection.current.ontrack = (event) => {
@@ -27,13 +32,9 @@ export const StreamViewer = () => {
     };
 
     peerConnection.current.onicecandidate = (event) => {
-      if (event.candidate) {
+      if (event.candidate && socket.current?.readyState === WebSocket.OPEN) {
+        socket.current.send(JSON.stringify({ iceCandidate: event.candidate }));
         console.log("🧊 Надсилаємо ICE candidate:", event.candidate);
-        if (socket.current?.readyState === WebSocket.OPEN) {
-          socket.current.send(
-            JSON.stringify({ iceCandidate: event.candidate })
-          );
-        }
       }
     };
 
@@ -42,6 +43,10 @@ export const StreamViewer = () => {
         "🧊 ICE Connection State:",
         peerConnection.current.iceConnectionState
       );
+      if (peerConnection.current.iceConnectionState === "disconnected") {
+        console.warn("⚠️ З’єднання розірвано, перезапуск");
+        initializePeerConnection();
+      }
     };
   };
 
@@ -54,12 +59,12 @@ export const StreamViewer = () => {
         );
         console.log("🧊 Додано ICE candidate з черги:", candidate);
       } catch (error) {
-        console.error("❌ Помилка при додаванні ICE candidate з черги:", error);
+        console.error("❌ Помилка при додаванні ICE candidate:", error);
       }
     }
   };
 
-  useEffect(() => {
+  const connectWebSocket = () => {
     socket.current = new WebSocket("wss://192.168.0.103:8080");
 
     socket.current.onopen = () => {
@@ -116,13 +121,17 @@ export const StreamViewer = () => {
 
     socket.current.onerror = (err) => {
       console.error("❌ Помилка WebSocket:", err);
+      setTimeout(connectWebSocket, 2000);
     };
 
     socket.current.onclose = () => {
       console.log("⚠️ WebSocket закрито");
-      if (peerConnection.current) peerConnection.current.close();
+      setTimeout(connectWebSocket, 2000);
     };
+  };
 
+  useEffect(() => {
+    connectWebSocket();
     return () => {
       if (socket.current) socket.current.close();
       if (peerConnection.current) peerConnection.current.close();
