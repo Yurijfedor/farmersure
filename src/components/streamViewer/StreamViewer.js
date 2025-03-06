@@ -65,7 +65,7 @@ export const StreamViewer = () => {
   };
 
   const connectWebSocket = () => {
-    socket.current = new WebSocket("wss://192.168.0.103:8080");
+    socket.current = new WebSocket("wss://stream.farmersure.pp.ua:8080");
 
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
