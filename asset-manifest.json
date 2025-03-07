@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/farmersure/static/css/main.277df7b9.css",
-    "main.js": "/farmersure/static/js/main.fee103ac.js",
+    "main.js": "/farmersure/static/js/main.20ff9de2.js",
     "static/js/142.d81c2e2c.chunk.js": "/farmersure/static/js/142.d81c2e2c.chunk.js",
     "static/js/620.ddb18bed.chunk.js": "/farmersure/static/js/620.ddb18bed.chunk.js",
     "static/js/805.402f59e0.chunk.js": "/farmersure/static/js/805.402f59e0.chunk.js",
     "static/js/950.44b2e59e.chunk.js": "/farmersure/static/js/950.44b2e59e.chunk.js",
-    "static/js/947.086f7805.chunk.js": "/farmersure/static/js/947.086f7805.chunk.js",
+    "static/js/947.66bba5b1.chunk.js": "/farmersure/static/js/947.66bba5b1.chunk.js",
     "static/js/175.0d7febe3.chunk.js": "/farmersure/static/js/175.0d7febe3.chunk.js",
     "static/js/248.eb7d330f.chunk.js": "/farmersure/static/js/248.eb7d330f.chunk.js",
     "static/js/736.10b2185a.chunk.js": "/farmersure/static/js/736.10b2185a.chunk.js",
@@ -57,12 +57,12 @@
     "static/media/sprite.svg": "/farmersure/static/media/sprite.a68114007e523bcd1b38489dd8094015.svg",
     "index.html": "/farmersure/index.html",
     "main.277df7b9.css.map": "/farmersure/static/css/main.277df7b9.css.map",
-    "main.fee103ac.js.map": "/farmersure/static/js/main.fee103ac.js.map",
+    "main.20ff9de2.js.map": "/farmersure/static/js/main.20ff9de2.js.map",
     "142.d81c2e2c.chunk.js.map": "/farmersure/static/js/142.d81c2e2c.chunk.js.map",
     "620.ddb18bed.chunk.js.map": "/farmersure/static/js/620.ddb18bed.chunk.js.map",
     "805.402f59e0.chunk.js.map": "/farmersure/static/js/805.402f59e0.chunk.js.map",
     "950.44b2e59e.chunk.js.map": "/farmersure/static/js/950.44b2e59e.chunk.js.map",
-    "947.086f7805.chunk.js.map": "/farmersure/static/js/947.086f7805.chunk.js.map",
+    "947.66bba5b1.chunk.js.map": "/farmersure/static/js/947.66bba5b1.chunk.js.map",
     "175.0d7febe3.chunk.js.map": "/farmersure/static/js/175.0d7febe3.chunk.js.map",
     "248.eb7d330f.chunk.js.map": "/farmersure/static/js/248.eb7d330f.chunk.js.map",
     "736.10b2185a.chunk.js.map": "/farmersure/static/js/736.10b2185a.chunk.js.map",
@@ -99,6 +99,6 @@
   },
   "entrypoints": [
     "static/css/main.277df7b9.css",
-    "static/js/main.fee103ac.js"
+    "static/js/main.20ff9de2.js"
   ]
 }
