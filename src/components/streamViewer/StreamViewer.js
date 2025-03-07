@@ -23,27 +23,17 @@ export const StreamViewer = () => {
     peerConnection.current.ontrack = (event) => {
       console.log("✅ Отримано потік:", event.streams);
       if (event.streams && event.streams[0] && videoRef.current) {
-        console.log("Прив’язуємо потік до videoRef:", videoRef.current);
         videoRef.current.srcObject = event.streams[0];
         setStreamReady(true);
-        playVideo();
-        // Перевірка активності треків
-        event.streams[0].getTracks().forEach((track) => {
-          console.log(
-            `Трек ${track.kind}: enabled=${track.enabled}, readyState=${track.readyState}`
-          );
-        });
+        videoRef.current
+          .play()
+          .catch((e) => console.error("❌ Помилка автозапуску:", e));
       }
     };
 
     peerConnection.current.onicecandidate = (event) => {
       if (event.candidate && socket.current?.readyState === WebSocket.OPEN) {
-        socket.current.send(
-          JSON.stringify({
-            iceCandidate: event.candidate,
-            viewerId: socket.current.viewerId,
-          })
-        );
+        socket.current.send(JSON.stringify({ iceCandidate: event.candidate }));
         console.log("🧊 Надсилаємо ICE candidate:", event.candidate);
       }
     };
@@ -53,12 +43,8 @@ export const StreamViewer = () => {
         "🧊 ICE Connection State:",
         peerConnection.current.iceConnectionState
       );
-      if (
-        peerConnection.current.iceConnectionState === "disconnected" ||
-        peerConnection.current.iceConnectionState === "failed"
-      ) {
+      if (peerConnection.current.iceConnectionState === "disconnected") {
         console.warn("⚠️ З’єднання розірвано, перезапуск");
-        setStreamReady(false);
         initializePeerConnection();
       }
     };
@@ -78,45 +64,11 @@ export const StreamViewer = () => {
     }
   };
 
-  const playVideo = () => {
-    if (!videoRef.current) {
-      console.error("❌ videoRef не ініціалізований");
-      return;
-    }
-    console.log(
-      "Спроба відтворити відео, srcObject:",
-      videoRef.current.srcObject
-    );
-    if (videoRef.current.srcObject) {
-      videoRef.current
-        .play()
-        .then(() => {
-          console.log("▶️ Відео відтворюється");
-          // Перевірка стану відео
-          console.log("Стан відео:", {
-            paused: videoRef.current.paused,
-            ended: videoRef.current.ended,
-            readyState: videoRef.current.readyState,
-            networkState: videoRef.current.networkState,
-          });
-        })
-        .catch((e) => {
-          console.error("❌ Помилка відтворення:", e);
-          if (e.name === "NotAllowedError") {
-            console.warn("⚠️ Автозапуск заблоковано. Натисніть 'Play Video'.");
-          }
-        });
-    } else {
-      console.warn("⚠️ Немає потоку для відтворення");
-    }
-  };
-
   const connectWebSocket = () => {
     socket.current = new WebSocket("wss://3f69-91-218-88-220.ngrok-free.app");
 
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
-      socket.current.send(JSON.stringify({ role: "viewer" }));
       initializePeerConnection();
     };
 
@@ -129,13 +81,6 @@ export const StreamViewer = () => {
           console.log("🎥 Отримано offer:", message.offer);
           const signalingState = peerConnection.current.signalingState;
           console.log("Текущий стан:", signalingState);
-
-          if (signalingState === "stable" && streamReady) {
-            console.log(
-              "⚠️ З’єднання вже встановлено, ігноруємо повторний offer"
-            );
-            return;
-          }
 
           if (signalingState !== "stable") {
             console.warn("⚠️ Перезапуск з’єднання через новий offer");
@@ -150,9 +95,7 @@ export const StreamViewer = () => {
           const answer = await peerConnection.current.createAnswer();
           await peerConnection.current.setLocalDescription(answer);
           if (socket.current?.readyState === WebSocket.OPEN) {
-            socket.current.send(
-              JSON.stringify({ answer, viewerId: socket.current.viewerId })
-            );
+            socket.current.send(JSON.stringify({ answer }));
             console.log("✅ Answer надіслано:", answer);
           }
           await processIceCandidates();
@@ -195,39 +138,35 @@ export const StreamViewer = () => {
     };
   }, []);
 
-  const handlePlay = () => {
-    playVideo();
-  };
-
   const handleRestart = () => {
     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
       socket.current.send(JSON.stringify({ restart: true }));
       console.log("🔄 Надіслано команду перезапуску broadcaster'у");
+      // Опціонально: перезапуск StreamViewer
+      if (peerConnection.current) peerConnection.current.close();
+      initializePeerConnection();
+      setStreamReady(false); // Скидаємо стан, щоб дочекатися нового потоку
     }
-    if (peerConnection.current) peerConnection.current.close();
-    initializePeerConnection();
-    setStreamReady(false);
+    if (videoRef.current) {
+      videoRef.current
+        .play()
+        .then(() => console.log("▶️ Відео відтворюється"))
+        .catch((e) => console.error("❌ Помилка відтворення:", e));
+    }
   };
 
   return (
     <div style={{ textAlign: "center" }}>
       <video
         ref={videoRef}
+        autoPlay
         playsInline
         muted
         style={{ width: "640px", height: "480px", border: "1px solid black" }}
       />
       <br />
-      <button onClick={handlePlay} disabled={!streamReady}>
-        Play Video
-      </button>
-      <button onClick={handleRestart}>Restart Stream</button>
+      <button onClick={handleRestart}>Play Video / Restart Stream</button>
       {!streamReady && <p>Очікування потоку...</p>}
-      {streamReady && (
-        <p>
-          Потік готовий. Натисніть "Play Video", якщо відео не відтворюється.
-        </p>
-      )}
     </div>
   );
 };
