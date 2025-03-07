@@ -27,6 +27,7 @@ export const StreamViewer = () => {
         setStreamReady(true);
         videoRef.current
           .play()
+          .then(() => console.log("▶️ Відео відтворюється"))
           .catch((e) => console.error("❌ Помилка автозапуску:", e));
       }
     };
@@ -48,7 +49,10 @@ export const StreamViewer = () => {
         "🧊 ICE Connection State:",
         peerConnection.current.iceConnectionState
       );
-      if (peerConnection.current.iceConnectionState === "disconnected") {
+      if (
+        peerConnection.current.iceConnectionState === "disconnected" ||
+        peerConnection.current.iceConnectionState === "failed"
+      ) {
         console.warn("⚠️ З’єднання розірвано, перезапуск");
         initializePeerConnection();
       }
@@ -70,7 +74,7 @@ export const StreamViewer = () => {
   };
 
   const connectWebSocket = () => {
-    socket.current = new WebSocket("wss://e85c-91-218-88-220.ngrok-free.app");
+    socket.current = new WebSocket("wss://3f69-91-218-88-220.ngrok-free.app");
 
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
@@ -87,6 +91,13 @@ export const StreamViewer = () => {
           console.log("🎥 Отримано offer:", message.offer);
           const signalingState = peerConnection.current.signalingState;
           console.log("Текущий стан:", signalingState);
+
+          if (signalingState === "stable" && streamReady) {
+            console.log(
+              "⚠️ З’єднання вже встановлено, ігноруємо повторний offer"
+            );
+            return;
+          }
 
           if (signalingState !== "stable") {
             console.warn("⚠️ Перезапуск з’єднання через новий offer");
