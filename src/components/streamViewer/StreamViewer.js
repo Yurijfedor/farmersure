@@ -26,7 +26,13 @@ export const StreamViewer = () => {
         console.log("Прив’язуємо потік до videoRef:", videoRef.current);
         videoRef.current.srcObject = event.streams[0];
         setStreamReady(true);
-        playVideo(); // Спроба автозапуску
+        playVideo();
+        // Перевірка активності треків
+        event.streams[0].getTracks().forEach((track) => {
+          console.log(
+            `Трек ${track.kind}: enabled=${track.enabled}, readyState=${track.readyState}`
+          );
+        });
       }
     };
 
@@ -84,7 +90,16 @@ export const StreamViewer = () => {
     if (videoRef.current.srcObject) {
       videoRef.current
         .play()
-        .then(() => console.log("▶️ Відео відтворюється"))
+        .then(() => {
+          console.log("▶️ Відео відтворюється");
+          // Перевірка стану відео
+          console.log("Стан відео:", {
+            paused: videoRef.current.paused,
+            ended: videoRef.current.ended,
+            readyState: videoRef.current.readyState,
+            networkState: videoRef.current.networkState,
+          });
+        })
         .catch((e) => {
           console.error("❌ Помилка відтворення:", e);
           if (e.name === "NotAllowedError") {
@@ -181,7 +196,7 @@ export const StreamViewer = () => {
   }, []);
 
   const handlePlay = () => {
-    playVideo(); // Лише відтворення
+    playVideo();
   };
 
   const handleRestart = () => {
