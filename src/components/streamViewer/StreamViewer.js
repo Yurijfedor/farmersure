@@ -33,7 +33,12 @@ export const StreamViewer = () => {
 
     peerConnection.current.onicecandidate = (event) => {
       if (event.candidate && socket.current?.readyState === WebSocket.OPEN) {
-        socket.current.send(JSON.stringify({ iceCandidate: event.candidate }));
+        socket.current.send(
+          JSON.stringify({
+            iceCandidate: event.candidate,
+            viewerId: socket.current.viewerId,
+          })
+        );
         console.log("🧊 Надсилаємо ICE candidate:", event.candidate);
       }
     };
@@ -69,6 +74,7 @@ export const StreamViewer = () => {
 
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
+      socket.current.send(JSON.stringify({ role: "viewer" }));
       initializePeerConnection();
     };
 
@@ -95,7 +101,9 @@ export const StreamViewer = () => {
           const answer = await peerConnection.current.createAnswer();
           await peerConnection.current.setLocalDescription(answer);
           if (socket.current?.readyState === WebSocket.OPEN) {
-            socket.current.send(JSON.stringify({ answer }));
+            socket.current.send(
+              JSON.stringify({ answer, viewerId: socket.current.viewerId })
+            );
             console.log("✅ Answer надіслано:", answer);
           }
           await processIceCandidates();
@@ -142,10 +150,9 @@ export const StreamViewer = () => {
     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
       socket.current.send(JSON.stringify({ restart: true }));
       console.log("🔄 Надіслано команду перезапуску broadcaster'у");
-      // Опціонально: перезапуск StreamViewer
       if (peerConnection.current) peerConnection.current.close();
       initializePeerConnection();
-      setStreamReady(false); // Скидаємо стан, щоб дочекатися нового потоку
+      setStreamReady(false);
     }
     if (videoRef.current) {
       videoRef.current
