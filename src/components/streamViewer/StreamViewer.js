@@ -138,7 +138,15 @@ export const StreamViewer = () => {
     };
   }, []);
 
-  const handlePlay = () => {
+  const handleRestart = () => {
+    if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+      socket.current.send(JSON.stringify({ restart: true }));
+      console.log("🔄 Надіслано команду перезапуску broadcaster'у");
+      // Опціонально: перезапуск StreamViewer
+      if (peerConnection.current) peerConnection.current.close();
+      initializePeerConnection();
+      setStreamReady(false); // Скидаємо стан, щоб дочекатися нового потоку
+    }
     if (videoRef.current) {
       videoRef.current
         .play()
@@ -157,9 +165,7 @@ export const StreamViewer = () => {
         style={{ width: "640px", height: "480px", border: "1px solid black" }}
       />
       <br />
-      <button onClick={handlePlay} disabled={!streamReady}>
-        Play Video
-      </button>
+      <button onClick={handleRestart}>Play Video / Restart Stream</button>
       {!streamReady && <p>Очікування потоку...</p>}
     </div>
   );
