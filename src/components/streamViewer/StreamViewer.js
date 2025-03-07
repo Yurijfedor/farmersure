@@ -88,7 +88,7 @@ export const StreamViewer = () => {
   };
 
   const connectWebSocket = () => {
-    socket.current = new WebSocket("wss://9078-91-218-88-220.ngrok-free.app");
+    socket.current = new WebSocket("wss://3f69-91-218-88-220.ngrok-free.app");
 
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
