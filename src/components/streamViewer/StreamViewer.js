@@ -25,7 +25,7 @@ export const StreamViewer = () => {
       if (event.streams && event.streams[0] && videoRef.current) {
         videoRef.current.srcObject = event.streams[0];
         setStreamReady(true);
-        playVideo(); // Явний виклик відтворення
+        playVideo(); // Спроба автозапуску
       }
     };
 
@@ -51,6 +51,7 @@ export const StreamViewer = () => {
         peerConnection.current.iceConnectionState === "failed"
       ) {
         console.warn("⚠️ З’єднання розірвано, перезапуск");
+        setStreamReady(false);
         initializePeerConnection();
       }
     };
@@ -71,23 +72,23 @@ export const StreamViewer = () => {
   };
 
   const playVideo = () => {
-    if (videoRef.current) {
+    if (videoRef.current && videoRef.current.srcObject) {
       videoRef.current
         .play()
         .then(() => console.log("▶️ Відео відтворюється"))
         .catch((e) => {
           console.error("❌ Помилка відтворення:", e);
           if (e.name === "NotAllowedError") {
-            console.warn(
-              "⚠️ Автозапуск заблоковано. Натисніть 'Play Video' для відтворення."
-            );
+            console.warn("⚠️ Автозапуск заблоковано. Натисніть 'Play Video'.");
           }
         });
+    } else {
+      console.warn("⚠️ Немає потоку для відтворення");
     }
   };
 
   const connectWebSocket = () => {
-    socket.current = new WebSocket("wss://3f69-91-218-88-220.ngrok-free.app");
+    socket.current = new WebSocket("wss://9078-91-218-88-220.ngrok-free.app");
 
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
@@ -170,15 +171,18 @@ export const StreamViewer = () => {
     };
   }, []);
 
+  const handlePlay = () => {
+    playVideo(); // Лише відтворення без перезапуску
+  };
+
   const handleRestart = () => {
     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
       socket.current.send(JSON.stringify({ restart: true }));
       console.log("🔄 Надіслано команду перезапуску broadcaster'у");
-      if (peerConnection.current) peerConnection.current.close();
-      initializePeerConnection();
-      setStreamReady(false);
     }
-    playVideo(); // Явний виклик відтворення після рестарту
+    if (peerConnection.current) peerConnection.current.close();
+    initializePeerConnection();
+    setStreamReady(false);
   };
 
   return (
@@ -190,7 +194,10 @@ export const StreamViewer = () => {
         style={{ width: "640px", height: "480px", border: "1px solid black" }}
       />
       <br />
-      <button onClick={handleRestart}>Play Video / Restart Stream</button>
+      <button onClick={handlePlay} disabled={!streamReady}>
+        Play Video
+      </button>
+      <button onClick={handleRestart}>Restart Stream</button>
       {!streamReady && <p>Очікування потоку...</p>}
       {streamReady && (
         <p>
