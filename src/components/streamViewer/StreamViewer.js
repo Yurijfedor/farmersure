@@ -25,10 +25,7 @@ export const StreamViewer = () => {
       if (event.streams && event.streams[0] && videoRef.current) {
         videoRef.current.srcObject = event.streams[0];
         setStreamReady(true);
-        videoRef.current
-          .play()
-          .then(() => console.log("▶️ Відео відтворюється"))
-          .catch((e) => console.error("❌ Помилка автозапуску:", e));
+        playVideo(); // Явний виклик відтворення
       }
     };
 
@@ -70,6 +67,22 @@ export const StreamViewer = () => {
       } catch (error) {
         console.error("❌ Помилка при додаванні ICE candidate:", error);
       }
+    }
+  };
+
+  const playVideo = () => {
+    if (videoRef.current) {
+      videoRef.current
+        .play()
+        .then(() => console.log("▶️ Відео відтворюється"))
+        .catch((e) => {
+          console.error("❌ Помилка відтворення:", e);
+          if (e.name === "NotAllowedError") {
+            console.warn(
+              "⚠️ Автозапуск заблоковано. Натисніть 'Play Video' для відтворення."
+            );
+          }
+        });
     }
   };
 
@@ -165,19 +178,13 @@ export const StreamViewer = () => {
       initializePeerConnection();
       setStreamReady(false);
     }
-    if (videoRef.current) {
-      videoRef.current
-        .play()
-        .then(() => console.log("▶️ Відео відтворюється"))
-        .catch((e) => console.error("❌ Помилка відтворення:", e));
-    }
+    playVideo(); // Явний виклик відтворення після рестарту
   };
 
   return (
     <div style={{ textAlign: "center" }}>
       <video
         ref={videoRef}
-        autoPlay
         playsInline
         muted
         style={{ width: "640px", height: "480px", border: "1px solid black" }}
@@ -185,6 +192,11 @@ export const StreamViewer = () => {
       <br />
       <button onClick={handleRestart}>Play Video / Restart Stream</button>
       {!streamReady && <p>Очікування потоку...</p>}
+      {streamReady && (
+        <p>
+          Потік готовий. Натисніть "Play Video", якщо відео не відтворюється.
+        </p>
+      )}
     </div>
   );
 };
