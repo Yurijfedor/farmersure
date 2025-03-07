@@ -23,6 +23,7 @@ export const StreamViewer = () => {
     peerConnection.current.ontrack = (event) => {
       console.log("✅ Отримано потік:", event.streams);
       if (event.streams && event.streams[0] && videoRef.current) {
+        console.log("Прив’язуємо потік до videoRef:", videoRef.current);
         videoRef.current.srcObject = event.streams[0];
         setStreamReady(true);
         playVideo(); // Спроба автозапуску
@@ -72,7 +73,15 @@ export const StreamViewer = () => {
   };
 
   const playVideo = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
+    if (!videoRef.current) {
+      console.error("❌ videoRef не ініціалізований");
+      return;
+    }
+    console.log(
+      "Спроба відтворити відео, srcObject:",
+      videoRef.current.srcObject
+    );
+    if (videoRef.current.srcObject) {
       videoRef.current
         .play()
         .then(() => console.log("▶️ Відео відтворюється"))
@@ -172,7 +181,7 @@ export const StreamViewer = () => {
   }, []);
 
   const handlePlay = () => {
-    playVideo(); // Лише відтворення без перезапуску
+    playVideo(); // Лише відтворення
   };
 
   const handleRestart = () => {
