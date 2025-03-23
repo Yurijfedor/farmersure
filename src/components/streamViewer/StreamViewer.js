@@ -65,7 +65,7 @@ export const StreamViewer = () => {
   };
 
   const connectWebSocket = () => {
-    socket.current = new WebSocket("ws://localhost:8080");
+    socket.current = new WebSocket("ws://localhost:1984/api/ws");
 
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
