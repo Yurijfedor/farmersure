@@ -70,6 +70,9 @@ export const StreamViewer = () => {
     socket.current.onopen = () => {
       console.log("✅ WebSocket підключено");
       initializePeerConnection();
+      // Запит потоку mystream
+      socket.current.send(JSON.stringify({ stream: "mystream" }));
+      console.log("📡 Запитано потік: mystream");
     };
 
     socket.current.onmessage = async (event) => {
